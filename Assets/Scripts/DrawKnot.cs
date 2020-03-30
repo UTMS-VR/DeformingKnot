@@ -11,7 +11,7 @@ public class DrawKnot : MonoBehaviour
     private GameObject knotMaster;
     private Controller controller;
 
-    private CurveFunction curveFunction = new CurveFunction();
+    // private CurveFunction curveFunction = new CurveFunction();
 
     [SerializeField] private Material material;
     private Mesh mesh;
@@ -21,19 +21,19 @@ public class DrawKnot : MonoBehaviour
     private float radius = 0.01f;
 
     private List<Vector3> positions = new List<Vector3>();
-    private Vector3 pPosition = new Vector3();
+    private Vector3 predPosition = new Vector3();
 
     // Start is called before the first frame update
     void Start()
     {
         knotMaster = GameObject.Find("KnotMaster");
-        controller = GameObject.Find("Setup").GetComponent<Setup>().controller;
+        controller = knotMaster.GetComponent<KnotMaster>().controller;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (knotMaster.GetComponent<GenerateKnots>().knotNumber == number + 1)
+        if (knotMaster.GetComponent<KnotMaster>().knotNumber == number + 1)
         {
             if (controller.GetButton(OVRInput.RawButton.A))
             {
@@ -42,19 +42,19 @@ public class DrawKnot : MonoBehaviour
                 if (positions.Count == 0)
                 {
                     positions.Add(nowPosition);
-                    pPosition = nowPosition;
+                    predPosition = nowPosition;
                 }
-                else if (Vector3.Distance(nowPosition, pPosition) >= segment)
+                else if (Vector3.Distance(nowPosition, predPosition) >= segment)
                 {
                     positions.Add(nowPosition);
-                    pPosition = nowPosition;
+                    predPosition = nowPosition;
 
-                    mesh = curveFunction.Curve(positions, meridian, radius, false);
+                    mesh = CurveFunction.Curve(positions, meridian, radius, false);
                 }
             }
             else if (controller.GetButtonDown(OVRInput.RawButton.B))
             {
-                mesh = curveFunction.Curve(positions, meridian, radius, true);
+                mesh = CurveFunction.Curve(positions, meridian, radius, true);
             }
         }
 

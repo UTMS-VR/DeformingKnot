@@ -5,7 +5,7 @@ using UnityEngine;
 // 点列から曲線のメッシュを生成する
 public class CurveFunction
 {
-    public Mesh Curve(List<Vector3> positions, int meridian, float radius, bool closed)
+    public static Mesh Curve(List<Vector3> positions, int meridian, float radius, bool closed)
     {
         Mesh mesh = new Mesh();
 
@@ -13,10 +13,7 @@ public class CurveFunction
         List<int> triangles;
         List<Vector3> normals = new List<Vector3>();
 
-        if (closed)
-        {
-            positions.Add(positions[0]);
-        }
+        if (closed) positions.Add(positions[0]);
 
         int length = positions.Count;
         List<Vector3> tangents = Tangents(positions, closed);
@@ -24,7 +21,15 @@ public class CurveFunction
 
         for (int j = 0; j < length; j++)
         {
-            AddVertexNormal(positions[j], tangents[j], principalNormals[j], meridian, radius, vertices, normals);
+            Vector3 binormal = Vector3.Cross(tangents[j], principalNormals[j]);
+
+            for (int i = 0; i <= meridian; i++)
+            {
+                float theta = i * 2 * Mathf.PI / meridian;
+                Vector3 direction = Mathf.Cos(theta) * principalNormals[j] + Mathf.Sin(theta) * binormal;
+                vertices.Add(positions[j] + radius * direction);
+                normals.Add(direction);
+            }
         }
 
         triangles = Triangles(length, meridian);
@@ -36,7 +41,7 @@ public class CurveFunction
         return mesh;
     }
 
-    private List<Vector3> Tangents (List<Vector3> positions, bool closed)
+    private static List<Vector3> Tangents (List<Vector3> positions, bool closed)
     {
         List<Vector3> tangents = new List<Vector3>();
 
@@ -57,7 +62,7 @@ public class CurveFunction
         return tangents;
     }
 
-    private List<Vector3> PrincipalNormals (List<Vector3> tangents)
+    private static List<Vector3> PrincipalNormals (List<Vector3> tangents)
     {
         int length = tangents.Count;
         List<Vector3> principalNormals = new List<Vector3>();
@@ -76,7 +81,7 @@ public class CurveFunction
         return principalNormals;
     }
 
-    private Vector3 NaturalNormal (Vector3 v)
+    private static Vector3 NaturalNormal (Vector3 v)
     {
         Vector3 w = new Vector3();
 
@@ -92,23 +97,10 @@ public class CurveFunction
         return w;
     }
 
-    private void AddVertexNormal(Vector3 position, Vector3 tangent, Vector3 principalNormal, int meridian, float radius, List<Vector3> vertices, List<Vector3> normals)
-    {
-        Vector3 binormal = Vector3.Cross(tangent, principalNormal);
-
-        for (int i = 0; i <= meridian; i++)
-        {
-            float theta = i * 2 * Mathf.PI / meridian;
-            Vector3 direction = Mathf.Cos(theta) * principalNormal + Mathf.Sin(theta) * binormal;
-            vertices.Add(position + radius * direction);
-            normals.Add(direction);
-        }
-    }
-
-    private List<int> Triangles(int length, int meridian)
+    private static List<int> Triangles(int length, int meridian)
     {
         List<int> triangles = new List<int>();
-        for (int j = 0; j <= length - 2; j++)
+        for (int j = 0; j < length - 1; j++)
         {
             for (int i = 0; i < meridian; i++)
             {
@@ -125,7 +117,7 @@ public class CurveFunction
         return triangles;
     }
 
-    int GetIndex(int i, int j, int meridian)
+    private static int GetIndex(int i, int j, int meridian)
     {
         return j * (meridian + 1) + i;
     }
