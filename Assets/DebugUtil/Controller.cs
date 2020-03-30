@@ -17,7 +17,9 @@ namespace DebugUtil
             Stick2DMap rightStickMap = null,
             Stick3DMap rightHandMover = null,
             Stick2DMap leftStickMap = null,
-            Stick3DMap leftHandMover = null
+            Stick3DMap leftHandMover = null,
+            float handScale = 0.3f,
+            float handSpeed = 0.1f
         )
         {
             this.buttonMap = buttonMap;
@@ -26,6 +28,8 @@ namespace DebugUtil
                 stick: OVRInput.RawAxis2D.RThumbstick,
                 stickMap: rightStickMap,
                 positionMover: rightHandMover,
+                scale: handScale,
+                speed: handSpeed,
                 this.IsOnHeadset()
             );
             this.leftHand = new VRController(
@@ -33,6 +37,8 @@ namespace DebugUtil
                 stick: OVRInput.RawAxis2D.LThumbstick,
                 stickMap: leftStickMap,
                 positionMover: leftHandMover,
+                scale: handScale,
+                speed: handSpeed,
                 this.IsOnHeadset()
             );
         }

@@ -13,21 +13,23 @@ namespace DebugUtil
         private Stick3DMap positionMover;
         private Vector3 position = new Vector3(0, 0, 0);
         private GameObject cube;
+        private float speed;
         private bool onHeadSet;
 
-        public VRController(string handAnchorName, OVRInput.RawAxis2D stick, Stick2DMap stickMap, Stick3DMap positionMover, bool onHeadSet)
+        public VRController(string handAnchorName, OVRInput.RawAxis2D stick, Stick2DMap stickMap, Stick3DMap positionMover, float scale, float speed, bool onHeadSet)
         {
             this.handAnchor = GameObject.Find(handAnchorName);
             this.stick = stick;
             this.stickMap = stickMap;
             this.positionMover = positionMover;
+            this.speed = speed;
             this.onHeadSet = onHeadSet;
 
             if (!onHeadSet)
             {
                 this.cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 this.cube.transform.position = this.position;
-                this.cube.transform.localScale = new Vector3(1, 1, 1) * 0.03f;
+                this.cube.transform.localScale = new Vector3(1, 1, 1) * scale;
             }
         }
 
@@ -37,7 +39,7 @@ namespace DebugUtil
             {
                 if (this.positionMover != null)
                 {
-                    this.position += this.positionMover.ToVector3() * 0.01f;
+                    this.position += this.positionMover.ToVector3() * this.speed;
                 }
                 this.cube.transform.position = this.position;
             }
