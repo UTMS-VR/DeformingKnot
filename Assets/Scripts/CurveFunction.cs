@@ -13,7 +13,11 @@ public class CurveFunction
         List<int> triangles;
         List<Vector3> normals = new List<Vector3>();
 
-        if (closed) positions.Add(positions[0]);
+        if (closed)
+        {
+            positions.Add(positions[0]);
+            positions.Add(positions[1]);
+        }
 
         int length = positions.Count;
         List<Vector3> tangents = Tangents(positions, closed);
@@ -52,7 +56,7 @@ public class CurveFunction
 
         if (closed)
         {
-            tangents.Add(tangents[0]);
+            tangents.Add(tangents[1]);
         }
         else
         {
