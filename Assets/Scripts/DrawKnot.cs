@@ -9,14 +9,13 @@ public class DrawKnot : MonoBehaviour
 {
     public int number;
     private GameObject knotMaster;
+    private KnotMaster masterComponent;
     private Controller controller;
-
-    // private CurveFunction curveFunction = new CurveFunction();
 
     [SerializeField] private Material material;
     private Mesh mesh;
 
-    private float segment = 0.01f;
+    private float segment = 0.05f;
     private int meridian = 100;
     private float radius = 0.01f;
 
@@ -27,13 +26,14 @@ public class DrawKnot : MonoBehaviour
     void Start()
     {
         knotMaster = GameObject.Find("KnotMaster");
-        controller = knotMaster.GetComponent<KnotMaster>().controller;
+        masterComponent = knotMaster.GetComponent<KnotMaster>();
+        controller = masterComponent.controller;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (knotMaster.GetComponent<KnotMaster>().knotNumber == number + 1)
+        if (masterComponent.knotNumber == number + 1)
         {
             if (controller.GetButton(OVRInput.RawButton.A))
             {
