@@ -18,9 +18,17 @@ public class DrawKnot : MonoBehaviour
     private float segment = 0.05f;
     private int meridian = 100;
     private float radius = 0.01f;
+    private bool closed = false;
 
     private List<Vector3> positions = new List<Vector3>();
     private Vector3 predPosition = new Vector3();
+
+    private Vector3 position = Vector3.zero;
+    private Quaternion rotation = Quaternion.identity;
+
+    private bool moving = false;
+    private Vector3 stdPosition = new Vector3();
+    private Quaternion stdRotation = new Quaternion();
 
     // Start is called before the first frame update
     void Start()
@@ -49,16 +57,84 @@ public class DrawKnot : MonoBehaviour
                     positions.Add(nowPosition);
                     predPosition = nowPosition;
 
-                    mesh = CurveFunction.Curve(positions, meridian, radius, false);
+                    mesh = CurveFunction.Curve(positions, meridian, radius, closed);
                 }
             }
             else if (controller.GetButtonDown(OVRInput.RawButton.B))
             {
-                mesh = CurveFunction.Curve(positions, meridian, radius, true);
+                closed = true;
+                mesh = CurveFunction.Curve(positions, meridian, radius, closed);
             }
         }
 
-        Graphics.DrawMesh(mesh, Vector3.zero, Quaternion.identity, material, 0);
+        if (controller.GetButtonDown(OVRInput.RawButton.RIndexTrigger))
+        {
+            if (Dist(positions, controller.rightHand.GetPosition()) < 0.1f)
+            {
+                moving = true;
+                stdPosition = controller.rightHand.GetPosition();
+                stdRotation = controller.rightHand.GetRotation();
+                positions = MapPlus(positions, -stdPosition);
+                mesh = CurveFunction.Curve(positions, meridian, radius, closed);
+            }
+        }
+        else if (controller.GetButtonUp(OVRInput.RawButton.RIndexTrigger))
+        {
+            moving = false;
+            positions = MapPlus(MapRotation(positions, rotation), position);
+            mesh = CurveFunction.Curve(positions, meridian, radius, closed);
+            position = Vector3.zero;
+            rotation = Quaternion.identity;
+        }
 
+        if (controller.GetButton(OVRInput.RawButton.RIndexTrigger) && moving)
+        {
+            position = controller.rightHand.GetPosition();
+            rotation = Quaternion.Inverse(stdRotation) * controller.rightHand.GetRotation();
+        }
+
+        Graphics.DrawMesh(mesh, position, rotation, material, 0);
+
+    }
+
+    private List<Vector3> MapPlus(List<Vector3> positions, Vector3 position)
+    {
+        List<Vector3> newPositions = new List<Vector3>();
+
+        foreach (Vector3 v in positions)
+        {
+            newPositions.Add(v + position);
+        }
+
+        return newPositions;
+    }
+
+    private float Dist(List<Vector3> positions, Vector3 position)
+    {
+        List<Vector3> relPositions = MapPlus(positions, -position);
+
+        float min = relPositions[0].magnitude;
+
+        for (int i = 0; i < relPositions.Count - 1; i++)
+        {
+            if (relPositions[i + 1].magnitude < min)
+            {
+                min = relPositions[i + 1].magnitude;
+            }
+        }
+
+        return min;
+    }
+
+    private List<Vector3> MapRotation(List<Vector3> positions, Quaternion rotation)
+    {
+        List<Vector3> newPositions = new List<Vector3>();
+
+        foreach (Vector3 v in positions)
+        {
+            newPositions.Add(rotation * v);
+        }
+
+        return newPositions;
     }
 }
