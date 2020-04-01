@@ -16,6 +16,8 @@ public class Main : MonoBehaviour
     private float collision = 0.1f;
 
     private Vector3 predPosition = new Vector3();
+    private Vector3 stdPosition = new Vector3();
+    private Quaternion stdRotation = new Quaternion();
 
     // Start is called before the first frame update
     void Start()
@@ -71,6 +73,30 @@ public class Main : MonoBehaviour
             {
                 curve.isClosed = !curve.isClosed;
                 curve.MeshUpdate();
+            }
+
+            // 右手中指:曲線を移動
+            if (controller.GetButtonDown(OVRInput.RawButton.RHandTrigger) && Dist(curve.positions, nowPosition) < collision)
+            {
+                curve.isBeingMoved = true;
+                stdPosition = nowPosition;
+                stdRotation = controller.rightHand.GetRotation();
+                curve.positions = MapPlus(curve.positions, -stdPosition);
+                curve.MeshUpdate();
+            }
+            else if (controller.GetButtonUp(OVRInput.RawButton.RHandTrigger))
+            {
+                curve.isBeingMoved = false;
+                curve.positions = MapPlus(MapRotation(curve.positions, curve.rotation), curve.position);
+                curve.MeshUpdate();
+                curve.position = Vector3.zero;
+                curve.rotation = Quaternion.identity;
+            }
+
+            if (controller.GetButton(OVRInput.RawButton.RHandTrigger) && curve.isBeingMoved)
+            {
+                curve.position = nowPosition;
+                curve.rotation = controller.rightHand.GetRotation() * Quaternion.Inverse(stdRotation);
             }
 
             // Yボタン:曲線を消去

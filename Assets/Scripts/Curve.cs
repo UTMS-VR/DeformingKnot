@@ -6,7 +6,7 @@ public class Curve
 {
     public bool isSelected;
     public bool isBeingDrawn;
-    public bool isBeingMoving;
+    public bool isBeingMoved;
     public bool isClosed;
     public List<Vector3> positions;
     public Mesh mesh;
@@ -27,7 +27,7 @@ public class Curve
     {
         this.isSelected = isSelected;
         this.isBeingDrawn = isBeingDrawn;
-        this.isBeingMoving = isBeingMoving;
+        this.isBeingMoved = isBeingMoving;
         this.isClosed = isClosed;
         this.positions = positions;
         this.position = position;
