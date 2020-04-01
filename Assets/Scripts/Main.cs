@@ -13,7 +13,7 @@ public class Main : MonoBehaviour
     [SerializeField] private Material defaultMaterial;
     [SerializeField] private Material selectedMaterial;
     private float segment = 0.02f;
-    private float collision = 0.1f;
+    private float collision = 0.02f;
 
     private Vector3 predPosition = new Vector3();
     private Vector3 stdPosition = new Vector3();
@@ -36,6 +36,9 @@ public class Main : MonoBehaviour
         {
             curveList.Add(new Curve(false, true, false, false, new List<Vector3>(), Vector3.zero, Quaternion.identity));
         }
+
+        List<Curve> removeCurves = new List<Curve>;
+        List<Curve> addCurves = new List<Curve>();
 
         foreach (Curve curve in curveList)
         {
@@ -62,48 +65,117 @@ public class Main : MonoBehaviour
                 }
             }
 
-            // 右手人差し指:曲線を選択
-            if (controller.GetButtonDown(OVRInput.RawButton.RIndexTrigger) && Dist(curve.positions, nowPosition) < collision)
+            // 右人差し指:曲線を選択
+            if (controller.GetButtonDown(OVRInput.RawButton.RIndexTrigger) && Dist(curve.positions, nowPosition).Item2 < collision)
             {
                 curve.isSelected = !curve.isSelected;
             }
 
-            // Bボタン:曲線を閉じる
-            if (curve.isSelected && controller.GetButtonDown(OVRInput.RawButton.B))
+            if (curve.isSelected)
             {
-                curve.isClosed = !curve.isClosed;
-                curve.MeshUpdate();
-            }
+                // Bボタン:曲線を閉じる
+                if (controller.GetButtonDown(OVRInput.RawButton.B))
+                {
+                    curve.isClosed = !curve.isClosed;
+                    curve.MeshUpdate();
+                }
 
-            // 右手中指:曲線を移動
-            if (controller.GetButtonDown(OVRInput.RawButton.RHandTrigger) && Dist(curve.positions, nowPosition) < collision)
-            {
-                curve.isBeingMoved = true;
-                stdPosition = nowPosition;
-                stdRotation = controller.rightHand.GetRotation();
-                curve.positions = MapPlus(curve.positions, -stdPosition);
-                curve.MeshUpdate();
-            }
-            else if (controller.GetButtonUp(OVRInput.RawButton.RHandTrigger))
-            {
-                curve.isBeingMoved = false;
-                curve.positions = MapPlus(MapRotation(curve.positions, curve.rotation), curve.position);
-                curve.MeshUpdate();
-                curve.position = Vector3.zero;
-                curve.rotation = Quaternion.identity;
-            }
+                // 右中指:曲線を移動
+                if (controller.GetButtonDown(OVRInput.RawButton.RHandTrigger) && Dist(curve.positions, nowPosition).Item2 < collision)
+                {
+                    curve.isBeingMoved = true;
+                    stdPosition = nowPosition;
+                    stdRotation = controller.rightHand.GetRotation();
+                    curve.positions = MapPlus(curve.positions, -stdPosition);
+                    curve.MeshUpdate();
+                }
+                else if (controller.GetButtonUp(OVRInput.RawButton.RHandTrigger))
+                {
+                    curve.isBeingMoved = false;
+                    curve.positions = MapPlus(MapRotation(curve.positions, curve.rotation), curve.position);
+                    curve.MeshUpdate();
+                    curve.position = Vector3.zero;
+                    curve.rotation = Quaternion.identity;
+                }
 
-            if (controller.GetButton(OVRInput.RawButton.RHandTrigger) && curve.isBeingMoved)
-            {
-                curve.position = nowPosition;
-                curve.rotation = controller.rightHand.GetRotation() * Quaternion.Inverse(stdRotation);
-            }
+                if (controller.GetButton(OVRInput.RawButton.RHandTrigger) && curve.isBeingMoved)
+                {
+                    curve.position = nowPosition;
+                    curve.rotation = controller.rightHand.GetRotation() * Quaternion.Inverse(stdRotation);
+                }
 
-            // Yボタン:曲線を消去
-            if (curve.isSelected && controller.GetButtonDown(OVRInput.RawButton.Y))
-            {
-                curveList.Remove(curve);
+                // 左人差し指:曲線を切る
+                if (controller.GetButtonDown(OVRInput.RawButton.LIndexTrigger) && Dist(curve.positions, nowPosition).Item2 < collision)
+                {
+                    int num = Dist(curve.positions, nowPosition).Item1;
+                    if (2 <= num && num <= curve.positions.Count - 3)
+                    {
+                        if (curve.isClosed)
+                        {
+                            List<Vector3> newPositions = new List<Vector3>();
+
+                            for (int i = num + 1; i < curve.positions.Count; i++)
+                            {
+                                newPositions.Add(curve.positions[i]);
+                            }
+
+                            for (int i = 0; i < num; i++)
+                            {
+                                newPositions.Add(curve.positions[i]);
+                            }
+
+                            Curve newCurve = new Curve(false, false, false, false, newPositions, curve.position, curve.rotation);
+                            newCurve.MeshUpdate();
+
+                            removeCurves.Add(curve);
+                            addCurves.Add(newCurve);
+                        }
+                        else
+                        {
+                            List<Vector3> newPositions1 = new List<Vector3>();
+                            List<Vector3> newPositions2 = new List<Vector3>();
+
+                            for (int i = 0; i < num; i++)
+                            {
+                                newPositions1.Add(curve.positions[i]);
+                            }
+
+                            for (int i = num + 1; i < curve.positions.Count; i++)
+                            {
+                                newPositions2.Add(curve.positions[i]);
+                            }
+
+                            Curve newCurve1 = new Curve(false, false, false, false, newPositions1, curve.position, curve.rotation);
+                            newCurve1.MeshUpdate();
+                            Curve newCurve2 = new Curve(false, false, false, false, newPositions2, curve.position, curve.rotation);
+                            newCurve2.MeshUpdate();
+
+                            removeCurves.Add(curve);
+                            addCurves.Add(newCurve1);
+                            addCurves.Add(newCurve2);
+                        }
+                    }
+                }
+
+                // Yボタン:曲線を消去
+                if (controller.GetButtonDown(OVRInput.RawButton.Y))
+                {
+                    removeCurves.Add(curve);
+                }
             }
+        }
+
+        // 左中指:曲線の結合
+
+
+        foreach (Curve curve in removeCurves)
+        {
+            curveList.Remove(curve);
+        }
+
+        foreach (Curve curve in addCurves)
+        {
+            curveList.Add(curve);
         }
 
         // 曲線を描画
@@ -146,21 +218,23 @@ public class Main : MonoBehaviour
         return newPositions;
     }
 
-    private float Dist(List<Vector3> positions, Vector3 position)
+    private Tuple<int, float> Dist(List<Vector3> positions, Vector3 position)
     {
         List<Vector3> relPositions = MapPlus(positions, -position);
 
+        int num = 0;
         float min = relPositions[0].magnitude;
 
         for (int i = 0; i < relPositions.Count - 1; i++)
         {
             if (relPositions[i + 1].magnitude < min)
             {
+                num = i + 1;
                 min = relPositions[i + 1].magnitude;
             }
         }
 
-        return min;
+        return new Tuple<int, float>(num, min);
     }
 
     private List<Vector3> MapRotation(List<Vector3> positions, Quaternion rotation)
