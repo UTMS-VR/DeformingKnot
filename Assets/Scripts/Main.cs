@@ -13,7 +13,7 @@ public class Main : MonoBehaviour
     [SerializeField] private Material defaultMaterial;
     [SerializeField] private Material selectedMaterial;
     private float segment = 0.02f;
-    private float collision = 0.02f;
+    private float collision = 0.05f;
 
     private Vector3 predPosition = new Vector3();
     private Vector3 stdPosition = new Vector3();
@@ -37,7 +37,7 @@ public class Main : MonoBehaviour
             curveList.Add(new Curve(false, true, false, false, new List<Vector3>(), Vector3.zero, Quaternion.identity));
         }
 
-        List<Curve> removeCurves = new List<Curve>;
+        List<Curve> removeCurves = new List<Curve>();
         List<Curve> addCurves = new List<Curve>();
 
         foreach (Curve curve in curveList)
@@ -165,8 +165,42 @@ public class Main : MonoBehaviour
             }
         }
 
-        // 左中指:曲線の結合
+        // 左中指:曲線の結合1
+        if (controller.GetButtonDown(OVRInput.RawButton.LHandTrigger))
+        {
+            List<Curve> selectedCurves = SelectedCurves(curveList);
+            if (selectedCurves.Count == 2 && !selectedCurves[0].isClosed && !selectedCurves[1].isClosed)
+            {
+                List<Vector3> positions0 = selectedCurves[0].positions;
+                List<Vector3> positions1 = selectedCurves[1].positions;
 
+                if (Vector3.Distance(positions0[positions0.Count - 1], positions1[positions1.Count - 1]) < collision)
+                {
+                    positions1.Reverse();
+                }
+                else if (Vector3.Distance(positions0[0], positions1[0]) < collision)
+                {
+                    positions0.Reverse();
+                }
+                else if (Vector3.Distance(positions0[0], positions1[positions1.Count - 1]) < collision)
+                {
+                    positions0.Reverse();
+                    positions1.Reverse();
+                }
+
+                foreach (Vector3 v in positions1)
+                {
+                    positions0.Add(v);
+                }
+
+                Curve newCurve = new Curve(false, false, false, false, positions0, Vector3.zero, Quaternion.identity);
+                newCurve.MeshUpdate();
+
+                removeCurves.Add(selectedCurves[0]);
+                removeCurves.Add(selectedCurves[1]);
+                addCurves.Add(newCurve);
+            }
+        }
 
         foreach (Curve curve in removeCurves)
         {
@@ -249,7 +283,22 @@ public class Main : MonoBehaviour
         return newPositions;
     }
 
-    public Material MaterialChoice(bool isSelected)
+    private List<Curve> SelectedCurves (List<Curve> curveList)
+    {
+        List<Curve> newCurveList = new List<Curve>();
+
+        foreach (Curve curve in curveList)
+        {
+            if (curve.isSelected)
+            {
+                newCurveList.Add(curve);
+            }
+        }
+
+        return newCurveList;
+    }
+
+    private Material MaterialChoice(bool isSelected)
     {
         if (isSelected)
         {
