@@ -8,7 +8,10 @@ public class CurveFunction
     public static Mesh Curve(List<Vector3> positions, int meridian, float radius, bool closed)
     {
         List<Vector3> positionsCopy = new List<Vector3>();
-        foreach (Vector3 v in positions) positionsCopy.Add(v);
+        foreach (Vector3 v in positions)
+        {
+            positionsCopy.Add(v);
+        }
 
         Mesh mesh = new Mesh();
 
