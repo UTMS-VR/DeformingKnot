@@ -15,7 +15,7 @@ public class DrawKnot : MonoBehaviour
     [SerializeField] private Material material;
     private Mesh mesh;
 
-    private float segment = 0.05f;
+    private float segment = 0.02f;
     private int meridian = 100;
     private float radius = 0.01f;
     private bool closed = false;
