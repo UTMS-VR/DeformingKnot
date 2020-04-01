@@ -7,6 +7,9 @@ public class CurveFunction
 {
     public static Mesh Curve(List<Vector3> positions, int meridian, float radius, bool closed)
     {
+        List<Vector3> positionsCopy = new List<Vector3>();
+        foreach (Vector3 v in positions) positionsCopy.Add(v);
+
         Mesh mesh = new Mesh();
 
         List<Vector3> vertices = new List<Vector3>();
@@ -15,12 +18,12 @@ public class CurveFunction
 
         if (closed)
         {
-            positions.Add(positions[0]);
-            positions.Add(positions[1]);
+            positionsCopy.Add(positionsCopy[0]);
+            positionsCopy.Add(positionsCopy[1]);
         }
 
-        int length = positions.Count;
-        List<Vector3> tangents = Tangents(positions, closed);
+        int length = positionsCopy.Count;
+        List<Vector3> tangents = Tangents(positionsCopy, closed);
         List<Vector3> principalNormals = PrincipalNormals(tangents);
 
         for (int j = 0; j < length; j++)
@@ -31,7 +34,7 @@ public class CurveFunction
             {
                 float theta = i * 2 * Mathf.PI / meridian;
                 Vector3 direction = Mathf.Cos(theta) * principalNormals[j] + Mathf.Sin(theta) * binormal;
-                vertices.Add(positions[j] + radius * direction);
+                vertices.Add(positionsCopy[j] + radius * direction);
                 normals.Add(direction);
             }
         }
