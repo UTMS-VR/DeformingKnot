@@ -8,8 +8,7 @@ using DebugUtil;
 public class DrawKnot : MonoBehaviour
 {
     public int number;
-    private GameObject knotMaster;
-    private KnotMaster masterComponent;
+    private KnotMaster knotMaster;
     private Controller controller;
 
     [SerializeField] private Material material;
@@ -18,6 +17,7 @@ public class DrawKnot : MonoBehaviour
     private float segment = 0.02f;
     private int meridian = 100;
     private float radius = 0.01f;
+    private float collision = 0.1f;
     private bool closed = false;
 
     private List<Vector3> positions = new List<Vector3>();
@@ -33,15 +33,14 @@ public class DrawKnot : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        knotMaster = GameObject.Find("KnotMaster");
-        masterComponent = knotMaster.GetComponent<KnotMaster>();
-        controller = masterComponent.controller;
+        knotMaster = GameObject.Find("KnotMaster").GetComponent<KnotMaster>();
+        controller = knotMaster.controller;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (masterComponent.knotNumber == number + 1)
+        if (knotMaster.knotNumber == number + 1)
         {
             if (controller.GetButton(OVRInput.RawButton.A))
             {
@@ -69,7 +68,7 @@ public class DrawKnot : MonoBehaviour
 
         if (controller.GetButtonDown(OVRInput.RawButton.RIndexTrigger))
         {
-            if (Dist(positions, controller.rightHand.GetPosition()) < 0.1f)
+            if (Dist(positions, controller.rightHand.GetPosition()) < collision)
             {
                 moving = true;
                 stdPosition = controller.rightHand.GetPosition();
