@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // 点列から曲線のメッシュを生成する
-public class CurveFunction
+public class MakeMesh
 {
     public static Mesh Curve(List<Vector3> positions, int meridian, float radius, bool closed)
     {

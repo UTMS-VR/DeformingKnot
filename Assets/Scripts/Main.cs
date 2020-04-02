@@ -7,8 +7,6 @@ using DebugUtil;
 
 public class Main : MonoBehaviour
 {
-    //[SerializeField] private Text text;
-
     private Controller controller;
 
     private List<Curve> curveList = new List<Curve>();
@@ -31,8 +29,6 @@ public class Main : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // text.text = "";
-
         controller.Update();
         Vector3 nowPosition = controller.rightHand.GetPosition();
 

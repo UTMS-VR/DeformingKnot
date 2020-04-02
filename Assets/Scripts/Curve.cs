@@ -36,6 +36,6 @@ public class Curve
 
     public void MeshUpdate()
     {
-        mesh = CurveFunction.Curve(this.positions, this.meridian, this.radius, this.isClosed);
+        mesh = MakeMesh.Curve(this.positions, this.meridian, this.radius, this.isClosed);
     }
 }
