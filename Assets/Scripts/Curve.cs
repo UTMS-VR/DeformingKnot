@@ -30,12 +30,18 @@ public class Curve
         this.isBeingMoved = isBeingMoving;
         this.isClosed = isClosed;
         this.positions = positions;
+
+        if (positions.Count >= 2)
+        {
+            this.mesh = MakeMesh.Curve(this.positions, this.meridian, this.radius, this.isClosed);
+        }
+
         this.position = position;
         this.rotation = rotation;
     }
 
     public void MeshUpdate()
     {
-        mesh = MakeMesh.Curve(this.positions, this.meridian, this.radius, this.isClosed);
+        this.mesh = MakeMesh.Curve(this.positions, this.meridian, this.radius, this.isClosed);
     }
 }
