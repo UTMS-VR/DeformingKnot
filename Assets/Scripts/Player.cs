@@ -124,7 +124,7 @@ public class Player
     {
         foreach (Curve curve in curves)
         {
-            if (curve.isSelected　&& Vector3.Distance(curve.positions.First(), curve.positions.Last()) < collision)
+            if (curve.isSelected && Vector3.Distance(curve.positions.First(), curve.positions.Last()) < collision)
             {
                 curve.isClosed = !curve.isClosed;
                 curve.MeshUpdate();
