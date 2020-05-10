@@ -531,7 +531,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 504ff64e88e104917bcff81c1729a58d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultMaterial: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
+  defaultMaterial: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 3}
   selectedMaterial: {fileID: 2100000, guid: 6a732e018979a450eb12e3d9389213f6, type: 2}
 --- !u!4 &1321700279
 Transform:

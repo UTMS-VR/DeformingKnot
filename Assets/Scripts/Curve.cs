@@ -43,5 +43,29 @@ public class Curve
     public void MeshUpdate()
     {
         this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.isClosed);
+<<<<<<< HEAD
+=======
+    }
+
+    public List<Vector3> GetTangents(bool closed)
+    {
+        List<Vector3> tangents = new List<Vector3>();
+
+        for (int i = 0; i < positions.Count - 1; i++)
+        {
+            tangents.Add((positions[i + 1] - positions[i]).normalized);
+        }
+
+        if (closed)
+        {
+            tangents.Add(tangents[1]);
+        }
+        else
+        {
+            tangents.Add(tangents[tangents.Count - 1]);
+        }
+
+        return tangents;
+>>>>>>> 99a5501... Add files about energy of knot
     }
 }
