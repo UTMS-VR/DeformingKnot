@@ -56,6 +56,10 @@ public class Main : MonoBehaviour
         {
             player.Remove(ref curves);
         }
+        else if (controller.GetButton(OVRInput.RawButton.LHandTrigger))
+        {
+            player.Optimize(curves);
+        }
 
         foreach (Curve curve in curves)
         {

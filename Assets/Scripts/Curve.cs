@@ -12,6 +12,7 @@ public class Curve
     public Mesh mesh;
     public Vector3 position;
     public Quaternion rotation;
+    public List<Vector3> momentum;
 
     private int meridian = 100;
     private float radius = 0.01f;

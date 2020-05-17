@@ -4,29 +4,20 @@ using UnityEngine;
 
 public class KnotEnergy : MonoBehaviour
 {
-    // private Mesh mesh;
     [SerializeField] private Material material;
-
     private int longitude = 50;
-    private int meridian = 20;
-    private float radius = 0.1f;
 
+    // private SGD SGD;
     private Curve curve;
-    // private Curve NewCurve;
     private List<Vector3> momentum;
-    // private List<Vector3> NewMomentum;
-    private SGD SGD;
 
-    // private int n_longitude = 50; // number of vertices excluding the end point along longitude
-    // private float scale = 2.0f; // scale of the curve
-
-    private float lr = 1e-05f; // the learning rate
-    private float alpha = 0.9f; // momentum
+    // private float lr = 1e-05f; // the learning rate
+    // private float alpha = 0.9f; // momentum
 
     // Start is called before the first frame update
     void Start()
     {
-        SGD = new SGD(lr, alpha);
+        // SGD = new SGD(lr, alpha);
 
         List<Vector3> positions = new List<Vector3>();
 
@@ -36,13 +27,10 @@ public class KnotEnergy : MonoBehaviour
             positions.Add(DoubledUnknot(t));
         }
 
-        // mesh = MakeMesh.GetMesh(positions, meridian, radius, true);
-
         curve = new Curve(false, false, false, true, positions, Vector3.zero, Quaternion.identity);
 
         momentum = new List<Vector3>();
 
-        // initialize
         for (int i = 0; i <= longitude; i++)
         {
             momentum.Add(new Vector3(0, 0, 0));
@@ -56,16 +44,8 @@ public class KnotEnergy : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space))
         {
-            Debug.Log("aaaaaa");
             SGD.Step(curve, momentum);
             curve.MeshUpdate();
-            Debug.Log(curve.positions[10]);
-            Debug.Log(momentum[10]);
-            // (NewCurve, NewMomentum) = SGD.Step(CurrentCurve, Momentum);
-            // CurrentCurve = NewCurve;
-            // Momentum = NewMomentum;
-
-            // List<Vector3> tangents = CurrentCurve.GetTangents(true);
         }
     }
 

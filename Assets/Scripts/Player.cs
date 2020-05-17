@@ -8,8 +8,8 @@ using DebugUtil;
 public class Player
 {
     private Controller controller;
-    private float segment = 0.02f;
-    private float collision = 0.05f;
+    private float segment = 0.1f;
+    private float collision = 0.1f;
 
     public Player(Controller controller)
     {
@@ -158,6 +158,28 @@ public class Player
         }
 
         RemoveAddCurve(ref curves, removeCurves, addCurves);
+    }
+
+    public void Optimize(List<Curve> curves)
+    {
+        foreach(Curve curve in curves)
+        {
+            if (curve.isSelected)
+            {
+                if (curve.momentum == null)
+                {
+                    curve.momentum = new List<Vector3>();
+
+                    for (int i = 0; i < curve.positions.Count; i++)
+                    {
+                        curve.momentum.Add(Vector3.zero);
+                    }
+                }
+
+                SGD.Step(curve, curve.momentum);
+                curve.MeshUpdate();
+            }
+        }
     }
 
     public void Remove(ref List<Curve> curves)

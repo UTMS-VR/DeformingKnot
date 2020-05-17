@@ -4,52 +4,32 @@ using UnityEngine;
 
 public class SGD
 {
-    private float lr;
-    private float alpha;
-    // private Curve curve;
+    private static float lr = 1e-07f;
+    private static float alpha = 0.9f;
 
-    public SGD(float lr = 1e-03f, float alpha = 0.9f)
+    public static void Step(Curve curve, List<Vector3> momentum)
     {
-        this.lr = lr;
-        this.alpha = alpha;
-    }
-
-    public void Step(Curve curve, List<Vector3> momentum)
-    {
-        // Debug.Log("bbbbbbbbbbbbbbbb");
-
-        // this.curve = curve;
         int N = curve.positions.Count;
 
-        // List<Vector3> CurrentPositions = curve.positions;
-        List<Vector3> newPositions = new List<Vector3>();
-        
-        Loss loss = new Loss(curve);
-        List<Vector3> grad = loss.Gradient();
+        List<Vector3> _positions = new List<Vector3>();
         List<Vector3> _momentum = new List<Vector3>();
 
-        // gradient descent
+        Loss loss = new Loss(curve);
+        List<Vector3> grad = loss.Gradient();
+
         for (int i = 0; i < N; i++)
         {
             Vector3 P = curve.positions[i];
-            Vector3 DP = -this.alpha * momentum[i] + (1 - this.alpha) * this.lr * grad[i];
-            // Debug.Log(grad[i]);
-            // Debug.Log((1 - this.alpha));
-            // Debug.Log(this.lr);
-            // Debug.Log((1 - this.alpha) * this.lr * grad[i]);
+            Vector3 DP = - alpha * momentum[i] + (1 - alpha) * lr * grad[i];
+            _positions.Add(P - DP);
             _momentum.Add(DP);
-            newPositions.Add(P - DP);
         }
 
-        curve.positions = newPositions;
+        curve.positions = _positions;
 
         for (int i = 0; i < N; i++)
         {
             momentum[i] = _momentum[i];
         }
-
-        // Debug.Log(grad[10]);
-        // Debug.Log(curve.positions[10]);
-        // Debug.Log(momentum[10]);
     }
 }
