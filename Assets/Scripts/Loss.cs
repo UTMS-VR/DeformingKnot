@@ -12,7 +12,7 @@ public class Loss
     public Loss(Curve curve)
     {
         this._curve = curve;
-        this.N = curve.GetLength();
+        this.N = curve.positions.Count;
     }
 
     public List<Vector3> Gradient()
@@ -47,8 +47,8 @@ public class Loss
 
     private Vector3 Function(int i, int j)
     {
-        List<Vector3> p = this._curve.GetPositions();
-        List<Vector3> t = this._curve.GetTangents();
+        List<Vector3> p = this._curve.positions;
+        List<Vector3> t = this._curve.GetTangents(true);
 
         int k = (i != N - 1) ? i + 1 : 1;
         int l = (i != 0) ? i - 1 : N - 2;
@@ -69,7 +69,7 @@ public class Loss
     private Vector3 IntegralAlongCurve(List<Vector3> integrand, int StartIndex, int EndIndex)
     {
         Vector3 _integral = new Vector3(0, 0, 0);
-        List<Vector3> tangents = this._curve.GetTangents();
+        List<Vector3> tangents = this._curve.GetTangents(true);
         int n = EndIndex - StartIndex;
 
         // trapezoidal methods
