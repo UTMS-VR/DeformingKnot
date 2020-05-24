@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SGD
 {
-    private static float lr = 1e-07f;
+    private static float lr = 1e-04f;
     private static float alpha = 0.9f;
 
     public static void Step(Curve curve, List<Vector3> momentum)
