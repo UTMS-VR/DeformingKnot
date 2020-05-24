@@ -10,6 +10,11 @@ public class Main : MonoBehaviour
     private Player player;
 
     private List<Curve> curves = new List<Curve>();
+    private int n_interval = 10;
+    private int k;
+    private List<Vector3> Positions;
+    private List<Vector3> NewPositions;
+    private BezierCurve PartialCurve;
 
     [SerializeField] private Material defaultMaterial;
     [SerializeField] private Material selectedMaterial;
@@ -55,6 +60,38 @@ public class Main : MonoBehaviour
         else if (controller.GetButtonDown(OVRInput.RawButton.Y))
         {
             player.Remove(ref curves);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            foreach (Curve curve in curves)
+            {
+                NewPositions = new List<Vector3>();
+                Positions = curve.GetPositions();
+                int N = Positions.Count;
+
+                for (int i = 0; i < N; i += n_interval)
+                {
+                    if (i + n_interval < N)
+                    {
+                        k = n_interval;
+                    }
+                    else
+                    {
+                        k = N - i - 1;
+                    }
+
+                    PartialCurve = new BezierCurve(Positions.GetRange(i, k));
+                    for (int j = 0; j < n_interval; j++)
+                    {
+                        NewPositions.Add(PartialCurve.GetPosition((float)j / n_interval));
+                    }
+                }
+
+                curve.UpdatePositions(NewPositions);
+                curve.MeshUpdate();
+                Debug.Log("Updated Knot");
+            }
         }
 
         foreach (Curve curve in curves)
