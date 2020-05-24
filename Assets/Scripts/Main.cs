@@ -62,7 +62,7 @@ public class Main : MonoBehaviour
             player.Remove(ref curves);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (controller.GetButtonDown(OVRInput.RawButton.LIndexTrigger))
         {
             foreach (Curve curve in curves)
             {
