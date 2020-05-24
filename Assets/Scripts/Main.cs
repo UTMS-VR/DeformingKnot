@@ -84,7 +84,7 @@ public class Main : MonoBehaviour
                     PartialCurve = new BezierCurve(Positions.GetRange(i, k));
                     for (int j = 0; j < n_interval; j++)
                     {
-                        NewPositions.Add(PartialCurve.GetPosition((float)j / n_interval));
+                        NewPositions.Add(PartialCurve.GetPosition((float)j / k));
                     }
                 }
 
