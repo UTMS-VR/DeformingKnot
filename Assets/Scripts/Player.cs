@@ -11,6 +11,10 @@ public class Player
     private float segment = 0.02f;
     private float collision = 0.05f;
 
+    private List<Vector3> Positions;
+    private List<Vector3> NewPositions;
+    private BezierCurve PartialCurve;
+
     public Player(Controller controller)
     {
         this.controller = controller;
@@ -182,6 +186,44 @@ public class Player
         }
 
         return new Tuple<int, float>(num, min);
+    }
+
+    public void MakeBezierCurve(ref List<Curve> curves, int n_interval)
+    {
+        List<Curve> selectedCurves = curves.Where(curve => curve.isSelected).ToList();
+
+        foreach (Curve curve in selectedCurves)
+        {
+            NewPositions = new List<Vector3>();
+            Positions = curve.GetPositions();
+            int N = Positions.Count;
+            int q = N / n_interval;
+            int r = N % n_interval;
+
+            for (int i = 0; i < q; i++)
+            {
+                int s = i * n_interval;
+                PartialCurve = new BezierCurve(Positions.GetRange(s, n_interval));
+                for (int j = 0; j < n_interval; j++)
+                {
+                    NewPositions.Add(PartialCurve.GetPosition((float) j / n_interval));
+                }
+            }
+
+            // remain part
+            PartialCurve = new BezierCurve(Positions.GetRange(N - r, r));
+            for (int j = 0; j < r; j++)
+            {
+                NewPositions.Add(PartialCurve.GetPosition((float) j / r));
+            }
+
+            curve.UpdatePositions(NewPositions);
+            curve.MeshUpdate();
+            Debug.Log("Updated Knot");
+
+            // unselect
+            curve.isSelected = !curve.isSelected;
+        }
     }
 
     private void RemoveAddCurve(ref List<Curve> curves, List<Curve> removeCurves, List<Curve> addCurves)

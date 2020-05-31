@@ -40,6 +40,16 @@ public class Curve
         this.rotation = rotation;
     }
 
+    public List<Vector3> GetPositions()
+    {
+        return this.positions;
+    }
+
+    public void UpdatePositions(List<Vector3> NewPositions)
+    {
+        this.positions = NewPositions;
+    }
+
     public void MeshUpdate()
     {
         this.mesh = MakeMesh.Curve(this.positions, this.meridian, this.radius, this.isClosed);

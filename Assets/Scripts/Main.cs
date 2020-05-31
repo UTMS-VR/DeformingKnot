@@ -10,6 +10,7 @@ public class Main : MonoBehaviour
     private Player player;
 
     private List<Curve> curves = new List<Curve>();
+    private int n_interval = 20;
 
     [SerializeField] private Material defaultMaterial;
     [SerializeField] private Material selectedMaterial;
@@ -55,6 +56,10 @@ public class Main : MonoBehaviour
         else if (controller.GetButtonDown(OVRInput.RawButton.Y))
         {
             player.Remove(ref curves);
+        }
+        else if (controller.GetButtonDown(OVRInput.RawButton.LIndexTrigger))
+        {
+            player.MakeBezierCurve(ref curves, n_interval);
         }
 
         foreach (Curve curve in curves)
