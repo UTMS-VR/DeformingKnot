@@ -44,8 +44,6 @@ public class Curve
     public void MeshUpdate()
     {
         this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.isClosed);
-<<<<<<< HEAD
-=======
     }
 
     public List<Vector3> GetTangents(bool closed)
@@ -67,6 +65,5 @@ public class Curve
         }
 
         return tangents;
->>>>>>> 99a5501... Add files about energy of knot
     }
 }
