@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MakeMesh
 {
-    public static Mesh Curve(List<Vector3> positions, int meridian, float radius, bool closed)
+    public static Mesh GetMesh(List<Vector3> positions, int meridian, float radius, bool closed)
     {
         List<Vector3> positionsCopy = new List<Vector3>();
         foreach (Vector3 v in positions)
@@ -48,6 +49,57 @@ public class MakeMesh
         mesh.normals = normals.ToArray();
 
         return mesh;
+    }
+
+
+    public static Mesh GetMeshAtPositions(List<Vector3> positions, float radius)
+    {
+        var vertices = new List<Vector3>();
+        var triangles = new List<int>();
+        var normals = new List<Vector3>();
+        foreach (Vector3 position in positions)
+        {
+            var meshInfo = GetMeshInfoAtPosition(position, radius);
+            int offset = vertices.Count;
+            vertices.AddRange(meshInfo.vertices);
+            triangles.AddRange(meshInfo.triangles.Select(i => i + offset));
+            normals.AddRange(meshInfo.normals);
+        }
+
+        var mesh = new Mesh();
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.normals = normals.ToArray();
+
+        return mesh;
+    }
+
+    private static (List<Vector3> vertices, List<int> triangles, List<Vector3> normals)
+        GetMeshInfoAtPosition(Vector3 position, float radius)
+    {
+        float r = radius;
+        var vertices = new List<Vector3>()
+        {
+            position + new Vector3(r, 0, 0),
+            position + new Vector3(0, r, 0),
+            position + new Vector3(-r, 0, 0),
+            position + new Vector3(0, -r, 0),
+            position + new Vector3(0, 0, r),
+            position + new Vector3(0, 0, -r)
+        };
+        var triangles = new List<int>()
+        {
+            4, 0, 1,
+            4, 1, 2,
+            4, 2, 3,
+            4, 3, 0,
+            5, 1, 0,
+            5, 2, 1,
+            5, 3, 2,
+            5, 0, 3
+        };
+        var normals = vertices;
+        return (vertices, triangles, normals);
     }
 
     private static List<Vector3> Tangents (List<Vector3> positions, bool closed)

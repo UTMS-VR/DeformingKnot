@@ -33,7 +33,7 @@ public class Curve
 
         if (positions.Count >= 2)
         {
-            this.mesh = MakeMesh.Curve(this.positions, this.meridian, this.radius, this.isClosed);
+            this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.isClosed);
         }
 
         this.position = position;
@@ -42,6 +42,6 @@ public class Curve
 
     public void MeshUpdate()
     {
-        this.mesh = MakeMesh.Curve(this.positions, this.meridian, this.radius, this.isClosed);
+        this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.isClosed);
     }
 }
