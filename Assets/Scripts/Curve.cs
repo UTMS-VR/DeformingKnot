@@ -10,11 +10,13 @@ public class Curve
     public bool isClosed;
     public List<Vector3> positions;
     public Mesh mesh;
+    public Mesh meshAtPositions;
     public Vector3 position;
     public Quaternion rotation;
     public List<Vector3> momentum;
 
-    private int meridian = 100;
+    public float segment = 0.1f;
+    private int meridian = 10;
     private float radius = 0.01f;
 
     public Curve(
@@ -46,7 +48,12 @@ public class Curve
         this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.isClosed);
     }
 
-    public List<Vector3> GetTangents(bool closed)
+    public void MeshAtPositionsUpdate()
+    {
+        this.meshAtPositions = MakeMesh.GetMeshAtPositions(this.positions, this.radius * 5.0f);
+    }
+
+    public List<Vector3> GetTangents()
     {
         List<Vector3> tangents = new List<Vector3>();
 
@@ -55,7 +62,7 @@ public class Curve
             tangents.Add((positions[i + 1] - positions[i]).normalized);
         }
 
-        if (closed)
+        if (this.isClosed)
         {
             tangents.Add(tangents[1]);
         }
@@ -65,5 +72,43 @@ public class Curve
         }
 
         return tangents;
+    }
+
+    public void ParameterExchange()
+    {
+        int length = this.positions.Count;
+
+        List<Vector3> newPositions = new List<Vector3>();
+        newPositions.Add(this.positions[0]);
+
+        Vector3 endPosition = newPositions[0];
+
+        for (int i = 1; i < length; i++)
+        {
+            Completion(ref newPositions, positions[i], false);
+        }
+
+        Completion(ref newPositions, positions[0], true);
+
+        this.positions = newPositions;
+    }
+
+    private void Completion(ref List<Vector3> newPositions, Vector3 position, bool end)
+    {
+        Vector3 endPosition = newPositions[newPositions.Count - 1];
+        float distance = Vector3.Distance(endPosition, position);
+
+        if (distance > this.segment * 1.1f)
+        {
+            for (int i = 1; this.segment * i < distance; i++)
+            {
+                newPositions.Add(endPosition + (position - endPosition) * this.segment * i / distance);
+            }
+        }
+
+        if (Vector3.Distance(newPositions[newPositions.Count - 1], position) > this.segment * 0.9f && !end)
+        {
+            newPositions.Add(position);
+        }
     }
 }

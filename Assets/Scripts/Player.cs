@@ -8,7 +8,6 @@ using DebugUtil;
 public class Player
 {
     private Controller controller;
-    private float segment = 0.1f;
     private float collision = 0.1f;
 
     public Player(Controller controller)
@@ -33,7 +32,7 @@ public class Player
                 {
                     curve.positions.Add(nowPosition);
                 }
-                else if (Vector3.Distance(nowPosition, curve.positions.Last()) >= segment)
+                else if (Vector3.Distance(nowPosition, curve.positions.Last()) >= curve.segment)
                 {
                     curve.positions.Add(nowPosition);
                     curve.MeshUpdate();
@@ -164,9 +163,9 @@ public class Player
     {
         foreach(Curve curve in curves)
         {
-            if (curve.isSelected)
+            if (curve.isSelected && curve.isClosed)
             {
-                if (curve.momentum == null)
+                /*if (curve.momentum == null)
                 {
                     curve.momentum = new List<Vector3>();
 
@@ -174,9 +173,10 @@ public class Player
                     {
                         curve.momentum.Add(Vector3.zero);
                     }
-                }
+                }*/
 
-                SGD.Step(curve, curve.momentum);
+                SGD.Step(curve);
+                curve.ParameterExchange();
                 curve.MeshUpdate();
             }
         }

@@ -4,10 +4,28 @@ using UnityEngine;
 
 public class SGD
 {
-    private static float lr = 1e-04f;
+    private static float lr = 1e-05f;
     private static float alpha = 0.9f;
 
-    public static void Step(Curve curve, List<Vector3> momentum)
+    public static void Step(Curve curve)
+    {
+        int N = curve.positions.Count;
+
+        List<Vector3> _positions = new List<Vector3>();
+
+        Loss loss = new Loss(curve);
+        List<Vector3> grad = loss.Gradient();
+
+        for (int i = 0; i < N; i++)
+        {
+            _positions.Add(curve.positions[i] - lr * grad[i]);
+        }
+
+        curve.positions = _positions;
+    }
+
+    // momentum SGD
+    /*public static void Step(Curve curve, List<Vector3> momentum)
     {
         int N = curve.positions.Count;
 
@@ -31,5 +49,5 @@ public class SGD
         {
             momentum[i] = _momentum[i];
         }
-    }
+    }*/
 }

@@ -17,29 +17,56 @@ public class KnotEnergy : MonoBehaviour
         for (int i = 0; i < longitude; i++)
         {
             float t = (float)i / longitude;
-            positions.Add(ExampleCurve2(t));
+            positions.Add(ExampleCurve5(t));
         }
 
         curve = new Curve(false, false, false, true, positions, Vector3.zero, Quaternion.identity);
+        curve.segment = MeanDistance(curve.positions);
+        curve.MeshAtPositionsUpdate();
 
-        curve.momentum = new List<Vector3>();
+        // curve.momentum = new List<Vector3>();
 
-        for (int i = 0; i <= longitude; i++)
+        /*for (int i = 0; i <= longitude; i++)
         {
             curve.momentum.Add(new Vector3(0, 0, 0));
-        }
+        }*/
     }
 
     // Update is called once per frame
     void Update()
     {
         Graphics.DrawMesh(curve.mesh, new Vector3(0, 0, 3), Quaternion.identity, material, 0);
+        Graphics.DrawMesh(curve.meshAtPositions, new Vector3(0, 0, 3), Quaternion.identity, MakeMesh.PositionMaterial, 0);
 
         if (Input.GetKey(KeyCode.Space))
         {
-            SGD.Step(curve, curve.momentum);
+            SGD.Step(curve);
+            curve.ParameterExchange();
             curve.MeshUpdate();
+            curve.MeshAtPositionsUpdate();
         }
+    }
+
+    private float MeanDistance(List<Vector3> positions)
+    {
+        float _sum = 0.0f;
+
+        for (int i = 0; i < positions.Count - 1; i++)
+        {
+            _sum += Vector3.Distance(positions[i], positions[i + 1]);
+        }
+
+        _sum += Vector3.Distance(positions[positions.Count - 1], positions[0]);
+
+        return _sum / positions.Count;
+    }
+
+    private Vector3 Circle(float t)
+    {
+        float theta = 2 * Mathf.PI * t;
+        float x = 3 * Mathf.Cos(theta);
+        float y = 3 * Mathf.Sin(theta);
+        return new Vector3(x, y, 0);
     }
 
     private Vector3 Trefoil(float t)
@@ -101,7 +128,7 @@ public class KnotEnergy : MonoBehaviour
         return new Vector3(x, y, z);
     }
 
-    private Vector3 DoubledUnknot(float t) // t in [0, 1]
+    private Vector3 ExampleCurve5(float t) // t in [0, 1]
     {
         float theta = 2 * Mathf.PI * t;
         float x;
