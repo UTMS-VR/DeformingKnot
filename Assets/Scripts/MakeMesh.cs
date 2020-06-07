@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class MakeMesh
 {
+    public static Material CurveMaterial = Resources.Load<Material>("MyPackage/DrawCurve/Curve");
+    public static Material PositionMaterial = Resources.Load<Material>("MyPackage/DrawCurve/Position");
+
     public static Mesh GetMesh(List<Vector3> positions, int meridian, float radius, bool closed)
     {
         List<Vector3> positionsCopy = new List<Vector3>();
