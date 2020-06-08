@@ -61,6 +61,10 @@ public class Main : MonoBehaviour
         {
             player.MakeBezierCurve(ref curves, n_interval);
         }
+        else if (controller.GetButton(OVRInput.RawButton.LHandTrigger))
+        {
+            player.Optimize(curves);
+        }
 
         foreach (Curve curve in curves)
         {
