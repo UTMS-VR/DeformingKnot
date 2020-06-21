@@ -40,7 +40,9 @@ public class KnotEnergy : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space))
         {
-            SGD.Step(curve);
+            Debug.Log("optimize");
+            curve.positions = FlowAlongGradient.optimize(curve.positions);
+            // SGD.Step(curve);
             curve.ParameterExchange();
             curve.MeshUpdate();
             curve.MeshAtPositionsUpdate();

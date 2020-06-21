@@ -88,19 +88,22 @@ public class Curve
     {
         int length = this.positions.Count;
 
-        List<Vector3> newPositions = new List<Vector3>();
-        newPositions.Add(this.positions[0]);
-
-        Vector3 endPosition = newPositions[0];
+        List<Vector3> _positions = new List<Vector3>();
+        _positions.Add(this.positions[0]);
 
         for (int i = 1; i < length; i++)
         {
-            Completion(ref newPositions, positions[i], false);
+            Completion(ref _positions, positions[i], false);
         }
 
-        Completion(ref newPositions, positions[0], true);
+        Completion(ref _positions, positions[0], true);
 
-        this.positions = newPositions;
+        if (Vector3.Distance(_positions[_positions.Count - 1], _positions[0]) < this.segment * 1.0f)
+        {
+            _positions.Remove(_positions[_positions.Count - 1]);
+        }
+
+        this.positions = _positions;
     }
 
     private void Completion(ref List<Vector3> newPositions, Vector3 position, bool end)
@@ -108,7 +111,7 @@ public class Curve
         Vector3 endPosition = newPositions[newPositions.Count - 1];
         float distance = Vector3.Distance(endPosition, position);
 
-        if (distance > this.segment * 1.1f)
+        if (distance > this.segment * 1.01f)
         {
             for (int i = 1; this.segment * i < distance; i++)
             {
@@ -116,7 +119,7 @@ public class Curve
             }
         }
 
-        if (Vector3.Distance(newPositions[newPositions.Count - 1], position) > this.segment * 0.9f && !end)
+        if (Vector3.Distance(newPositions[newPositions.Count - 1], position) > this.segment * 0.99f && !end)
         {
             newPositions.Add(position);
         }
