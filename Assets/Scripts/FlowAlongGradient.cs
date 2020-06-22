@@ -6,7 +6,7 @@ public class FlowAlongGradient
 {
     private static float lr = 1.0f; // learning rate
 
-    public static List<Vector3> optimize(List<Vector3> positions)
+    public static List<Vector3> Optimize(List<Vector3> positions)
     {
         int length = positions.Count;
 
@@ -22,11 +22,9 @@ public class FlowAlongGradient
 
     private static Vector3 Gradient(List<Vector3> positions, int i)
     {
-        int length = positions.Count;
-
         Vector3 gradient = new Vector3(0, 0, 0);
 
-        for (int j = 0; j < length; j++)
+        for (int j = 0; j < positions.Count; j++)
         {
             if (j != i)
             {

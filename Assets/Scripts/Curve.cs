@@ -93,35 +93,62 @@ public class Curve
 
         for (int i = 1; i < length; i++)
         {
-            Completion(ref _positions, positions[i], false);
+            Completion(ref _positions, this.positions[i - 1], this.positions[i]);
         }
 
-        Completion(ref _positions, positions[0], true);
-
-        if (Vector3.Distance(_positions[_positions.Count - 1], _positions[0]) < this.segment * 1.0f)
+        if (this.isClosed)
         {
-            _positions.Remove(_positions[_positions.Count - 1]);
+            Completion(ref _positions, this.positions[length - 1], this.positions[0]);
+
+            if (_positions.Count > this.DivisionNumber())
+            {
+                _positions.Remove(_positions[_positions.Count - 1]);
+            }
+        }
+        else
+        {
+            if (_positions.Count < this.DivisionNumber() + 1)
+            {
+                _positions.Add(this.positions[length - 1]);
+            }
         }
 
         this.positions = _positions;
     }
 
-    private void Completion(ref List<Vector3> newPositions, Vector3 position, bool end)
+    public float ArcLength()
     {
-        Vector3 endPosition = newPositions[newPositions.Count - 1];
-        float distance = Vector3.Distance(endPosition, position);
+        int length = this.positions.Count;
+        float arclength = 0.0f;
 
-        if (distance > this.segment * 1.01f)
+        for (int i = 1; i < length; i++)
         {
-            for (int i = 1; this.segment * i < distance; i++)
-            {
-                newPositions.Add(endPosition + (position - endPosition) * this.segment * i / distance);
-            }
+            arclength += Vector3.Distance(this.positions[i - 1], this.positions[i]);
         }
 
-        if (Vector3.Distance(newPositions[newPositions.Count - 1], position) > this.segment * 0.99f && !end)
+        if (this.isClosed)
         {
-            newPositions.Add(position);
+            arclength += Vector3.Distance(this.positions[length - 1], this.positions[0]);
+        }
+
+        return arclength;
+    }
+
+    public int DivisionNumber()
+    {
+        return Mathf.FloorToInt(this.ArcLength() / this.segment + 0.5f);
+    }
+
+    private void Completion(ref List<Vector3> newPositions, Vector3 start, Vector3 end)
+    {
+        Vector3 last = newPositions[newPositions.Count - 1];
+        float remainder = Vector3.Distance(last, start);
+        float distance = Vector3.Distance(start, end);
+        float temporarySegment = this.ArcLength() / this.DivisionNumber();
+
+        for (int i = 1; temporarySegment * i - remainder < distance; i++)
+        {
+            newPositions.Add(start + (end - start) * (temporarySegment * i - remainder) / distance);
         }
     }
 }

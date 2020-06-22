@@ -17,11 +17,11 @@ public class KnotEnergy : MonoBehaviour
         for (int i = 0; i < longitude; i++)
         {
             float t = (float)i / longitude;
-            positions.Add(ExampleCurve5(t));
+            positions.Add(Circle(t));
         }
 
         curve = new Curve(false, false, false, true, positions, Vector3.zero, Quaternion.identity);
-        curve.segment = MeanDistance(curve.positions);
+        curve.segment = curve.ArcLength() / curve.positions.Count;
         curve.MeshAtPositionsUpdate();
 
         // curve.momentum = new List<Vector3>();
@@ -40,38 +40,28 @@ public class KnotEnergy : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space))
         {
-            Debug.Log("optimize");
-            curve.positions = FlowAlongGradient.optimize(curve.positions);
+            // Debug.Log("optimize");
+            curve.positions = FlowAlongGradient.Optimize(curve.positions);
             // SGD.Step(curve);
+            Debug.Log("a" + curve.DivisionNumber());
             curve.ParameterExchange();
+            Debug.Log("b" + curve.positions.Count);
             curve.MeshUpdate();
             curve.MeshAtPositionsUpdate();
         }
     }
 
-    private float MeanDistance(List<Vector3> positions)
-    {
-        float _sum = 0.0f;
-
-        for (int i = 0; i < positions.Count - 1; i++)
-        {
-            _sum += Vector3.Distance(positions[i], positions[i + 1]);
-        }
-
-        _sum += Vector3.Distance(positions[positions.Count - 1], positions[0]);
-
-        return _sum / positions.Count;
-    }
-
+    //circle
     private Vector3 Circle(float t)
     {
-        float theta = 2 * Mathf.PI * t;
+        float theta = 2 * Mathf.PI * (t + 0.3f);
         float x = 3 * Mathf.Cos(theta);
         float y = 3 * Mathf.Sin(theta);
         return new Vector3(x, y, 0);
     }
 
-    private Vector3 Trefoil(float t)
+    //trefoil
+    private Vector3 ExampleCurve0(float t)
     {
         float theta = 2 * Mathf.PI * t;
         float x = Mathf.Sin(theta) + 2 * Mathf.Sin(2 * theta);
@@ -130,6 +120,7 @@ public class KnotEnergy : MonoBehaviour
         return new Vector3(x, y, z);
     }
 
+    // NTT
     private Vector3 ExampleCurve5(float t) // t in [0, 1]
     {
         float theta = 2 * Mathf.PI * t;

@@ -179,7 +179,8 @@ public class Player
                     }
                 }*/
 
-                SGD.Step(curve);
+                // SGD.Step(curve);
+                curve.positions = FlowAlongGradient.Optimize(curve.positions);
                 curve.ParameterExchange();
                 curve.MeshUpdate();
             }
