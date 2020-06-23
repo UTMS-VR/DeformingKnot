@@ -77,6 +77,25 @@ public class MakeMesh
         return mesh;
     }
 
+    public static Mesh GetMeshAtEndPosition(List<Vector3> positions, float radius)
+    {
+        var vertices = new List<Vector3>();
+        var triangles = new List<int>();
+        var normals = new List<Vector3>();
+
+        var meshInfo = GetMeshInfoAtPosition(positions[0], radius);
+        vertices.AddRange(meshInfo.vertices);
+        triangles.AddRange(meshInfo.triangles);
+        normals.AddRange(meshInfo.normals);
+
+        var mesh = new Mesh();
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.normals = normals.ToArray();
+
+        return mesh;
+    }
+
     private static (List<Vector3> vertices, List<int> triangles, List<Vector3> normals)
         GetMeshInfoAtPosition(Vector3 position, float radius)
     {

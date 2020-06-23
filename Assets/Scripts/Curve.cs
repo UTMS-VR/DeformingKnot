@@ -63,6 +63,11 @@ public class Curve
         this.meshAtPositions = MakeMesh.GetMeshAtPositions(this.positions, this.radius * 5.0f);
     }
 
+    public void MeshAtEndPositionUpdate()
+    {
+        this.meshAtPositions = MakeMesh.GetMeshAtEndPosition(this.positions, this.radius * 5.0f);
+    }
+
     public List<Vector3> GetTangents()
     {
         List<Vector3> tangents = new List<Vector3>();
@@ -102,6 +107,7 @@ public class Curve
 
             if (_positions.Count > this.DivisionNumber())
             {
+                Debug.Log("remove");
                 _positions.Remove(_positions[_positions.Count - 1]);
             }
         }
@@ -150,5 +156,12 @@ public class Curve
         {
             newPositions.Add(start + (end - start) * (temporarySegment * i - remainder) / distance);
         }
+    }
+
+    public void ParameterShift()
+    {
+        Vector3 endPosition = this.positions[0];
+        this.positions.Remove(endPosition);
+        this.positions.Add(endPosition);
     }
 }

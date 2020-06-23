@@ -22,7 +22,7 @@ public class KnotEnergy : MonoBehaviour
 
         curve = new Curve(false, false, false, true, positions, Vector3.zero, Quaternion.identity);
         curve.segment = curve.ArcLength() / curve.positions.Count;
-        curve.MeshAtPositionsUpdate();
+        curve.MeshAtEndPositionUpdate();
 
         // curve.momentum = new List<Vector3>();
 
@@ -43,11 +43,16 @@ public class KnotEnergy : MonoBehaviour
             // Debug.Log("optimize");
             curve.positions = FlowAlongGradient.Optimize(curve.positions);
             // SGD.Step(curve);
-            Debug.Log("a" + curve.DivisionNumber());
+            Debug.Log("new");
+            Debug.Log(curve.ArcLength() / curve.DivisionNumber());
             curve.ParameterExchange();
-            Debug.Log("b" + curve.positions.Count);
+            Debug.Log(Vector3.Distance(curve.positions[0], curve.positions[1]));
+            Debug.Log(Vector3.Distance(curve.positions[curve.positions.Count - 1], curve.positions[0]));
+            Debug.Log(Vector3.Distance(curve.positions[19], curve.positions[20]));
+            Debug.Log(Vector3.Distance(curve.positions[20], curve.positions[21]));
+            // curve.ParameterShift();
             curve.MeshUpdate();
-            curve.MeshAtPositionsUpdate();
+            curve.MeshAtEndPositionUpdate();
         }
     }
 
