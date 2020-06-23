@@ -92,34 +92,33 @@ public class Curve
     public void ParameterExchange()
     {
         int length = this.positions.Count;
-
-        List<Vector3> _positions = new List<Vector3>();
-        _positions.Add(this.positions[0]);
+        List<Vector3> newpositions = new List<Vector3>();
+        newpositions.Add(this.positions[0]);
+        float remainder = 0.0f;
 
         for (int i = 1; i < length; i++)
         {
-            Completion(ref _positions, this.positions[i - 1], this.positions[i]);
+            Completion(ref newpositions, this.positions[i - 1], this.positions[i], ref remainder);
         }
 
         if (this.isClosed)
         {
-            Completion(ref _positions, this.positions[length - 1], this.positions[0]);
+            Completion(ref newpositions, this.positions[length - 1], this.positions[0], ref remainder);
 
-            if (_positions.Count > this.DivisionNumber())
+            if (newpositions.Count > this.DivisionNumber())
             {
-                Debug.Log("remove");
-                _positions.Remove(_positions[_positions.Count - 1]);
+                newpositions.Remove(newpositions[newpositions.Count - 1]);
             }
         }
         else
         {
-            if (_positions.Count < this.DivisionNumber() + 1)
+            if (newpositions.Count < this.DivisionNumber() + 1)
             {
-                _positions.Add(this.positions[length - 1]);
+                newpositions.Add(this.positions[length - 1]);
             }
         }
 
-        this.positions = _positions;
+        this.positions = newpositions;
     }
 
     public float ArcLength()
@@ -140,28 +139,38 @@ public class Curve
         return arclength;
     }
 
-    public int DivisionNumber()
+    private int DivisionNumber()
     {
         return Mathf.FloorToInt(this.ArcLength() / this.segment + 0.5f);
     }
 
-    private void Completion(ref List<Vector3> newPositions, Vector3 start, Vector3 end)
+    private void Completion(ref List<Vector3> newPositions, Vector3 start, Vector3 end, ref float remainder)
     {
-        Vector3 last = newPositions[newPositions.Count - 1];
-        float remainder = Vector3.Distance(last, start);
-        float distance = Vector3.Distance(start, end);
         float temporarySegment = this.ArcLength() / this.DivisionNumber();
+        float distance = Vector3.Distance(start, end);
+        remainder += distance;
 
-        for (int i = 1; temporarySegment * i - remainder < distance; i++)
+        while (temporarySegment < remainder)
         {
-            newPositions.Add(start + (end - start) * (temporarySegment * i - remainder) / distance);
+            remainder -= temporarySegment;
+            newPositions.Add(start + (end - start) * (distance - remainder) / distance);
         }
     }
 
-    public void ParameterShift()
+    public void ParameterShift(int n) // n < this.positions.Count
     {
-        Vector3 endPosition = this.positions[0];
-        this.positions.Remove(endPosition);
-        this.positions.Add(endPosition);
+        List<Vector3> newpositions = new List<Vector3>();
+
+        for (int i = n; i < this.positions.Count; i++)
+        {
+            newpositions.Add(this.positions[i]);
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            newpositions.Add(this.positions[i]);
+        }
+
+        this.positions = newpositions;
     }
 }

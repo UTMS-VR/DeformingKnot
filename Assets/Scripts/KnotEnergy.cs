@@ -5,7 +5,7 @@ using UnityEngine;
 public class KnotEnergy : MonoBehaviour
 {
     [SerializeField] private Material material;
-    private int longitude = 50;
+    private int longitude = 100;
 
     private Curve curve;
 
@@ -17,12 +17,12 @@ public class KnotEnergy : MonoBehaviour
         for (int i = 0; i < longitude; i++)
         {
             float t = (float)i / longitude;
-            positions.Add(Circle(t));
+            positions.Add(ExampleCurve(t));
         }
 
         curve = new Curve(false, false, false, true, positions, Vector3.zero, Quaternion.identity);
         curve.segment = curve.ArcLength() / curve.positions.Count;
-        curve.MeshAtEndPositionUpdate();
+        curve.MeshAtPositionsUpdate();
 
         // curve.momentum = new List<Vector3>();
 
@@ -40,24 +40,15 @@ public class KnotEnergy : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space))
         {
-            // Debug.Log("optimize");
-            curve.positions = FlowAlongGradient.Optimize(curve.positions);
-            // SGD.Step(curve);
-            Debug.Log("new");
-            Debug.Log(curve.ArcLength() / curve.DivisionNumber());
+            // curve.positions = FlowAlongGradient.Optimize(curve.positions);
             curve.ParameterExchange();
-            Debug.Log(Vector3.Distance(curve.positions[0], curve.positions[1]));
-            Debug.Log(Vector3.Distance(curve.positions[curve.positions.Count - 1], curve.positions[0]));
-            Debug.Log(Vector3.Distance(curve.positions[19], curve.positions[20]));
-            Debug.Log(Vector3.Distance(curve.positions[20], curve.positions[21]));
-            // curve.ParameterShift();
             curve.MeshUpdate();
-            curve.MeshAtEndPositionUpdate();
+            curve.MeshAtPositionsUpdate();
         }
     }
 
     //circle
-    private Vector3 Circle(float t)
+    private Vector3 ExampleCurve(float t)
     {
         float theta = 2 * Mathf.PI * (t + 0.3f);
         float x = 3 * Mathf.Cos(theta);
