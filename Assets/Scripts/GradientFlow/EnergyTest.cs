@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DrawCurve;
 
-public class KnotEnergy : MonoBehaviour
+public class EnergyTest : MonoBehaviour
 {
     [SerializeField] private Material material;
-    private int longitude = 100;
+    private int longitude = 50;
 
     private Curve curve;
 
@@ -21,7 +22,7 @@ public class KnotEnergy : MonoBehaviour
         }
 
         curve = new Curve(false, false, false, true, positions, Vector3.zero, Quaternion.identity);
-        curve.segment = curve.ArcLength() / curve.positions.Count;
+        curve.segment = AdjustParameter.ArcLength(curve.positions, curve.isClosed) / curve.positions.Count;
         curve.MeshAtPositionsUpdate();
 
         // curve.momentum = new List<Vector3>();
@@ -40,8 +41,9 @@ public class KnotEnergy : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space))
         {
-            // curve.positions = FlowAlongGradient.Optimize(curve.positions);
-            curve.ParameterExchange();
+            // SGD.Step(curve);
+            curve.positions = KnotEnergy.Flow(curve.positions);
+            AdjustParameter.Equalize(ref curve.positions, curve.segment, curve.isClosed);
             curve.MeshUpdate();
             curve.MeshAtPositionsUpdate();
         }
@@ -50,7 +52,7 @@ public class KnotEnergy : MonoBehaviour
     //circle
     private Vector3 ExampleCurve(float t)
     {
-        float theta = 2 * Mathf.PI * (t + 0.3f);
+        float theta = 2 * Mathf.PI * (t + 0.0f);
         float x = 3 * Mathf.Cos(theta);
         float y = 3 * Mathf.Sin(theta);
         return new Vector3(x, y, 0);

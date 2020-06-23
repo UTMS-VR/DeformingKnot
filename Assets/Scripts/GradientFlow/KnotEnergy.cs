@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FlowAlongGradient
+public class KnotEnergy
 {
     private static float lr = 1.0f; // learning rate
 
-    public static List<Vector3> Optimize(List<Vector3> positions)
+    public static List<Vector3> Flow(List<Vector3> positions)
     {
         int length = positions.Count;
 

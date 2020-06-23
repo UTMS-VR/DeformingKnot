@@ -180,8 +180,8 @@ public class Player
                 }*/
 
                 // SGD.Step(curve);
-                curve.positions = FlowAlongGradient.Optimize(curve.positions);
-                curve.ParameterExchange();
+                curve.positions = KnotEnergy.Flow(curve.positions);
+                DrawCurve.AdjustParameter.Equalize(ref curve.positions, curve.segment, curve.isClosed);
                 curve.MeshUpdate();
             }
         }
