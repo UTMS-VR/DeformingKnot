@@ -6,53 +6,74 @@ using DrawCurve;
 public class EnergyTest : MonoBehaviour
 {
     [SerializeField] private Material material;
-    private int longitude = 50;
+    private int longitude = 64;
+    int repeat = 10;
 
-    private Curve curve;
+    private Curve curve1;
+    private Curve curve2;
 
     // Start is called before the first frame update
     void Start()
     {
-        List<Vector3> positions = new List<Vector3>();
+        List<Vector3> positions1 = new List<Vector3>();
+        List<Vector3> positions2 = new List<Vector3>();
 
         for (int i = 0; i < longitude; i++)
         {
             float t = (float)i / longitude;
-            positions.Add(ExampleCurve(t));
+            positions1.Add(ExampleCurve(t));
+            positions2.Add(ExampleCurve(t));
         }
 
-        curve = new Curve(false, false, false, true, positions, Vector3.zero, Quaternion.identity);
-        curve.segment = AdjustParameter.ArcLength(curve.positions, curve.isClosed) / curve.positions.Count;
-        curve.MeshAtPositionsUpdate();
+        curve1 = new Curve(false, false, false, true, positions1, Vector3.zero, Quaternion.identity);
+        curve1.segment = AdjustParameter.ArcLength(curve1.positions, curve1.isClosed) / curve1.positions.Count;
+        curve1.MeshAtPositionsUpdate();
 
-        // curve.momentum = new List<Vector3>();
+        curve2 = new Curve(false, false, false, true, positions2, Vector3.zero, Quaternion.identity);
+        curve2.segment = AdjustParameter.ArcLength(curve2.positions, curve2.isClosed) / curve2.positions.Count;
+        curve2.MeshAtPositionsUpdate();
+
+        // curve1.momentum = new List<Vector3>();
 
         /*for (int i = 0; i <= longitude; i++)
         {
-            curve.momentum.Add(new Vector3(0, 0, 0));
+            curve1.momentum.Add(new Vector3(0, 0, 0));
         }*/
     }
 
     // Update is called once per frame
     void Update()
     {
-        Graphics.DrawMesh(curve.mesh, new Vector3(0, 0, 3), Quaternion.identity, material, 0);
-        Graphics.DrawMesh(curve.meshAtPositions, new Vector3(0, 0, 3), Quaternion.identity, MakeMesh.PositionMaterial, 0);
+        Graphics.DrawMesh(curve1.mesh, new Vector3(0, 0, 3), Quaternion.identity, material, 0);
+        Graphics.DrawMesh(curve1.meshAtPositions, new Vector3(0, 0, 3), Quaternion.identity, MakeMesh.PositionMaterial, 0);
+        Graphics.DrawMesh(curve2.mesh, new Vector3(0, 0, 3), Quaternion.identity, material, 0);
+        // Graphics.DrawMesh(curve2.meshAtPositions, new Vector3(0, 0, 3), Quaternion.identity, MakeMesh.PositionMaterial, 0);
 
         if (Input.GetKey(KeyCode.Space))
         {
-            // SGD.Step(curve);
-            curve.positions = KnotEnergy.Flow(curve.positions);
-            AdjustParameter.Equalize(ref curve.positions, curve.segment, curve.isClosed);
-            curve.MeshUpdate();
-            curve.MeshAtPositionsUpdate();
+            for (int i = 0; i < repeat; i++)
+            {
+                // SGD.Step(curve1);
+                KnotEnergy.Flow(curve1.positions);
+                KnotEnergy.RestrictedFlow(curve2.positions);
+                // AdjustParameter.EqualizeP(ref curve1.positions, curve1.segment, curve1.isClosed);
+                // Debug.Log(curve1.positions.Count);
+                // AdjustParameter.EqualizeL(ref curve1.positions, curve1.segment, curve1.positions.Count, curve1.isClosed);
+                // AdjustParameter.EqualizeD(ref curve1.positions, curve1.positions.Count, curve1.isClosed);
+                // AdjustParameter.Shift(ref curve1.positions, 7);
+            }
+
+            curve1.MeshUpdate();
+            curve1.MeshAtPositionsUpdate();
+            curve2.MeshUpdate();
+            curve2.MeshAtPositionsUpdate();
         }
     }
 
     //circle
     private Vector3 ExampleCurve(float t)
     {
-        float theta = 2 * Mathf.PI * (t + 0.0f);
+        float theta = 2 * Mathf.PI * (t + 0.3f);
         float x = 3 * Mathf.Cos(theta);
         float y = 3 * Mathf.Sin(theta);
         return new Vector3(x, y, 0);
