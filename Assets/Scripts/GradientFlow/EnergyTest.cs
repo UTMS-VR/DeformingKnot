@@ -43,7 +43,7 @@ public class EnergyTest : MonoBehaviour
             for (int i = 0; i < repeat; i++)
             {
                 Optimizer optimizer = new Optimizer(curve);
-                optimizer.MomentumStep();
+                optimizer.MomentumFlow();
                 // AdjustParameter.EqualizeP(ref curve.positions, curve.segment, curve.isClosed);
                 // AdjustParameter.EqualizeL(ref curve.positions, curve.segment, curve.positions.Count, curve.isClosed);
                 // AdjustParameter.EqualizeD(ref curve.positions, curve.positions.Count, curve.isClosed);

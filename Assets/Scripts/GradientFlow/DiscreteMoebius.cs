@@ -18,8 +18,8 @@ public class DiscreteMoebius
 
     public Vector3[] Gradient()
     {
-        float arc = ArcLength();
-        float energy = AuxiliaryEnergy();
+        float arc = ArcLength(this.positions.ToArray());
+        float energy = AuxiliaryEnergy(this.positions.ToArray());
         Vector3[] gradient = new Vector3[this.length];
 
         for (int i = 0; i < this.length; i++)
@@ -44,38 +44,45 @@ public class DiscreteMoebius
         return gradient;
     }
 
-    public Vector3[] RestrictedGradient()
+    public Vector3[] LineSearch()
     {
+        float alpha = 1.0f;
+        float epsilon = 1e-05f;
         Vector3[] gradient = Gradient();
-        Vector3[][] matrix = ONRestrictionMatrix();
+        float energy = Energy(this.positions.ToArray());
+        float norm = SequentialNorm(gradient);
 
-        float[] product = new float[this.length - 1];
+        Vector3[] newPositions = new Vector3[this.length];
 
-        for (int i = 0; i < this.length - 1; i++)
+        while (true)
         {
-            product[i] = SequentialInnerProduct(matrix[i], gradient);
-        }
-
-        for (int j = 0; j < this.length; j++)
-        {
-            for (int i = 0; i < this.length - 1; i++)
+            for (int i = 0; i < this.length; i++)
             {
-                gradient[j] -= product[i] * matrix[i][j];
+                newPositions[i] = this.positions[i] + alpha * gradient[i];
             }
+
+            if (Energy(newPositions) < energy - epsilon * alpha * Mathf.Pow(norm, 2))
+            {
+                break;
+            }
+
+            alpha /= 1.2f;
         }
 
-        return gradient;
+        Debug.Log(alpha);
+
+        return newPositions;
     }
 
-    public float Energy()
+    public float Energy(Vector3[] sequence)
     {
-        float arc = ArcLength();
-        float energy = Mathf.Pow(arc / this.length, 2) * AuxiliaryEnergy();
+        float arc = ArcLength(sequence);
+        float energy = Mathf.Pow(arc / this.length, 2) * AuxiliaryEnergy(sequence);
 
         return energy - Mathf.Pow(Mathf.PI, 2) * this.length / 3.0f + 4.0f;
     }
 
-    private float AuxiliaryEnergy()
+    private float AuxiliaryEnergy(Vector3[] sequence)
     {
         float energy = 0.0f;
 
@@ -85,7 +92,7 @@ public class DiscreteMoebius
             {
                 if (i != j)
                 {
-                    energy += 1.0f / (this.positions[i] - this.positions[j]).sqrMagnitude;
+                    energy += 1.0f / (sequence[i] - sequence[j]).sqrMagnitude;
                 }
             }
         }
@@ -98,13 +105,13 @@ public class DiscreteMoebius
         return (v1 - v2) / Mathf.Pow((v1 - v2).sqrMagnitude, 2);
     }
 
-    public float ArcLength()
+    public float ArcLength(Vector3[] sequence)
     {
         float arc = 0.0f;
 
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < this.length; i++)
         {
-            arc += Vector3.Distance(positions[i], positions[(i + 1) % this.length]);
+            arc += Vector3.Distance(sequence[i], sequence[(i + 1) % this.length]);
         }
 
         return arc;
@@ -120,86 +127,5 @@ public class DiscreteMoebius
         }
 
         return Mathf.Sqrt(_sum);
-    }
-
-    private float SequentialInnerProduct(Vector3[] sequence1, Vector3[] sequence2)
-    {
-        float _sum = 0.0f;
-
-        for (int i = 0; i < this.length - 1; i++)
-        {
-            _sum += Vector3.Dot(sequence1[i], sequence2[i]);
-        }
-
-        return _sum;
-    }
-
-    private void SequentialNormalize(Vector3[] sequence)
-    {
-        float norm = SequentialNorm(sequence);
-
-        for (int i = 0; i < this.length; i++)
-        {
-            sequence[i] = sequence[i] / norm;
-        }
-    }
-
-    private Vector3[][] RestrictionMatrix()
-    {
-        Vector3[][] _matrix = new Vector3[this.length - 1][];
-
-        for (int i = 0; i < this.length - 1; i++)
-        {
-            _matrix[i] = new Vector3[this.length];
-
-            for (int j = 0; j < this.length; j++)
-            {
-                _matrix[i][j] = Vector3.zero;
-            }
-        }
-
-        for (int i = 0; i < this.length - 1; i++)
-        {
-            _matrix[i][i] = this.positions[i + 1] - this.positions[i];
-            _matrix[i][i + 1] = this.positions[i] - this.positions[(i + 2) % this.length];
-            _matrix[i][(i + 2) % this.length] = this.positions[(i + 2) % this.length] - this.positions[i + 1];
-        }
-
-        return _matrix;
-    }
-
-    private Vector3[][] ONRestrictionMatrix()
-    {
-        Vector3[][] _matrix = RestrictionMatrix();
-
-        SequentialNormalize(_matrix[0]);
-        SequentialNormalize(_matrix[1]);
-
-        for (int i = 2; i < this.length - 2; i++)
-        {
-            float product1 = SequentialInnerProduct(_matrix[i - 2], _matrix[i]);
-            float product2 = SequentialInnerProduct(_matrix[i - 1], _matrix[i]);
-
-            for (int j = 0; j < this.length; j++)
-            {
-                _matrix[i][j] -= _matrix[i - 2][j] * product1 + _matrix[i - 1][j] * product2;
-            }
-
-            SequentialNormalize(_matrix[i]);
-        }
-
-        for (int i = 0; i < this.length - 2; i++)
-        {
-            float product = SequentialInnerProduct(_matrix[i], _matrix[this.length - 2]);
-
-            for (int j = 0; j < this.length; j++)
-            {
-                _matrix[this.length - 2][j] -= _matrix[i][j] * product;
-            }
-        }
-
-        SequentialNormalize(_matrix[this.length - 2]);
-
-        return _matrix;
     }
 }

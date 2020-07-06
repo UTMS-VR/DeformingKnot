@@ -180,8 +180,7 @@ public class Player
                 }
 
                 Optimizer optimizer = new Optimizer(curve);
-                optimizer.MomentumStep();
-                // DrawCurve.AdjustParameter.EqualizeL(ref curve.positions, curve.segment, curve.positions.Count, curve.isClosed);
+                optimizer.MomentumFlow();
                 curve.MeshUpdate();
             }
         }
