@@ -4,55 +4,51 @@ using UnityEngine;
 
 public class Loss
 {
-    private const float epsilon = 1e-03f;
+    private List<Vector3> positions;
+    private int length;
+    private float lr;
 
-    private Curve _curve;
-    private int N;
-    
-    public Loss(Curve curve)
+    public Loss(List<Vector3> positions, float lr)
     {
-        this._curve = curve;
-        this.N = curve.positions.Count;
+        this.positions = positions;
+        this.length = positions.Count;
+        this.lr = lr;
     }
 
-    public List<Vector3> Gradient()
+    public Vector3[] Gradient()
     {
-        List<Vector3> _gradient = new List<Vector3>();
+        Vector3[] _gradient = new Vector3[this.length];
 
-        for (int i = 0; i < N - 1; i++)
+        for (int i = 0; i < this.length; i++)
         {
-            List<Vector3> integrand = Integrand(i);
-            _gradient.Add(IntegralAlongCurve(integrand, 0, N));
+            Vector3[] integrand = Integrand(i);
+            _gradient[i] = -this.lr * IntegralAlongCurve(integrand, 0, this.length);
         }
-
-        // knot case
-        _gradient.Add(_gradient[0]);
 
         return _gradient;
     }
 
-    private List<Vector3> Integrand(int i)
+    private Vector3[] Integrand(int i)
     {
-        List<Vector3> _integrand = new List<Vector3>();
-        for (int j = 0; j < N - 1; j++)
-        {
-            _integrand.Add(Function(i, j));
-        }
+        Vector3[] _integrand = new Vector3[this.length];
 
-        // knot case
-        _integrand.Add(_integrand[0]);
+        for (int j = 0; j < this.length; j++)
+        {
+            _integrand[j] = Function(i, j);
+        }
 
         return _integrand;
     }
 
     private Vector3 Function(int i, int j)
     {
-        List<Vector3> p = this._curve.positions;
-        List<Vector3> t = DrawCurve.MakeMesh.Tangents(this._curve.positions, true);
+        List<Vector3> p = this.positions;
+        int N = this.length;
+        Vector3[] t = Tangents();
 
-        int k = (i != N - 1) ? i + 1 : 1;
-        int l = (i != 0) ? i - 1 : N - 2;
-        Vector3 _curvature = (t[k].normalized - t[l].normalized) / epsilon;
+        int k = (i + 1) % N;
+        int l = (i + N - 1) % N;
+        Vector3 _curvature = (t[k].normalized - t[i].normalized) * this.length;
         float _norm = (p[j] - p[i]).magnitude;
 
         if (i == j)
@@ -61,31 +57,77 @@ public class Loss
         }
         else
         {
-            return OrthogonalProjection(t[i],
-            (4 / (float) Mathf.Pow(_norm, 4)) * (p[j] - p[i]) - (2 / (float) Mathf.Pow(_norm, 2)) * _curvature);
+            return (4.0f * Vector3.ProjectOnPlane(t[i], (p[j] - p[i])) / Mathf.Pow(_norm, 4)
+                    - 2.0f * _curvature / (t[i].magnitude * Mathf.Pow(_norm, 2))) * t[j].magnitude;
         }
     }
 
-    private Vector3 IntegralAlongCurve(List<Vector3> integrand, int StartIndex, int EndIndex)
+    private Vector3 IntegralAlongCurve(Vector3[] integrand, int StartIndex, int EndIndex)
     {
         Vector3 _integral = new Vector3(0, 0, 0);
-        List<Vector3> tangents = DrawCurve.MakeMesh.Tangents(this._curve.positions, true);
         int n = EndIndex - StartIndex;
 
         // trapezoidal methods
         for (int i = StartIndex; i < EndIndex; i++)
         {
-            float velocity = tangents[i].magnitude;
             int k = (i != EndIndex - 1) ? i + 1 : StartIndex;
-            _integral += (integrand[i] + integrand[k]) * (velocity / ((float) 2 * n));
+            _integral += (integrand[i] + integrand[k]) / ((float) 2 * n);
         }
 
         return _integral;
     }
 
-    // U maps to the orthoganl projection of V
-    private Vector3 OrthogonalProjection(Vector3 V, Vector3 U)
+    private Vector3[] Tangents()
     {
-        return U - (Vector3.Dot(V, U) / Mathf.Pow(V.magnitude, 2)) * V;
+        Vector3[] tangents = new Vector3[this.length];
+
+        for (int i = 0; i < this.length; i++)
+        {
+            tangents[i] = (this.positions[(i + 1) % this.length] - this.positions[i]) * this.length;
+        }
+
+        return tangents;
+    }
+
+    public float Energy()
+    {
+        float energy = 0.0f;
+
+        for (int i = 0; i < this.length; i++)
+        {
+            for (int j = 0; j < this.length; j++)
+            {
+                energy += EnergyIntegrand(i, j) / Mathf.Pow(this.length, 2);
+            }
+        }
+
+        return energy;
+    }
+
+    private float EnergyIntegrand(int i, int j)
+    {
+        if (i == j)
+        {
+            return 0.0f;
+        }
+        else
+        {
+            float first = 1.0f / (this.positions[j] - this.positions[i]).sqrMagnitude;
+            float second = 1.0f / Mathf.Pow(Mathf.Min(ArcLength(i, j), ArcLength(j, i)), 2);
+
+            return (first - second) * Tangents()[i].magnitude * Tangents()[j].magnitude;
+        }
+    }
+
+    private float ArcLength(int i, int j)
+    {
+        float arc = 0.0f;
+
+        for (int k = i; (k % this.length) != j; k++) 
+        {
+            arc += Vector3.Distance(this.positions[k % this.length], this.positions[(k + 1) % this.length]);
+        }
+
+        return arc;
     }
 }
