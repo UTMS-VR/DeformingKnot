@@ -91,19 +91,12 @@ namespace DrawCurve
 
         public static void Shift(ref List<Vector3> positions, int n) // 0 <= n < positions.Count
         {
-            List<Vector3> newpositions = new List<Vector3>();
-
-            for (int i = n; i < positions.Count; i++)
-            {
-                newpositions.Add(positions[i]);
-            }
-
             for (int i = 0; i < n; i++)
             {
-                newpositions.Add(positions[i]);
+                Vector3 position = positions[0];
+                positions.Remove(position);
+                positions.Add(position);
             }
-
-            positions = newpositions;
         }
     }
 }

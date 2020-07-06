@@ -10,15 +10,15 @@ public class Curve
     public bool isBeingMoved;
     public bool isClosed;
     public List<Vector3> positions;
+    public List<Vector3> momentum;
     public Mesh mesh;
     public Mesh meshAtPositions;
     public Vector3 position;
     public Quaternion rotation;
-    public List<Vector3> momentum;
 
-    public float segment = 0.1f;
+    public float segment = 0.03f;
     private int meridian = 10;
-    private float radius = 0.01f;
+    private float radius = 0.002f;
 
     public Curve(
         bool isSelected,
@@ -61,11 +61,11 @@ public class Curve
 
     public void MeshAtPositionsUpdate()
     {
-        this.meshAtPositions = MakeMesh.GetMeshAtPositions(this.positions, this.radius * 5.0f);
+        this.meshAtPositions = MakeMesh.GetMeshAtPositions(this.positions, this.radius * 2.0f);
     }
 
     public void MeshAtEndPositionUpdate()
     {
-        this.meshAtPositions = MakeMesh.GetMeshAtEndPosition(this.positions, this.radius * 5.0f);
+        this.meshAtPositions = MakeMesh.GetMeshAtEndPosition(this.positions, this.radius * 2.0f);
     }
 }

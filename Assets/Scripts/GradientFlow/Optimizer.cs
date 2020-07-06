@@ -2,52 +2,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SGD
+public class Optimizer
 {
-    private static float lr = 1e-05f;
-    private static float alpha = 0.9f;
+    private Curve curve;
+    private float length;
+    private Loss loss;
+    private Electricity electricity;
+    private DiscreteMoebius discreteMoebius;
+    private Elasticity elasticity;
+    private float alpha = 0.9f;
 
-    public static void Step(Curve curve)
+    public Optimizer(Curve curve)
     {
-        int N = curve.positions.Count;
+        this.curve = curve;
+        this.length = curve.positions.Count;
+        this.loss = new Loss(curve.positions, 1e-08f);
+        this.electricity = new Electricity(curve.positions, 1e-03f);
+        this.discreteMoebius = new DiscreteMoebius(curve.positions, 1e-05f);
+        this.elasticity = new Elasticity(curve.positions, 1.0f);
+    }
 
-        List<Vector3> _positions = new List<Vector3>();
+    public void Step()
+    {
+        Vector3[] gradient = this.discreteMoebius.Gradient();
+        Debug.Log(this.discreteMoebius.Energy());
 
-        Loss loss = new Loss(curve);
-        List<Vector3> grad = loss.Gradient();
-
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < this.length; i++)
         {
-            _positions.Add(curve.positions[i] - lr * grad[i]);
+            this.curve.positions[i] += gradient[i];
         }
-
-        curve.positions = _positions;
     }
 
     // momentum SGD
-    /*public static void Step(Curve curve, List<Vector3> momentum)
+    public void MomentumStep()
     {
-        int N = curve.positions.Count;
+        Vector3[] gradient = this.discreteMoebius.Gradient();
+        Debug.Log(this.discreteMoebius.Energy());
 
-        List<Vector3> _positions = new List<Vector3>();
-        List<Vector3> _momentum = new List<Vector3>();
-
-        Loss loss = new Loss(curve);
-        List<Vector3> grad = loss.Gradient();
-
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < this.length; i++)
         {
-            Vector3 P = curve.positions[i];
-            Vector3 DP = - alpha * momentum[i] + (1 - alpha) * lr * grad[i];
-            _positions.Add(P - DP);
-            _momentum.Add(DP);
+            this.curve.momentum[i] = this.alpha * this.curve.momentum[i] + gradient[i];
+            this.curve.positions[i] += this.curve.momentum[i];
         }
-
-        curve.positions = _positions;
-
-        for (int i = 0; i < N; i++)
-        {
-            momentum[i] = _momentum[i];
-        }
-    }*/
+    }
 }

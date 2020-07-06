@@ -169,7 +169,7 @@ public class Player
         {
             if (curve.isSelected && curve.isClosed)
             {
-                /*if (curve.momentum == null)
+                if (controller.GetButtonDown(OVRInput.RawButton.LHandTrigger))
                 {
                     curve.momentum = new List<Vector3>();
 
@@ -177,11 +177,11 @@ public class Player
                     {
                         curve.momentum.Add(Vector3.zero);
                     }
-                }*/
+                }
 
-                // SGD.Step(curve);
-                KnotEnergy.Flow(curve.positions);
-                DrawCurve.AdjustParameter.EqualizeP(ref curve.positions, curve.segment, curve.isClosed);
+                Optimizer optimizer = new Optimizer(curve);
+                optimizer.MomentumStep();
+                // DrawCurve.AdjustParameter.EqualizeL(ref curve.positions, curve.segment, curve.positions.Count, curve.isClosed);
                 curve.MeshUpdate();
             }
         }
