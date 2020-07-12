@@ -5,7 +5,7 @@ using DrawCurve;
 
 public class EnergyTest : MonoBehaviour
 {
-    private int longitude = 128;
+    private int longitude = 64;
     int repeat = 1;
     private Curve curve;
 
@@ -17,7 +17,7 @@ public class EnergyTest : MonoBehaviour
         for (int i = 0; i < longitude; i++)
         {
             float t = (float)i / longitude;
-            positions.Add(ExampleCurve1(t));
+            positions.Add(ExampleCurve5(t));
         }
 
         curve = new Curve(false, false, false, true, positions, Vector3.zero, Quaternion.identity);
@@ -38,16 +38,10 @@ public class EnergyTest : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            Debug.Log("flow");
-
             for (int i = 0; i < repeat; i++)
             {
                 Optimizer optimizer = new Optimizer(curve);
                 optimizer.MomentumFlow();
-                // AdjustParameter.EqualizeP(ref curve.positions, curve.segment, curve.isClosed);
-                // AdjustParameter.EqualizeL(ref curve.positions, curve.segment, curve.positions.Count, curve.isClosed);
-                // AdjustParameter.EqualizeD(ref curve.positions, curve.positions.Count, curve.isClosed);
-                // AdjustParameter.Shift(ref curve.positions, 7);
             }
 
             curve.MeshUpdate();

@@ -44,7 +44,7 @@ public class DiscreteMoebius
         return gradient;
     }
 
-    public Vector3[] LineSearch()
+    /*public Vector3[] LineSearch()
     {
         float alpha = 1.0f;
         float epsilon = 1e-05f;
@@ -72,7 +72,7 @@ public class DiscreteMoebius
         Debug.Log(alpha);
 
         return newPositions;
-    }
+    }*/
 
     public float Energy(Vector3[] sequence)
     {
