@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DrawCurve;
 
 public class Curve
 {
@@ -9,12 +10,15 @@ public class Curve
     public bool isBeingMoved;
     public bool isClosed;
     public List<Vector3> positions;
+    public List<Vector3> momentum;
     public Mesh mesh;
+    public Mesh meshAtPositions;
     public Vector3 position;
     public Quaternion rotation;
 
-    private int meridian = 100;
-    private float radius = 0.01f;
+    public float segment = 0.01f;
+    private int meridian = 10;
+    private float radius = 0.002f;
 
     public Curve(
         bool isSelected,
@@ -33,7 +37,7 @@ public class Curve
 
         if (positions.Count >= 2)
         {
-            this.mesh = MakeMesh.Curve(this.positions, this.meridian, this.radius, this.isClosed);
+            this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.isClosed);
         }
 
         this.position = position;
@@ -52,6 +56,16 @@ public class Curve
 
     public void MeshUpdate()
     {
-        this.mesh = MakeMesh.Curve(this.positions, this.meridian, this.radius, this.isClosed);
+        this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.isClosed);
+    }
+
+    public void MeshAtPositionsUpdate()
+    {
+        this.meshAtPositions = MakeMesh.GetMeshAtPositions(this.positions, this.radius * 2.0f);
+    }
+
+    public void MeshAtEndPositionUpdate()
+    {
+        this.meshAtPositions = MakeMesh.GetMeshAtEndPosition(this.positions, this.radius * 2.0f);
     }
 }

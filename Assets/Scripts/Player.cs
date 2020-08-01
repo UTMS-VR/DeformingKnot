@@ -8,7 +8,6 @@ using DebugUtil;
 public class Player
 {
     private Controller controller;
-    private float segment = 0.02f;
     private float collision = 0.05f;
 
     private List<Vector3> Positions;
@@ -37,7 +36,7 @@ public class Player
                 {
                     curve.positions.Add(nowPosition);
                 }
-                else if (Vector3.Distance(nowPosition, curve.positions.Last()) >= segment)
+                else if (Vector3.Distance(nowPosition, curve.positions.Last()) >= curve.segment)
                 {
                     curve.positions.Add(nowPosition);
                     curve.MeshUpdate();
@@ -162,6 +161,29 @@ public class Player
         }
 
         RemoveAddCurve(ref curves, removeCurves, addCurves);
+    }
+
+    public void Optimize(List<Curve> curves)
+    {
+        foreach(Curve curve in curves)
+        {
+            if (curve.isSelected && curve.isClosed)
+            {
+                if (controller.GetButtonDown(OVRInput.RawButton.LHandTrigger))
+                {
+                    curve.momentum = new List<Vector3>();
+
+                    for (int i = 0; i < curve.positions.Count; i++)
+                    {
+                        curve.momentum.Add(Vector3.zero);
+                    }
+                }
+
+                Optimizer optimizer = new Optimizer(curve);
+                optimizer.MomentumFlow();
+                curve.MeshUpdate();
+            }
+        }
     }
 
     public void Remove(ref List<Curve> curves)
