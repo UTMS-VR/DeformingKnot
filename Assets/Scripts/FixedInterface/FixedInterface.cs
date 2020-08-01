@@ -9,32 +9,38 @@ namespace FixedInterface {
     private Canvas canvas;
     private Text text;
     private RectTransform textRectTransform;
+    public FixedInterfaceEvent firstEvents;
     public FixedInterfaceEvent events;
 
     // ヒエラルキーに Canvas を 1 つ追加し、このスクリプトをアタッチしてください。
     // Canvas の各種設定はこのスクリプトが自動で行うので、ヒエラルキーに追加する以上の設定を行う必要はありません。
     // また、ヒエラルキーに OVRCameraRig が存在することを確認してください (存在しなかった場合は実行時にエラーログが出力されます)。
     public void Start() {
-      var setting = new FixedInterfaceSetting();
-      SetupCanvas();
-      SetupText();
-      SetupEvents();
+      Setup();
+      var setting = CreateSetting(true);
+      firstEvents.Invoke(setting);
       ApplySetting(setting);
     }
 
     public void Update() {
-      var setting = CreateSetting();
+      var setting = CreateSetting(false);
       events.Invoke(setting);
       ApplySetting(setting);
     }
 
+    private void Setup() {
+      SetupCanvas();
+      SetupText();
+      SetupEvents();
+    }
+
     private void SetupCanvas() {
       var canvas = this.gameObject.GetComponent<Canvas>();
-      var anchor = GameObject.Find("CenterEyeAnchor");
-      canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+      var anchorObject = GameObject.Find("CenterEyeAnchor");
+      canvas.renderMode = RenderMode.ScreenSpaceCamera;
       canvas.pixelPerfect = true;
-      if (anchor != null) {
-        canvas.worldCamera = anchor.GetComponent<Camera>();
+      if (anchorObject != null) {
+        canvas.worldCamera = anchorObject.GetComponent<Camera>();
       } else {
         Debug.LogError("Cannot find CenterEyeAnchor inside OVRCameraRig. Please add it in the hierarchy.");
       }
@@ -62,22 +68,26 @@ namespace FixedInterface {
       }
     }
 
-    private FixedInterfaceSetting CreateSetting() {
+    private FixedInterfaceSetting CreateSetting(bool first) {
       var setting = new FixedInterfaceSetting();
-      setting.text = text.text;
-      setting.font = text.font;
-      setting.fontSize = text.fontSize;
-      setting.color = text.color;
-      setting.alignment = text.alignment;
+      setting.canvasComponent = this.canvas;
+      setting.textComponent = this.text;
+      if (!first) {
+        setting.text = this.text.text;
+        setting.font = this.text.font;
+        setting.fontSize = this.text.fontSize;
+        setting.color = this.text.color;
+        setting.alignment = this.text.alignment;
+      }
       return setting;
     }
 
     private void ApplySetting(FixedInterfaceSetting setting) {
-      text.text = setting.text;
-      text.font = setting.font;
-      text.fontSize = setting.fontSize;
-      text.color = setting.color;
-      text.alignment = setting.alignment;
+      this.text.text = setting.text;
+      this.text.font = setting.font;
+      this.text.fontSize = setting.fontSize;
+      this.text.color = setting.color;
+      this.text.alignment = setting.alignment;
     }
 
   }

@@ -12,7 +12,7 @@ public class Main : MonoBehaviour
 
     private List<Curve> curves = new List<Curve>();
     private int n_interval = 20;
-    // private string text1;
+    private string text1;
     // private Text text2;
 
     [SerializeField] private Material defaultMaterial;
@@ -72,7 +72,7 @@ public class Main : MonoBehaviour
         }
 
         // text2.text = "text2 Energy : ";
-        // text1 = "text1 Energy : ";
+        text1 = "text1 Energy : ";
 
         foreach (Curve curve in curves)
         {
@@ -80,12 +80,12 @@ public class Main : MonoBehaviour
             Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, material, 0);
             DiscreteMoebius discreteMoebius = new DiscreteMoebius(curve.positions, 1e-06f);
             // text2.text += discreteMoebius.Energy(curve.positions.ToArray()) + " ";
-            // text1 += discreteMoebius.Energy(curve.positions.ToArray()) + " ";
+            text1 += discreteMoebius.Energy(curve.positions.ToArray()) + " ";
         }
     }
 
-    /*public void UpdateFixedInterface(FixedInterface.FixedInterfaceSetting setting)
+    public void UpdateFixedInterface(FixedInterface.FixedInterfaceSetting setting)
     {
         setting.text = text1;
-    }*/
+    }
 }

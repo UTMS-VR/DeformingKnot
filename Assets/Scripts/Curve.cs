@@ -16,7 +16,7 @@ public class Curve
     public Vector3 position;
     public Quaternion rotation;
 
-    public float segment = 0.03f;
+    public float segment = 0.01f;
     private int meridian = 10;
     private float radius = 0.002f;
 

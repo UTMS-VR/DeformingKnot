@@ -5,7 +5,7 @@ using DrawCurve;
 
 public class EnergyTest : MonoBehaviour
 {
-    private int longitude = 64;
+    private int longitude = 128;
     int repeat = 1;
     private Curve curve;
 
@@ -17,7 +17,7 @@ public class EnergyTest : MonoBehaviour
         for (int i = 0; i < longitude; i++)
         {
             float t = (float)i / longitude;
-            positions.Add(ExampleCurve5(t));
+            positions.Add(ExampleCurve1(t));
         }
 
         curve = new Curve(false, false, false, true, positions, Vector3.zero, Quaternion.identity);
