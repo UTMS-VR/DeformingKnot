@@ -9,6 +9,7 @@ namespace DrawCurve
     {
         public static Material CurveMaterial = Resources.Load<Material>("MyPackage/DrawCurve/Curve");
         public static Material PositionMaterial = Resources.Load<Material>("MyPackage/DrawCurve/Position");
+        public static Material SelectedCurveMaterial = Resources.Load<Material>("Mypackage/DrawCurve/SelectedCurve");
 
         public static Mesh GetMesh(List<Vector3> positions, int meridian, float radius, bool closed)
         {

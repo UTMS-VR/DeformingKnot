@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DebugUtil;
 
-public class MyController
+public static class MyController
 {
     public static void SetUp(ref Controller controller)
     {

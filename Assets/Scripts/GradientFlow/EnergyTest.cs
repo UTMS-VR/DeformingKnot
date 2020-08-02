@@ -20,7 +20,7 @@ public class EnergyTest : MonoBehaviour
             positions.Add(ExampleCurve1(t));
         }
 
-        curve = new Curve(false, false, false, true, positions, Vector3.zero, Quaternion.identity);
+        curve = new Curve(positions, true);
         curve.momentum = new List<Vector3>();
 
         for (int i = 0; i < curve.positions.Count; i++)
@@ -28,7 +28,7 @@ public class EnergyTest : MonoBehaviour
             curve.momentum.Add(Vector3.zero);
         }
 
-        curve.segment = AdjustParameter.ArcLength(curve.positions, curve.isClosed) / curve.positions.Count;
+        curve.segment = AdjustParameter.ArcLength(curve.positions, curve.close) / curve.positions.Count;
         Debug.Log(curve.segment);
         curve.MeshAtPositionsUpdate();
     }
