@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DrawCurve;
 using DebugUtil;
 
 public static class Player
@@ -17,7 +18,7 @@ public static class Player
 
             if (drawingCurve.positions.Count >= 2)
             {
-                Graphics.DrawMesh(drawingCurve.mesh, drawingCurve.position, drawingCurve.rotation, defaultMaterial, 0);
+                Graphics.DrawMesh(drawingCurve.mesh, drawingCurve.position, drawingCurve.rotation, MakeMesh.CurveMaterial, 0);
             }
         }
 
@@ -142,7 +143,7 @@ public static class Player
     {
         foreach (Curve curve in curves)
         {
-            Material material = curve.selected ? selectedMaterial : defaultMaterial;
+            Material material = curve.selected ? MakeMesh.SelectedCurveMaterial : MakeMesh.CurveMaterial;
             Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, material, 0);
         }
     }

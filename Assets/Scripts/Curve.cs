@@ -13,17 +13,16 @@ public class Curve
     public Mesh mesh;
     public Mesh meshAtPositions;
     public bool close;
-    private Vector3 position = Vector3.zero;
-    private Quaternion rotation = Quaternion.identity;
+    public bool selected = false;
+    public Vector3 position = Vector3.zero;
+    public Quaternion rotation = Quaternion.identity;
+    public float segment = 0.03f;
     public static Controller controller;
-    public static float segment = 0.01f;
+    public static float collision = 0.05f;
     private static int meridian = 10;
     private static float radius = 0.002f;
-    private static float collision = 0.05f;
 
-    public Curve(
-        List<Vector3> positions,
-        bool close)
+    public Curve(List<Vector3> positions, bool close)
     {
         this.positions = positions;
         this.close = close;
@@ -49,6 +48,25 @@ public class Curve
         this.meshAtPositions = MakeMesh.GetMeshAtEndPosition(this.positions, radius * 2.0f);
     }
 
+    public static (int, float) Distance(List<Vector3> positions, Vector3 position)
+    {
+        List<Vector3> relPositions = positions.Select(v => v - position).ToList();
+
+        int num = 0;
+        float min = relPositions[0].magnitude;
+
+        for (int i = 0; i < positions.Count - 1; i++)
+        {
+            if (relPositions[i + 1].magnitude < min)
+            {
+                num = i + 1;
+                min = relPositions[i + 1].magnitude;
+            }
+        }
+
+        return (num, min);
+    }
+
     public void Draw()
     {
         Vector3 nowPosition = controller.rightHand.GetPosition();
@@ -57,7 +75,7 @@ public class Curve
         {
             this.positions.Add(nowPosition);
         }
-        else if (Vector3.Distance(this.positions.Last(), nowPosition) >= segment)
+        else if (Vector3.Distance(this.positions.Last(), nowPosition) >= this.segment)
         {
             this.positions.Add(nowPosition);
             this.MeshUpdate();
@@ -90,6 +108,16 @@ public class Curve
         this.rotation = Quaternion.identity;
     }
 
+    public void Select()
+    {
+        Vector3 nowPosition = controller.rightHand.GetPosition();
+
+        if (Distance(this.positions, nowPosition).Item2 < collision)
+        {
+            this.selected = !this.selected;
+        }
+    }
+
     public void Close()
     {
         if (Vector3.Distance(this.positions.First(), this.positions.Last()) < collision)
@@ -103,10 +131,10 @@ public class Curve
     {
         List<Curve> newCurves = new List<Curve>();
         Vector3 nowPosition = controller.rightHand.GetPosition();
-        (int, float) dist = Dist(nowPosition);
-        int num = dist.Item1;
+        (int, float) distance = Distance(this.positions, nowPosition);
+        int num = distance.Item1;
 
-        if (dist.Item2 < collision)
+        if (distance.Item2 < collision)
         {
             if (this.close)
             {
@@ -161,25 +189,6 @@ public class Curve
         Curve newCurve2 = new Curve(newPositions2, false);
 
         return (newCurve1, newCurve2);
-    }
-
-    private (int, float) Dist(Vector3 position)
-    {
-        List<Vector3> relPositions = this.positions.Select(v => v - position).ToList();
-
-        int num = 0;
-        float min = relPositions[0].magnitude;
-
-        for (int i = 0; i < Length() - 1; i++)
-        {
-            if (relPositions[i + 1].magnitude < min)
-            {
-                num = i + 1;
-                min = relPositions[i + 1].magnitude;
-            }
-        }
-
-        return (num, min);
     }
 
     public static List<Curve> Combine(Curve curve1, Curve curve2)
