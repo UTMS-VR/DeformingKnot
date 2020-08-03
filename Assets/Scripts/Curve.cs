@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,21 +15,29 @@ public class Curve
     public bool selected = false;
     public Vector3 position = Vector3.zero;
     public Quaternion rotation = Quaternion.identity;
-    public float segment = 0.03f;
-    public static Controller controller;
+    private float segment;
+    private int meridian = 10;
+    private float radius = 0.002f;
     public static float collision = 0.05f;
-    private static int meridian = 10;
-    private static float radius = 0.002f;
+    public static Controller controller;
+    public static ButtonConfig button;
 
-    public Curve(List<Vector3> positions, bool close)
+    public Curve(List<Vector3> positions, bool close, float segment = 0.03f)
     {
         this.positions = positions;
         this.close = close;
+        this.segment = segment;
 
         if (positions.Count >= 2)
         {
             this.mesh = MakeMesh.GetMesh(this.positions, meridian, radius, this.close);
         }
+    }
+
+    public static void SetUp(Controller argController, ButtonConfig argButton)
+    {
+        controller = argController;
+        button = argButton;
     }
 
     public void MeshUpdate()
@@ -48,60 +55,79 @@ public class Curve
         this.meshAtPositions = MakeMesh.GetMeshAtEndPosition(this.positions, radius * 2.0f);
     }
 
-    public static (int, float) Distance(List<Vector3> positions, Vector3 position)
+    public void MomentumInitialize()
     {
-        List<Vector3> relPositions = positions.Select(v => v - position).ToList();
+        this.momentum = new List<Vector3>();
 
-        int num = 0;
-        float min = relPositions[0].magnitude;
-
-        for (int i = 0; i < positions.Count - 1; i++)
+        for (int i = 0; i < this.positions.Count; i++)
         {
-            if (relPositions[i + 1].magnitude < min)
-            {
-                num = i + 1;
-                min = relPositions[i + 1].magnitude;
-            }
+            this.momentum.Add(Vector3.zero);
         }
+    }
 
-        return (num, min);
+    private int Length()
+    {
+        return this.positions.Count;
     }
 
     public void Draw()
     {
-        Vector3 nowPosition = controller.rightHand.GetPosition();
-        
-        if (this.positions.Count == 0)
+        if (controller.GetButton(button.draw))
         {
-            this.positions.Add(nowPosition);
-        }
-        else if (Vector3.Distance(this.positions.Last(), nowPosition) >= this.segment)
-        {
-            this.positions.Add(nowPosition);
-            this.MeshUpdate();
-        }
-    }
+            Vector3 nowPosition = controller.rightHand.GetPosition();
 
-    public void MoveSetUp()
-    {
-        Vector3 nowPosition = controller.rightHand.GetPosition();
-        Quaternion nowRotation = controller.rightHand.GetRotation();
-        this.positions = this.positions.Select(v => v - nowPosition).Select(v => Quaternion.Inverse(nowRotation) * v).ToList();
-        MeshUpdate();
+            if (this.positions.Count == 0)
+            {
+                this.positions.Add(nowPosition);
+            }
+            else
+            {
+                float dist = Vector3.Distance(this.positions.Last(), nowPosition);
+
+                if (dist >= this.segment)
+                {
+                    this.positions.Add(nowPosition);
+                    this.MeshUpdate();
+                }
+            }
+        }
     }
 
     public void Move()
     {
         Vector3 nowPosition = controller.rightHand.GetPosition();
         Quaternion nowRotation = controller.rightHand.GetRotation();
-        this.position = nowPosition;
-        this.rotation = nowRotation;
+
+        if (controller.GetButtonDown(button.move))
+        {
+            MoveSetUp(nowPosition, nowRotation);
+        }
+
+        if (controller.GetButton(button.move))
+        {
+            MoveUpdate(nowPosition, nowRotation);
+        }
+
+        if (controller.GetButtonUp(button.move))
+        {
+            MoveCleanUp();
+        }
+    }
+
+    public void MoveSetUp(Vector3 position, Quaternion rotation)
+    {
+        this.positions = this.positions.Select(v => v - position).Select(v => Quaternion.Inverse(rotation) * v).ToList();
+        MeshUpdate();
+    }
+
+    public void MoveUpdate(Vector3 position, Quaternion rotation)
+    {
+        this.position = position;
+        this.rotation = rotation;
     }
 
     public void MoveCleanUp()
     {
-        Vector3 nowPosition = controller.rightHand.GetPosition();
-        Quaternion nowRotation = controller.rightHand.GetRotation();
         this.positions = this.positions.Select(v => this.rotation * v).Select(v => v + this.position).ToList();
         MeshUpdate();
         this.position = Vector3.zero;
@@ -110,11 +136,14 @@ public class Curve
 
     public void Select()
     {
-        Vector3 nowPosition = controller.rightHand.GetPosition();
-
-        if (Distance(this.positions, nowPosition).Item2 < collision)
+        if (controller.GetButtonDown(button.select))
         {
-            this.selected = !this.selected;
+            Vector3 nowPosition = controller.rightHand.GetPosition();
+
+            if (Distance(this.positions, nowPosition).Item2 < collision)
+            {
+                this.selected = !this.selected;
+            }
         }
     }
 
@@ -229,8 +258,22 @@ public class Curve
         }
     }
 
-    private int Length()
+    public static (int, float) Distance(List<Vector3> positions, Vector3 position)
     {
-        return this.positions.Count;
+        List<Vector3> relPositions = positions.Select(v => v - position).ToList();
+
+        int num = 0;
+        float min = relPositions[0].magnitude;
+
+        for (int i = 0; i < positions.Count - 1; i++)
+        {
+            if (relPositions[i + 1].magnitude < min)
+            {
+                num = i + 1;
+                min = relPositions[i + 1].magnitude;
+            }
+        }
+
+        return (num, min);
     }
 }

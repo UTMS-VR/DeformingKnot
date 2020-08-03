@@ -20,16 +20,9 @@ public class EnergyTest : MonoBehaviour
             positions.Add(ExampleCurve1(t));
         }
 
-        curve = new Curve(positions, true);
-        curve.momentum = new List<Vector3>();
-
-        for (int i = 0; i < curve.positions.Count; i++)
-        {
-            curve.momentum.Add(Vector3.zero);
-        }
-
-        curve.segment = AdjustParameter.ArcLength(curve.positions, curve.close) / curve.positions.Count;
-        Debug.Log(curve.segment);
+        float segment = AdjustParameter.ArcLength(positions, true) / positions.Count;
+        curve = new Curve(positions, true, segment);
+        curve.MomentumInitialize();
         curve.MeshAtPositionsUpdate();
     }
 
