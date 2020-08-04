@@ -16,6 +16,24 @@ public static class Player
         button = argButton;
     }
 
+    public static void DeepCopy(List<Curve> curves, ref List<Curve> preCurves)
+    {
+        if (controller.GetButtonDown(button.draw)
+            || controller.GetButtonDown(button.move)
+            || controller.GetButtonDown(button.select)
+            || controller.GetButtonDown(button.cut)
+            || controller.GetButtonDown(button.combine)
+            || controller.GetButtonDown(button.remove))
+        {
+            preCurves = new List<Curve>();
+
+            foreach (Curve curve in curves)
+            {
+                preCurves.Add(curve.DeepCopy());
+            }
+        }
+    }
+
     public static void Draw(ref Curve curve, ref List<Curve> curves)
     {
         curve.Draw();
@@ -29,7 +47,7 @@ public static class Player
 
             curve = new Curve(new List<Vector3>(), false);
         }
-
+        
         if (curve.positions.Count >= 2)
         {
             Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, MakeMesh.CurveMaterial, 0);
@@ -64,9 +82,12 @@ public static class Player
 
     public static void Select(List<Curve> curves)
     {
-        for (int i = 0; i < curves.Count; i++)
+        if (controller.GetButtonDown(button.select))
         {
-            curves[i].Select();
+            for (int i = 0; i < curves.Count; i++)
+            {
+                curves[i].Select();
+            }
         }
     }
 
@@ -122,6 +143,14 @@ public static class Player
         if (controller.GetButtonDown(button.remove))
         {
             curves = curves.Where(curve => !curve.selected).ToList();
+        }
+    }
+
+    public static void Undo(ref List<Curve> curves, List<Curve> preCurves)
+    {
+        if (controller.GetButtonDown(button.undo))
+        {
+            curves = preCurves;
         }
     }
 
