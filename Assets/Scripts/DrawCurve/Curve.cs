@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DrawCurve;
 using DebugUtil;
 
 namespace DrawCurve
@@ -14,6 +13,7 @@ namespace DrawCurve
         public Mesh mesh;
         public Mesh meshAtPositions;
         public bool close;
+        public bool selected;
         public Vector3 position = Vector3.zero;
         public Quaternion rotation = Quaternion.identity;
         private float segment;
@@ -128,6 +128,16 @@ namespace DrawCurve
             MeshUpdate();
             this.position = Vector3.zero;
             this.rotation = Quaternion.identity;
+        }
+
+        public void Select()
+        {
+            Vector3 nowPosition = controller.rightHand.GetPosition();
+            
+            if (Distance(this.positions, nowPosition).Item2 < collision)
+            {
+                this.selected = !this.selected;
+            }
         }
 
         public void Close()

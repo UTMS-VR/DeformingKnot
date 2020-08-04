@@ -75,24 +75,21 @@ public static class Player
         if (controller.GetButtonDown(button.cut))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
-            List<Curve> removeCurves = new List<Curve>();
-            List<Curve> addCurves = new List<Curve>();
 
-            foreach (Curve curve in selection)
+            if (selection.Count == 1)
             {
-                List<Curve> newCurves = curve.Cut();
+                List<Curve> newCurves = selection[0].Cut();
 
                 if (newCurves.Count != 0)
                 {
-                    removeCurves.Add(curve);
-                    foreach (Curve newCurve in newCurves)
+                    curves.Remove(selection[0]);
+                    
+                    foreach (Curve curve in newCurves)
                     {
-                        addCurves.Add(newCurve);
+                        curves.Add(curve);
                     }
                 }
             }
-
-            RemoveAddCurve(ref curves, removeCurves, addCurves);
         }
     }
 
@@ -112,10 +109,9 @@ public static class Player
 
                 if (newCurves.Count != 0)
                 {
-                    List<Curve> removeCurves = new List<Curve>();
-                    removeCurves.Add(selection[0]);
-                    removeCurves.Add(selection[1]);
-                    RemoveAddCurve(ref curves, removeCurves, newCurves);
+                    curves.Remove(selection[0]);
+                    curves.Remove(selection[1]);
+                    curves.Add(newCurves[0]);
                 }
             }
         }
@@ -135,19 +131,6 @@ public static class Player
         {
             Material material = curve.selected ? MakeMesh.SelectedCurveMaterial : MakeMesh.CurveMaterial;
             Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, material, 0);
-        }
-    }
-
-    private static void RemoveAddCurve(ref List<Curve> curves, List<Curve> removeCurves, List<Curve> addCurves)
-    {
-        foreach (Curve curve in removeCurves)
-        {
-            curves.Remove(curve);
-        }
-
-        foreach (Curve curve in addCurves)
-        {
-            curves.Add(curve);
         }
     }
 }
