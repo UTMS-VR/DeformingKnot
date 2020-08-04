@@ -13,26 +13,25 @@ namespace DrawCurve
         public Mesh mesh;
         public Mesh meshAtPositions;
         public bool close;
-        public bool selected;
+        public bool selected = false;
         public Vector3 position = Vector3.zero;
         public Quaternion rotation = Quaternion.identity;
         private float segment;
-        private int meridian = 10;
-        private float radius = 0.002f;
+        private int meridian;
+        private float radius;
         public static float collision = 0.05f;
         public static Controller controller;
         public static ButtonConfig button;
 
-        public Curve(List<Vector3> positions, bool close, float segment = 0.03f)
+        public Curve(List<Vector3> positions, bool close, float segment = 0.03f, int meridian = 10, float radius = 0.002f)
         {
             this.positions = positions;
+            this.momentum = new List<Vector3>();
             this.close = close;
             this.segment = segment;
-
-            if (positions.Count >= 2)
-            {
-                this.mesh = MakeMesh.GetMesh(this.positions, meridian, radius, this.close);
-            }
+            this.meridian = meridian;
+            this.radius = radius;
+            this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.close);
         }
 
         public static void SetUp(Controller argController, ButtonConfig argButton)
@@ -133,7 +132,7 @@ namespace DrawCurve
         public void Select()
         {
             Vector3 nowPosition = controller.rightHand.GetPosition();
-            
+
             if (Distance(this.positions, nowPosition).Item2 < collision)
             {
                 this.selected = !this.selected;
@@ -268,6 +267,46 @@ namespace DrawCurve
             }
 
             return (num, min);
+        }
+
+        public Curve DeepCopy()
+        {
+            List<Vector3> positions = ListVector3Copy(this.positions);
+            Curve curve = new Curve(positions, this.close, this.segment);
+            curve.momentum = ListVector3Copy(this.momentum);
+            curve.mesh = this.mesh;
+            curve.meshAtPositions = this.meshAtPositions;
+            curve.close = this.close;
+            curve.selected = this.selected;
+            curve.position = Vector3Copy(this.position);
+            curve.rotation = QuaternionCopy(this.rotation);
+            curve.meridian = this.meridian;
+            curve.radius = this.radius;
+            return curve;
+        }
+
+        private Vector3 Vector3Copy(Vector3 v)
+        {
+            Vector3 w = new Vector3(v.x, v.y, v.z);
+            return w;
+        }
+
+        private Quaternion QuaternionCopy(Quaternion v)
+        {
+            Quaternion w = new Quaternion(v.x, v.y, v.z, v.w);
+            return w;
+        }
+
+        private List<Vector3> ListVector3Copy(List<Vector3> l)
+        {
+            List<Vector3> m = new List<Vector3>();
+            
+            foreach (Vector3 v in l)
+            {
+                m.Add(Vector3Copy(v));
+            }
+
+            return m;
         }
     }
 }
