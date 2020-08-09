@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace DrawCurve
 {
-    public class MakeMesh
+    public static class MakeMesh
     {
         public static Material CurveMaterial = Resources.Load<Material>("MyPackage/DrawCurve/Curve");
         public static Material PositionMaterial = Resources.Load<Material>("MyPackage/DrawCurve/Position");
-        public static Material SelectedCurveMaterial = Resources.Load<Material>("Mypackage/DrawCurve/SelectedCurve");
+        public static Material SelectedCurveMaterial = Resources.Load<Material>("MyPackage/DrawCurve/SelectedCurve");
 
         public static Mesh GetMesh(List<Vector3> positions, int meridian, float radius, bool closed)
         {
@@ -20,6 +20,11 @@ namespace DrawCurve
             }
 
             Mesh mesh = new Mesh();
+
+            if (positionsCopy.Count < 2)
+            {
+                return mesh;
+            }
 
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles;
@@ -82,6 +87,13 @@ namespace DrawCurve
 
         public static Mesh GetMeshAtEndPosition(List<Vector3> positions, float radius)
         {
+            var mesh = new Mesh();
+
+            if (positions.Count == 0)
+            {
+                return mesh;
+            }
+
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
             var normals = new List<Vector3>();
@@ -91,7 +103,6 @@ namespace DrawCurve
             triangles.AddRange(meshInfo.triangles);
             normals.AddRange(meshInfo.normals);
 
-            var mesh = new Mesh();
             mesh.vertices = vertices.ToArray();
             mesh.triangles = triangles.ToArray();
             mesh.normals = normals.ToArray();
@@ -99,31 +110,42 @@ namespace DrawCurve
             return mesh;
         }
 
-        private static (List<Vector3> vertices, List<int> triangles, List<Vector3> normals)
-            GetMeshInfoAtPosition(Vector3 position, float radius)
+        private static (List<Vector3> vertices, List<int> triangles, List<Vector3> normals) GetMeshInfoAtPosition(Vector3 position, float radius)
         {
             float r = radius;
-            var vertices = new List<Vector3>()
-        {
-            position + new Vector3(r, 0, 0),
-            position + new Vector3(0, r, 0),
-            position + new Vector3(-r, 0, 0),
-            position + new Vector3(0, -r, 0),
-            position + new Vector3(0, 0, r),
-            position + new Vector3(0, 0, -r)
-        };
-            var triangles = new List<int>()
-        {
-            4, 0, 1,
-            4, 1, 2,
-            4, 2, 3,
-            4, 3, 0,
-            5, 1, 0,
-            5, 2, 1,
-            5, 3, 2,
-            5, 0, 3
-        };
-            var normals = vertices;
+
+            var vertices = new List<Vector3>
+            {
+                position + new Vector3(r, 0, 0),
+                position + new Vector3(0, r, 0),
+                position + new Vector3(-r, 0, 0),
+                position + new Vector3(0, -r, 0),
+                position + new Vector3(0, 0, r),
+                position + new Vector3(0, 0, -r)
+            };
+
+            var triangles = new List<int>
+            {
+                4, 0, 1,
+                4, 1, 2,
+                4, 2, 3,
+                4, 3, 0,
+                5, 1, 0,
+                5, 2, 1,
+                5, 3, 2,
+                5, 0, 3
+            };
+
+            var normals = new List<Vector3>
+            {
+                new Vector3(r, 0, 0),
+                new Vector3(0, r, 0),
+                new Vector3(-r, 0, 0),
+                new Vector3(0, -r, 0),
+                new Vector3(0, 0, r),
+                new Vector3(0, 0, -r)
+            };
+
             return (vertices, triangles, normals);
         }
 
@@ -152,6 +174,12 @@ namespace DrawCurve
         {
             int length = tangents.Count;
             List<Vector3> principalNormals = new List<Vector3>();
+
+            if (length == 0)
+            {
+                return principalNormals;
+            }
+
             principalNormals.Add(NaturalNormal(tangents[0]));
 
             for (int i = 0; i < length - 1; i++)

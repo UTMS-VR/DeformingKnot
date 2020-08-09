@@ -15,9 +15,9 @@ public static class MyController
         );
     }
 
-    public static void Update(Controller contoller)
+    public static void Update(Controller controller)
     {
-        contoller.Update();
+        controller.Update();
     }
 
     private static ButtonMap LiteralKeysPlus

@@ -20,8 +20,8 @@ namespace DebugUtil
         {
             this.handAnchor = GameObject.Find(handAnchorName);
             this.stick = stick;
-            this.stickMap = stickMap;
-            this.positionMover = positionMover;
+            this.stickMap = stickMap ?? Stick2DMap.Empty;
+            this.positionMover = positionMover ?? Stick3DMap.Empty;
             this.speed = speed;
             this.onHeadSet = onHeadSet;
 
@@ -53,15 +53,7 @@ namespace DebugUtil
             }
             else
             {
-                if (this.stickMap == null)
-                {
-                    Debug.LogWarning($"VRController.stickMap ({this.handAnchorName}) is null");
-                    return new Vector2(0, 0);
-                }
-                else
-                {
-                    return this.stickMap.ToVector2();
-                }
+                return this.stickMap.ToVector2();
             }
         }
 
@@ -85,7 +77,7 @@ namespace DebugUtil
             }
             else
             {
-                // Debug.Log("GetRotation is not suppported on non-VRheadset environment");
+                Debug.Log("GetRotation is not suppported on non-VRheadset environment");
                 return Quaternion.identity;
             }
         }

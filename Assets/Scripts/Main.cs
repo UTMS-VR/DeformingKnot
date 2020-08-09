@@ -1,24 +1,32 @@
-﻿using System.Linq;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DrawCurve;
 using DebugUtil;
 
 public class Main : MonoBehaviour
 {
     private Controller controller;
-    private List<Curve> curves = new List<Curve>();
-    private Curve drawingCurve = new Curve(new List<Vector3>(), false);
-    private List<int> movingCurves = new List<int>();
+    private ButtonConfig button;
+    private List<Curve> curves;
+    private List<Curve> preCurves;
+    private Curve drawingCurve;
+    private List<int> movingCurves;
     private string text;
 
     // Start is called before the first frame update
     void Start()
     {
         MyController.SetUp(ref controller);
-        Player.controller = this.controller;
-        Curve.controller = this.controller;
+        button = new ButtonConfig(controller);
+        Player.SetUp(controller, button);
+        Curve.SetUp(controller, button.draw, button.move);
+
+        curves = new List<Curve>();
+        preCurves = new List<Curve>();
+        drawingCurve = new Curve(new List<Vector3>(), false);
+        movingCurves = new List<int>();
     }
 
     // Update is called once per frame
@@ -26,12 +34,18 @@ public class Main : MonoBehaviour
     {
         MyController.Update(this.controller);
 
-        Player.Draw(ref drawingCurve, ref curves, OVRInput.RawButton.RIndexTrigger);
-        Player.Move(curves, movingCurves, OVRInput.RawButton.RHandTrigger);
-        Player.Select(curves, OVRInput.RawButton.A);
-        Player.Cut(ref curves, OVRInput.RawButton.B);
-        Player.Combine(ref curves, OVRInput.RawButton.X);
-        Player.Remove(ref curves, OVRInput.RawButton.Y);
+        if (button.ValidButtonInput())
+        {
+            Player.DeepCopy(curves, ref preCurves);
+            Player.Draw(ref drawingCurve, ref curves);
+            Player.Move(curves, movingCurves);
+            Player.Select(curves);
+            Player.Cut(ref curves);
+            Player.Combine(ref curves);
+            Player.Remove(ref curves);
+            Player.Undo(ref curves, preCurves);
+        }
+
         Player.Display(curves);
     }
 

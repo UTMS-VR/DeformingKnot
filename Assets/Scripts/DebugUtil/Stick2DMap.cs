@@ -29,6 +29,8 @@ namespace DebugUtil
             }
         }
 
+        public static Stick2DMap Empty = new Stick2DMap(new Stick2DMapData { });
+
         public static Stick2DMap Arrows = new Stick2DMap(new Stick2DMapData
         {
             ( Stick2D.Up, KeyCode.UpArrow ),
@@ -58,7 +60,7 @@ namespace DebugUtil
             ( Stick2D.Up, KeyCode.O ),
             ( Stick2D.Down, KeyCode.L ),
             ( Stick2D.Right, KeyCode.K ),
-            ( Stick2D.Left, KeyCode.Comma )
+            ( Stick2D.Left, KeyCode.Semicolon )
         });
 
         public bool Get(Stick2D stickDirection)

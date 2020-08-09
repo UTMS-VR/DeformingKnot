@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,69 +8,81 @@ using DebugUtil;
 public static class Player
 {
     public static Controller controller;
+    public static ButtonConfig button;
 
-    public static void Draw(ref Curve drawingCurve, ref List<Curve> curves, OVRInput.RawButton button)
+    public static void SetUp(Controller argController, ButtonConfig argButton)
     {
-        if (controller.GetButton(button))
+        controller = argController;
+        button = argButton;
+    }
+
+    public static void DeepCopy(List<Curve> curves, ref List<Curve> preCurves)
+    {
+        if (controller.GetButtonDown(button.draw)
+            || controller.GetButtonDown(button.move)
+            || controller.GetButtonDown(button.select)
+            || controller.GetButtonDown(button.cut)
+            || controller.GetButtonDown(button.combine)
+            || controller.GetButtonDown(button.remove))
         {
-            drawingCurve.Draw();
+            preCurves = new List<Curve>();
 
-            if (drawingCurve.positions.Count >= 2)
+            foreach (Curve curve in curves)
             {
-                Graphics.DrawMesh(drawingCurve.mesh, drawingCurve.position, drawingCurve.rotation, MakeMesh.CurveMaterial, 0);
+                preCurves.Add(curve.DeepCopy());
             }
-        }
-
-        if (controller.GetButtonUp(button))
-        {
-            if (drawingCurve.positions.Count >= 2)
-            {
-                curves.Add(drawingCurve);
-            }
-
-            drawingCurve = new Curve(new List<Vector3>(), false);
         }
     }
 
-    public static void Move(List<Curve> curves, List<int> movingCurves, OVRInput.RawButton button)
+    public static void Draw(ref Curve curve, ref List<Curve> curves)
+    {
+        curve.Draw();
+
+        if (controller.GetButtonUp(button.draw))
+        {
+            if (curve.positions.Count >= 2)
+            {
+                curves.Add(curve);
+            }
+
+            curve = new Curve(new List<Vector3>(), false);
+        }
+        
+        if (curve.positions.Count >= 2)
+        {
+            Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, MakeMesh.CurveMaterial, 0);
+        }
+    }
+
+    public static void Move(List<Curve> curves, List<int> movingCurves)
     {
         Vector3 nowPosition = controller.rightHand.GetPosition();
-        Quaternion nowRotation = controller.rightHand.GetRotation();
 
-        if (controller.GetButtonDown(button))
+        if (controller.GetButtonDown(button.move))
         {
             for (int i = 0; i < curves.Count; i++)
             {
                 if (Curve.Distance(curves[i].positions, nowPosition).Item2 < Curve.collision)
                 {
                     movingCurves.Add(i);
-                    curves[i].MoveSetUp();
                 }
             }
         }
 
-        if (controller.GetButton(button))
+        foreach (int i in movingCurves)
         {
-            foreach (int i in movingCurves)
-            {
-                curves[i].Move();
-            }
+            curves[i].Move();
         }
         
-        if (controller.GetButtonUp(button))
+        if (controller.GetButtonUp(button.move))
         {
-            foreach (int i in movingCurves)
-            {
-                curves[i].MoveCleanUp();
-            }
-
             movingCurves = new List<int>();
         }
     }
 
-    public static void Select(List<Curve> curves, OVRInput.RawButton button)
+    public static void Select(List<Curve> curves)
     {
-        if (controller.GetButtonDown(button))
+        if (controller.GetButtonDown(button.select))
         {
             for (int i = 0; i < curves.Count; i++)
             {
@@ -80,35 +91,32 @@ public static class Player
         }
     }
 
-    public static void Cut(ref List<Curve> curves, OVRInput.RawButton button)
+    public static void Cut(ref List<Curve> curves)
     {
-        if (controller.GetButtonDown(button))
+        if (controller.GetButtonDown(button.cut))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
-            List<Curve> removeCurves = new List<Curve>();
-            List<Curve> addCurves = new List<Curve>();
 
-            foreach (Curve curve in selection)
+            if (selection.Count == 1)
             {
-                List<Curve> newCurves = curve.Cut();
+                List<Curve> newCurves = selection[0].Cut();
 
                 if (newCurves.Count != 0)
                 {
-                    removeCurves.Add(curve);
-                    foreach (Curve newCurve in newCurves)
+                    curves.Remove(selection[0]);
+                    
+                    foreach (Curve curve in newCurves)
                     {
-                        addCurves.Add(newCurve);
+                        curves.Add(curve);
                     }
                 }
             }
-
-            RemoveAddCurve(ref curves, removeCurves, addCurves);
         }
     }
 
-    public static void Combine(ref List<Curve> curves, OVRInput.RawButton button)
+    public static void Combine(ref List<Curve> curves)
     {
-        if (controller.GetButtonDown(button))
+        if (controller.GetButtonDown(button.combine))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
@@ -122,20 +130,27 @@ public static class Player
 
                 if (newCurves.Count != 0)
                 {
-                    List<Curve> removeCurves = new List<Curve>();
-                    removeCurves.Add(selection[0]);
-                    removeCurves.Add(selection[1]);
-                    RemoveAddCurve(ref curves, removeCurves, newCurves);
+                    curves.Remove(selection[0]);
+                    curves.Remove(selection[1]);
+                    curves.Add(newCurves[0]);
                 }
             }
         }
     }
 
-    public static void Remove(ref List<Curve> curves, OVRInput.RawButton button)
+    public static void Remove(ref List<Curve> curves)
     {
-        if (controller.GetButtonDown(button))
+        if (controller.GetButtonDown(button.remove))
         {
             curves = curves.Where(curve => !curve.selected).ToList();
+        }
+    }
+
+    public static void Undo(ref List<Curve> curves, List<Curve> preCurves)
+    {
+        if (controller.GetButtonDown(button.undo))
+        {
+            curves = preCurves;
         }
     }
 
@@ -145,19 +160,6 @@ public static class Player
         {
             Material material = curve.selected ? MakeMesh.SelectedCurveMaterial : MakeMesh.CurveMaterial;
             Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, material, 0);
-        }
-    }
-
-    private static void RemoveAddCurve(ref List<Curve> curves, List<Curve> removeCurves, List<Curve> addCurves)
-    {
-        foreach (Curve curve in removeCurves)
-        {
-            curves.Remove(curve);
-        }
-
-        foreach (Curve curve in addCurves)
-        {
-            curves.Add(curve);
         }
     }
 }

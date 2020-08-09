@@ -31,6 +31,8 @@ namespace DebugUtil
             return new ButtonMap(data);
         }*/
 
+        public static ButtonMap Empty = new ButtonMap(new ButtonMapData { });
+
         public static ButtonMap LiteralKeys = new ButtonMap(new ButtonMapData{
             ( RawButton.A, KeyCode.A ),
             ( RawButton.B, KeyCode.B ),

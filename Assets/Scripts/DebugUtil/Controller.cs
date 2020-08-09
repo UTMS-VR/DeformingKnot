@@ -22,7 +22,7 @@ namespace DebugUtil
             float handSpeed = 0.1f
         )
         {
-            this.buttonMap = buttonMap;
+            this.buttonMap = buttonMap ?? ButtonMap.Empty;
             this.rightHand = new VRController(
                 handAnchorName: "RightHandAnchor",
                 stick: OVRInput.RawAxis2D.RThumbstick,
@@ -63,10 +63,6 @@ namespace DebugUtil
             }
             else
             {
-                if (this.buttonMap == null)
-                {
-                    return false;
-                }
                 return this.buttonMap.Get(button);
             }
         }
@@ -78,10 +74,6 @@ namespace DebugUtil
             }
             else
             {
-                if (this.buttonMap == null)
-                {
-                    return false;
-                }
                 return this.buttonMap.GetDown(button);
             }
         }
@@ -93,10 +85,6 @@ namespace DebugUtil
             }
             else
             {
-                if (this.buttonMap == null)
-                {
-                    return false;
-                }
                 return this.buttonMap.GetUp(button);
             }
         }

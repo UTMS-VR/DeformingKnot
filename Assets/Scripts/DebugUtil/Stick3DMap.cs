@@ -30,6 +30,8 @@ namespace DebugUtil
             }
         }
 
+        public static Stick3DMap Empty = new Stick3DMap(new Stick3DMapData { });
+
         public static Stick3DMap WASDEC = new Stick3DMap(new Stick3DMapData
         {
             ( Stick3D.Up, KeyCode.W ),
