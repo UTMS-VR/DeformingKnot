@@ -24,8 +24,7 @@ namespace DrawCurve
             OVRInput.RawButton cut = OVRInput.RawButton.B,
             OVRInput.RawButton combine = OVRInput.RawButton.X,
             OVRInput.RawButton remove = OVRInput.RawButton.Y,
-            OVRInput.RawButton undo = OVRInput.RawButton.LHandTrigger
-        )
+            OVRInput.RawButton undo = OVRInput.RawButton.LHandTrigger)
         {
             this.controller = controller;
             this.draw = draw;

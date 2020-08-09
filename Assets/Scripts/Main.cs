@@ -21,7 +21,7 @@ public class Main : MonoBehaviour
         MyController.SetUp(ref controller);
         button = new ButtonConfig(controller);
         Player.SetUp(controller, button);
-        Curve.SetUp(controller, button);
+        Curve.SetUp(controller, button.draw, button.move);
 
         curves = new List<Curve>();
         preCurves = new List<Curve>();

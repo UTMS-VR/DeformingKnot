@@ -21,7 +21,8 @@ namespace DrawCurve
         private float radius;
         public static float collision = 0.05f;
         public static Controller controller;
-        public static ButtonConfig button;
+        public static OVRInput.RawButton drawButton;
+        public static OVRInput.RawButton moveButton;
 
         public Curve(List<Vector3> positions, bool close, float segment = 0.03f, int meridian = 10, float radius = 0.002f)
         {
@@ -34,25 +35,26 @@ namespace DrawCurve
             this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.close);
         }
 
-        public static void SetUp(Controller argController, ButtonConfig argButton)
+        public static void SetUp(Controller controller, OVRInput.RawButton drawButton, OVRInput.RawButton moveButton)
         {
-            controller = argController;
-            button = argButton;
+            Curve.controller = controller;
+            Curve.drawButton = drawButton;
+            Curve.moveButton = moveButton;
         }
 
         public void MeshUpdate()
         {
-            this.mesh = MakeMesh.GetMesh(this.positions, meridian, radius, this.close);
+            this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.close);
         }
 
         public void MeshAtPositionsUpdate()
         {
-            this.meshAtPositions = MakeMesh.GetMeshAtPositions(this.positions, radius * 2.0f);
+            this.meshAtPositions = MakeMesh.GetMeshAtPositions(this.positions, this.radius * 2.0f);
         }
 
         public void MeshAtEndPositionUpdate()
         {
-            this.meshAtPositions = MakeMesh.GetMeshAtEndPosition(this.positions, radius * 2.0f);
+            this.meshAtPositions = MakeMesh.GetMeshAtEndPosition(this.positions, this.radius * 2.0f);
         }
 
         public void MomentumInitialize()
@@ -72,7 +74,7 @@ namespace DrawCurve
 
         public void Draw()
         {
-            if (controller.GetButton(button.draw))
+            if (controller.GetButton(drawButton))
             {
                 Vector3 nowPosition = controller.rightHand.GetPosition();
 
@@ -93,17 +95,17 @@ namespace DrawCurve
             Vector3 nowPosition = controller.rightHand.GetPosition();
             Quaternion nowRotation = controller.rightHand.GetRotation();
 
-            if (controller.GetButtonDown(button.move))
+            if (controller.GetButtonDown(moveButton))
             {
                 MoveSetUp(nowPosition, nowRotation);
             }
 
-            if (controller.GetButton(button.move))
+            if (controller.GetButton(moveButton))
             {
                 MoveUpdate(nowPosition, nowRotation);
             }
 
-            if (controller.GetButtonUp(button.move))
+            if (controller.GetButtonUp(moveButton))
             {
                 MoveCleanUp();
             }
