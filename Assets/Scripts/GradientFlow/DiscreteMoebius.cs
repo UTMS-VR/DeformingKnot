@@ -5,127 +5,167 @@ using UnityEngine;
 // 暗黙の仮定：隣接する2点の間隔は一定
 public class DiscreteMoebius
 {
-    private List<Vector3> positions;
-    private int length;
+    private List<Vector3> pos;
+    private int len;
+    private float arc;
+    private float seg;
     private float lr;
 
     public DiscreteMoebius(List<Vector3> positions, float lr)
     {
-        this.positions = positions;
-        this.length = positions.Count;
+        this.pos = positions;
+        this.len = positions.Count;
+        this.arc = ArcLength();
+        this.seg = this.arc / this.len;
         this.lr = lr;
     }
 
-    public Vector3[] Gradient()
+    public List<Vector3> Gradient()
     {
-        float arc = ArcLength(this.positions.ToArray());
-        float energy = AuxiliaryEnergy(this.positions.ToArray());
-        Vector3[] gradient = new Vector3[this.length];
+        float energy = AuxiliaryEnergy();
+        List<Vector3> gradient = new List<Vector3>();
 
-        for (int i = 0; i < this.length; i++)
+        for (int i = 0; i < this.len; i++)
         {
             Vector3 first = new Vector3(0, 0, 0);
 
-            for (int j = 0; j < this.length; j++)
+            for (int j = 1; j < this.len; j++)
             {
-                if (j != i)
-                {
-                    first += 4 * Mathf.Pow(arc / this.length, 2) * Coulomb(this.positions[i], this.positions[j]);
-                }
+                first += Coulomb(i, Sum(i, j));
             }
 
-            Vector3 next = this.positions[(i + 1) % this.length] - this.positions[i];
-            Vector3 previous = this.positions[(i + this.length - 1) % this.length] - this.positions[i];
-            Vector3 second = 2 * arc * energy / Mathf.Pow(this.length, 2) * (next.normalized + previous.normalized);
+            first *= 2 * Mathf.Pow(this.seg, 2);
 
-            gradient[i] = this.lr * (first + second);
+            Vector3 second = energy * 2 * this.seg * this.SegmentDiff(i);
+
+            gradient.Add(this.lr * (first + second));
         }
 
         return gradient;
     }
 
-    /*public Vector3[] LineSearch()
+    public float Energy()
     {
-        float alpha = 1.0f;
-        float epsilon = 1e-05f;
-        Vector3[] gradient = Gradient();
-        float energy = Energy(this.positions.ToArray());
-        float norm = SequentialNorm(gradient);
+        float energy = Mathf.Pow(this.seg, 2) * AuxiliaryEnergy();
 
-        Vector3[] newPositions = new Vector3[this.length];
-
-        while (true)
-        {
-            for (int i = 0; i < this.length; i++)
-            {
-                newPositions[i] = this.positions[i] + alpha * gradient[i];
-            }
-
-            if (Energy(newPositions) < energy - epsilon * alpha * Mathf.Pow(norm, 2))
-            {
-                break;
-            }
-
-            alpha /= 1.2f;
-        }
-
-        Debug.Log(alpha);
-
-        return newPositions;
-    }*/
-
-    public float Energy(Vector3[] sequence)
-    {
-        float arc = ArcLength(sequence);
-        float energy = Mathf.Pow(arc / this.length, 2) * AuxiliaryEnergy(sequence);
-
-        return energy - Mathf.Pow(Mathf.PI, 2) * this.length / 3.0f + 4.0f;
+        return energy - Mathf.Pow(Mathf.PI, 2) * this.len / 3 + 4;
     }
 
-    private float AuxiliaryEnergy(Vector3[] sequence)
+    private float AuxiliaryEnergy()
     {
         float energy = 0.0f;
 
-        for (int i = 0; i < this.length; i++)
+        for (int i = 0; i < this.len; i++)
         {
-            for(int j = 0; j < this.length; j++)
+            for (int j = 1; j < this.len; j++)
             {
-                if (i != j)
-                {
-                    energy += 1.0f / (sequence[i] - sequence[j]).sqrMagnitude;
-                }
+                energy += 1 / Mathf.Pow(Vector3.Distance(pos[i], pos[Sum(i, j)]), 2);
+
             }
         }
 
         return energy;
     }
 
-    private Vector3 Coulomb(Vector3 v1, Vector3 v2)
+    public List<Vector3> ModifiedGradient()
     {
-        return (v1 - v2) / Mathf.Pow((v1 - v2).sqrMagnitude, 2);
+        float energy = AuxiliaryModifiedEnergy();
+        List<Vector3> gradient = new List<Vector3>();
+
+        for (int i = 0; i < this.len; i++)
+        {
+            Vector3 first = new Vector3();
+            first += RelativeVector(i, Succ(i));
+            first += RelativeVector(i, Pred(i));
+
+            for (int j = 2; j <= this.len - 2; j++)
+            {
+                first += ModifiedCoulomb(i, Sum(i, j));
+            }
+
+            first *= 2 * Mathf.Pow(this.seg, 2);
+
+            Vector3 second = energy * 2 * this.seg * SegmentDiff(i);
+
+            gradient.Add(this.lr * (first + second));
+        }
+
+        return gradient;
     }
 
-    public float ArcLength(Vector3[] sequence)
+    public float ModifiedEnergy()
+    {
+        return Mathf.Pow(this.seg, 2) * AuxiliaryModifiedEnergy();
+    }
+
+    private float AuxiliaryModifiedEnergy()
+    {
+        float energy = 0.0f;
+
+        for (int i = 0; i < this.len; i++)
+        {
+            energy += 1 / Mathf.Pow(Vector3.Distance(pos[i], pos[Succ(i)]), 2);
+            energy += 1 / Mathf.Pow(Vector3.Distance(pos[i], pos[Pred(i)]), 2);
+
+            for (int j = 2; j <= this.len - 2; j++)
+            {
+                float first = Vector3.Distance(pos[i], pos[Sum(i, j)]);
+                float second = this.seg / Mathf.Sqrt(2);
+                energy += 1 / Mathf.Pow(first - second, 2);
+            }
+        }
+
+        return energy;
+    }
+
+    private Vector3 Coulomb(int i, int j)
+    {
+        return - 2 * (pos[i] - pos[j]) / Mathf.Pow(Vector3.Distance(pos[i], pos[j]), 4);
+    }
+
+    private Vector3 ModifiedCoulomb(int i, int j)
+    {
+        Vector3 v0 = RelativeVector(i, j);
+        Vector3 v1 = RelativeVector(i, Succ(i));
+        Vector3 v2 = RelativeVector(i, Pred(i));
+        float denom = Vector3.Distance(pos[i], pos[j]) - this.seg / Mathf.Sqrt(2);
+        return - 2 * (v0 - (v1 + v2) / (this.len * Mathf.Sqrt(2))) / Mathf.Pow(denom, 3);
+    }
+
+    private Vector3 SegmentDiff(int i)
+    {
+        return (RelativeVector(i, Succ(i)) + RelativeVector(i, Pred(i))) / this.len;
+    }
+
+    public float ArcLength()
     {
         float arc = 0.0f;
 
-        for (int i = 0; i < this.length; i++)
+        for (int i = 0; i < this.len; i++)
         {
-            arc += Vector3.Distance(sequence[i], sequence[(i + 1) % this.length]);
+            arc += Vector3.Distance(pos[i], pos[Succ(i)]);
         }
 
         return arc;
     }
 
-    private float SequentialNorm(Vector3[] sequence)
+    private Vector3 RelativeVector(int i, int j)
     {
-        float _sum = 0.0f;
+        return (pos[i] - pos[j]).normalized;
+    }
 
-        for (int i = 0; i < this.length - 1; i++)
-        {
-            _sum += sequence[i].sqrMagnitude;
-        }
+    private int Succ(int i)
+    {
+        return Sum(i, 1);
+    }
 
-        return Mathf.Sqrt(_sum);
+    private int Pred(int i)
+    {
+        return Sum(i, this.len - 1);
+    }
+
+    private int Sum(int i, int j)
+    {
+        return (i + j) / this.len;
     }
 }

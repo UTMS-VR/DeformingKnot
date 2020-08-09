@@ -5,7 +5,7 @@ using DrawCurve;
 
 public class EnergyTest : MonoBehaviour
 {
-    private int longitude = 128;
+    private int longitude = 64;
     int repeat = 1;
     private Curve curve;
 
