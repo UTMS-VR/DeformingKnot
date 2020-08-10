@@ -16,7 +16,7 @@ namespace DrawCurve
         public bool selected = false;
         public Vector3 position = Vector3.zero;
         public Quaternion rotation = Quaternion.identity;
-        private float segment;
+        public float segment;
         private int meridian;
         private float radius;
         public static float collision = 0.05f;
@@ -177,9 +177,18 @@ namespace DrawCurve
 
         public void Optimize()
         {
-            Optimizer optimizer = new Optimizer(this);
+            DiscreteMoebius optimizer = new DiscreteMoebius(this);
+            //Electricity optimizer = new Electricity(this);
             optimizer.MomentumFlow();
-            this.ScaleTranslation();
+            //this.ScaleTranslation();
+
+            while (true)
+            {
+                Elasticity optimizer2 = new Elasticity(this);
+                if (optimizer2.MaxError() < this.segment * 0.5f) break;
+                optimizer2.Flow();
+            }
+
             this.MeshUpdate();
             this.MeshAtPositionsUpdate();
         }

@@ -1,35 +1,58 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DrawCurve;
 
 // 暗黙の仮定：隣接する2点の間隔は一定、弧長は保存される
 public class Electricity
 {
-    private List<Vector3> positions;
-    private int length;
-    private float lr;
+    private Curve curve;
+    private List<Vector3> pos;
+    private int len;
+    private float lr = 1e-03f;
+    private float alpha = 0.95f;
+    private List<Vector3> gradient;
 
-    public Electricity(List<Vector3> positions, float lr)
+    public Electricity(Curve curve)
     {
-        this.positions = positions;
-        this.length = positions.Count;
-        this.lr = lr;
+        this.curve = curve;
+        this.pos = curve.positions;
+        this.len = curve.positions.Count;
+        this.gradient = Gradient();
     }
 
-    public Vector3[] Gradient()
+    public void Flow()
+    {
+        for (int i = 0; i < this.len; i++)
+        {
+            this.curve.positions[i] += this.gradient[i];
+        }
+    }
+
+    // momentum SGD
+    public void MomentumFlow()
+    {
+        for (int i = 0; i < this.len; i++)
+        {
+            this.curve.momentum[i] = this.alpha * this.curve.momentum[i] + this.gradient[i];
+            this.curve.positions[i] += this.curve.momentum[i];
+        }
+    }
+
+    public List<Vector3> Gradient()
     {
         float arc = ArcLength();
-        Vector3[] gradient = new Vector3[this.length];
+        List<Vector3> gradient = new List<Vector3>();
 
-        for (int i = 0; i < this.length; i++)
+        for (int i = 0; i < this.len; i++)
         {
-            gradient[i] = new Vector3(0, 0, 0);
+            gradient.Add(new Vector3(0, 0, 0));
 
-            for (int j = 0; j < this.length; j++)
+            for (int j = 0; j < this.len; j++)
             {
                 if (j != i)
                 {
-                    gradient[i] += 4 * Mathf.Pow(arc / this.length, 2) * Coulomb(this.positions[i], this.positions[j]);
+                    gradient[i] += 4 * Mathf.Pow(arc / this.len, 2) * Coulomb(this.pos[i], this.pos[j]);
                 }
             }
 
@@ -41,19 +64,19 @@ public class Electricity
 
     public Vector3[] RestrictedGradient()
     {
-        Vector3[] gradient = Gradient();
+        Vector3[] gradient = this.gradient.ToArray();
         Vector3[][] matrix = ONRestrictionMatrix();
 
-        float[] product = new float[this.length];
+        float[] product = new float[this.len];
 
-        for (int i = 0; i < this.length; i++)
+        for (int i = 0; i < this.len; i++)
         {
             product[i] = SequentialInnerProduct(matrix[i], gradient);
         }
 
-        for (int j = 0; j < this.length; j++)
+        for (int j = 0; j < this.len; j++)
         {
-            for (int i = 0; i < this.length; i++)
+            for (int i = 0; i < this.len; i++)
             {
                 gradient[j] -= product[i] * matrix[i][j];
             }
@@ -67,18 +90,18 @@ public class Electricity
         float arc = ArcLength();
         float energy = 0.0f;
 
-        for (int i = 0; i < this.length; i++)
+        for (int i = 0; i < this.len; i++)
         {
-            for (int j = 0; j < this.length; j++)
+            for (int j = 0; j < this.len; j++)
             {
                 if (i != j)
                 {
-                    energy += Mathf.Pow(arc / this.length, 2) / (this.positions[i] - this.positions[j]).sqrMagnitude;
+                    energy += Mathf.Pow(arc / this.len, 2) / (this.pos[i] - this.pos[j]).sqrMagnitude;
                 }
             }
         }
 
-        energy += - Mathf.Pow(Mathf.PI, 2) * this.length / 3.0f + 4.0f;
+        energy += - Mathf.Pow(Mathf.PI, 2) * this.len / 3.0f + 4.0f;
 
         return energy;
     }
@@ -90,16 +113,16 @@ public class Electricity
 
     private Vector3 Tangent(int i)
     {
-        return this.positions[(i + 1) % this.length] - this.positions[i];
+        return this.pos[(i + 1) % this.len] - this.pos[i];
     }
 
     public float ArcLength()
     {
         float arc = 0.0f;
 
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < len; i++)
         {
-            arc += Vector3.Distance(positions[i], positions[(i + 1) % this.length]);
+            arc += Vector3.Distance(pos[i], pos[(i + 1) % this.len]);
         }
 
         return arc;
@@ -109,7 +132,7 @@ public class Electricity
     {
         float _sum = 0.0f;
 
-        for (int i = 0; i < this.length - 1; i++)
+        for (int i = 0; i < this.len - 1; i++)
         {
             _sum += sequence[i].sqrMagnitude;
         }
@@ -121,7 +144,7 @@ public class Electricity
     {
         float _sum = 0.0f;
 
-        for (int i = 0; i < this.length - 1; i++)
+        for (int i = 0; i < this.len - 1; i++)
         {
             _sum += Vector3.Dot(sequence1[i], sequence2[i]);
         }
@@ -133,7 +156,7 @@ public class Electricity
     {
         float norm = SequentialNorm(sequence);
 
-        for (int i = 0; i < this.length; i++)
+        for (int i = 0; i < this.len; i++)
         {
             sequence[i] = sequence[i] / norm;
         }
@@ -141,22 +164,22 @@ public class Electricity
 
     private Vector3[][] RestrictionMatrix()
     {
-        Vector3[][] _matrix = new Vector3[this.length][];
+        Vector3[][] _matrix = new Vector3[this.len][];
 
-        for (int i = 0; i < this.length; i++)
+        for (int i = 0; i < this.len; i++)
         {
-            _matrix[i] = new Vector3[this.length];
+            _matrix[i] = new Vector3[this.len];
 
-            for (int j = 0; j < this.length; j++)
+            for (int j = 0; j < this.len; j++)
             {
                 _matrix[i][j] = Vector3.zero;
             }
         }
 
-        for (int i = 0; i < this.length; i++)
+        for (int i = 0; i < this.len; i++)
         {
             _matrix[i][i] = -Tangent(i);
-            _matrix[i][(i + 1) % this.length] = Tangent(i);
+            _matrix[i][(i + 1) % this.len] = Tangent(i);
         }
 
         return _matrix;
@@ -168,11 +191,11 @@ public class Electricity
 
         SequentialNormalize(_matrix[0]);
 
-        for (int i = 1; i < this.length - 1; i++)
+        for (int i = 1; i < this.len - 1; i++)
         {
             float product = SequentialInnerProduct(_matrix[i - 1], _matrix[i]);
 
-            for (int j = 0; j < this.length; j++)
+            for (int j = 0; j < this.len; j++)
             {
                 _matrix[i][j] -= _matrix[i - 1][j] * product;
             }
@@ -180,17 +203,17 @@ public class Electricity
             SequentialNormalize(_matrix[i]);
         }
 
-        for (int i = 0; i < this.length - 1; i++)
+        for (int i = 0; i < this.len - 1; i++)
         {
-            float product = SequentialInnerProduct(_matrix[i], _matrix[this.length - 1]);
+            float product = SequentialInnerProduct(_matrix[i], _matrix[this.len - 1]);
 
-            for (int j = 0; j < this.length; j++)
+            for (int j = 0; j < this.len; j++)
             {
-                _matrix[this.length - 1][j] -= _matrix[i][j] * product;
+                _matrix[this.len - 1][j] -= _matrix[i][j] * product;
             }
         }
 
-        SequentialNormalize(_matrix[this.length - 1]);
+        SequentialNormalize(_matrix[this.len - 1]);
 
         return _matrix;
     }

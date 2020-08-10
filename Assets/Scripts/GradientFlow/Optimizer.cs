@@ -18,17 +18,17 @@ public class Optimizer
         this.curve = curve;
         this.length = curve.positions.Count;
         this.loss = new Loss(curve.positions, 1e-08f);
-        this.electricity = new Electricity(curve.positions, 1e-03f);
-        this.discreteMoebius = new DiscreteMoebius(curve.positions, 1e-06f); // longitude 64, segment 0.03f -> 1e-05f
-        this.elasticity = new Elasticity(curve.positions, 1.0f);
+        this.electricity = new Electricity(curve);
+        this.discreteMoebius = new DiscreteMoebius(curve);
+        this.elasticity = new Elasticity(curve);
     }
 
     public void Flow()
     {
-        List<Vector3> gradient = this.discreteMoebius.ModifiedGradient2();
+        List<Vector3> gradient = this.discreteMoebius.ModifiedGradient();
         Debug.Log(this.curve.ArcLength());
         Debug.Log(this.curve.positions.Count);
-        Debug.Log(this.discreteMoebius.ModifiedEnergy2());
+        Debug.Log(this.discreteMoebius.ModifiedEnergy());
 
         for (int i = 0; i < this.length; i++)
         {
@@ -39,10 +39,12 @@ public class Optimizer
     // momentum SGD
     public void MomentumFlow()
     {
-        List<Vector3> gradient = this.discreteMoebius.ModifiedGradient();
-        Debug.Log(this.curve.ArcLength());
-        Debug.Log(this.curve.positions.Count);
-        Debug.Log(this.discreteMoebius.ModifiedEnergy());
+        List<Vector3> gradient = this.discreteMoebius.Gradient();
+        Debug.Log ("flow");
+        Debug.Log(this.curve.segment);
+        Debug.Log(this.curve.ArcLength() / this.curve.positions.Count);
+        Debug.Log(this.elasticity.Energy());
+        Debug.Log(this.elasticity.MaxError());
 
         for (int i = 0; i < this.length; i++)
         {

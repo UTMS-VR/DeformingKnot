@@ -38,7 +38,7 @@ public class Main : MonoBehaviour
         {
             Player.DeepCopy(curves, ref preCurves);
             Player.Draw(ref drawingCurve, ref curves);
-            Player.Move(curves, movingCurves);
+            Player.Move(curves, ref movingCurves);
             Player.Select(curves);
             Player.Cut(ref curves);
             Player.Combine(ref curves);

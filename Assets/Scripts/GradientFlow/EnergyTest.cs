@@ -29,14 +29,26 @@ public class EnergyTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            curve.MomentumInitialize();
+        }
+
         if (Input.GetKey(KeyCode.Space))
         {
             for (int i = 0; i < repeat; i++)
             {
-                Optimizer optimizer = new Optimizer(curve);
-                optimizer.Flow();
+                //DiscreteMoebius optimizer = new DiscreteMoebius(curve);
+                Electricity optimizer = new Electricity(curve);
+                optimizer.MomentumFlow();
                 //curve.ScaleTranslation();
-                Debug.Log(curve.ArcLength());
+            }
+
+            while (true)
+            {
+                Elasticity optimizer = new Elasticity(curve);
+                if (optimizer.MaxError() < curve.segment * 0.5f) break;
+                optimizer.Flow();
             }
 
             curve.MeshUpdate();

@@ -54,7 +54,7 @@ public static class Player
         }
     }
 
-    public static void Move(List<Curve> curves, List<int> movingCurves)
+    public static void Move(List<Curve> curves, ref List<int> movingCurves)
     {
         Vector3 nowPosition = controller.rightHand.GetPosition();
 
