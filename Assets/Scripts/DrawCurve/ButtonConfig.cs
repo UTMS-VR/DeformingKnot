@@ -14,6 +14,7 @@ namespace DrawCurve
         public OVRInput.RawButton cut;
         public OVRInput.RawButton combine;
         public OVRInput.RawButton remove;
+        public OVRInput.RawButton optimize;
         public OVRInput.RawButton undo;
 
         public ButtonConfig(
@@ -24,6 +25,7 @@ namespace DrawCurve
             OVRInput.RawButton cut = OVRInput.RawButton.B,
             OVRInput.RawButton combine = OVRInput.RawButton.X,
             OVRInput.RawButton remove = OVRInput.RawButton.Y,
+            OVRInput.RawButton optimize = OVRInput.RawButton.LIndexTrigger,
             OVRInput.RawButton undo = OVRInput.RawButton.LHandTrigger)
         {
             this.controller = controller;
@@ -33,6 +35,7 @@ namespace DrawCurve
             this.cut = cut;
             this.combine = combine;
             this.remove = remove;
+            this.optimize = optimize;
             this.undo = undo;
         }
 
@@ -46,6 +49,7 @@ namespace DrawCurve
             if (controller.GetButtonDown(this.cut)) valid++;
             if (controller.GetButtonDown(this.combine)) valid++;
             if (controller.GetButtonDown(this.remove)) valid++;
+            if (controller.GetButton(this.optimize) || controller.GetButtonUp(this.optimize)) valid++;
             if (controller.GetButtonDown(this.undo)) valid++;
 
             return (valid == 1) ? true : false;

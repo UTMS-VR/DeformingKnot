@@ -146,6 +146,24 @@ public static class Player
         }
     }
 
+    public static void Optimize(List<Curve> curves)
+    {
+        if (controller.GetButton(button.optimize))
+        {
+            List<Curve> selection = curves.Where(curve => curve.selected).ToList();
+
+            foreach (Curve curve in selection)
+            {
+                if (controller.GetButtonDown(button.optimize))
+                {
+                    curve.MomentumInitialize();
+                }
+
+                curve.Optimize();
+            }
+        }
+    }
+
     public static void Undo(ref List<Curve> curves, List<Curve> preCurves)
     {
         if (controller.GetButtonDown(button.undo))

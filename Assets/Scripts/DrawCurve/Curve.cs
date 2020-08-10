@@ -72,6 +72,31 @@ namespace DrawCurve
             return this.positions.Count;
         }
 
+        public float ArcLength()
+        {
+            float arclength = 0.0f;
+
+            for (int i = 1; i < Length(); i++)
+            {
+                arclength += Vector3.Distance(positions[i - 1], positions[i]);
+            }
+
+            if (this.close)
+            {
+                arclength += Vector3.Distance(positions[Length() - 1], positions[0]);
+            }
+
+            return arclength;
+        }
+
+        public void ScaleTranslation()
+        {
+            for (int i = 0; i < Length(); i++)
+            {
+                this.positions[i] *= this.segment * Length() / ArcLength();
+            }
+        }
+
         public void Draw()
         {
             if (controller.GetButton(drawButton))
@@ -148,6 +173,15 @@ namespace DrawCurve
                 this.close = !this.close;
                 MeshUpdate();
             }
+        }
+
+        public void Optimize()
+        {
+            Optimizer optimizer = new Optimizer(this);
+            optimizer.MomentumFlow();
+            this.ScaleTranslation();
+            this.MeshUpdate();
+            this.MeshAtPositionsUpdate();
         }
 
         public List<Curve> Cut()

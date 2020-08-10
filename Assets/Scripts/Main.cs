@@ -43,6 +43,7 @@ public class Main : MonoBehaviour
             Player.Cut(ref curves);
             Player.Combine(ref curves);
             Player.Remove(ref curves);
+            Player.Optimize(curves);
             Player.Undo(ref curves, preCurves);
         }
 

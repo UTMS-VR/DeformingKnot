@@ -17,7 +17,7 @@ public class EnergyTest : MonoBehaviour
         for (int i = 0; i < longitude; i++)
         {
             float t = (float)i / longitude;
-            positions.Add(ExampleCurve1(t));
+            positions.Add(ExampleCurve5(t));
         }
 
         float segment = AdjustParameter.ArcLength(positions, true) / positions.Count;
@@ -34,7 +34,9 @@ public class EnergyTest : MonoBehaviour
             for (int i = 0; i < repeat; i++)
             {
                 Optimizer optimizer = new Optimizer(curve);
-                optimizer.MomentumFlow();
+                optimizer.Flow();
+                //curve.ScaleTranslation();
+                Debug.Log(curve.ArcLength());
             }
 
             curve.MeshUpdate();
