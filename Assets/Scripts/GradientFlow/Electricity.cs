@@ -9,6 +9,7 @@ public class Electricity
     private Curve curve;
     private List<Vector3> pos;
     private int len;
+    private float seg;
     private float lr = 1e-03f;
     private float alpha = 0.95f;
     private List<Vector3> gradient;
@@ -18,6 +19,7 @@ public class Electricity
         this.curve = curve;
         this.pos = curve.positions;
         this.len = curve.positions.Count;
+        this.seg = curve.segment;
         this.gradient = Gradient();
     }
 
@@ -52,7 +54,7 @@ public class Electricity
             {
                 if (j != i)
                 {
-                    gradient[i] += 4 * Mathf.Pow(arc / this.len, 2) * Coulomb(this.pos[i], this.pos[j]);
+                    gradient[i] += 4 * Mathf.Pow(this.seg, 2) * Coulomb(this.pos[i], this.pos[j]);
                 }
             }
 
@@ -96,7 +98,7 @@ public class Electricity
             {
                 if (i != j)
                 {
-                    energy += Mathf.Pow(arc / this.len, 2) / (this.pos[i] - this.pos[j]).sqrMagnitude;
+                    energy += Mathf.Pow(this.seg, 2) / (this.pos[i] - this.pos[j]).sqrMagnitude;
                 }
             }
         }

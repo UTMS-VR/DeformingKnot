@@ -88,7 +88,7 @@ public class Elasticity
         return (v.magnitude - this.seg) * v.normalized;
     }
 
-        private int Succ(int i)
+    private int Succ(int i)
     {
         return Sum(i, 1);
     }

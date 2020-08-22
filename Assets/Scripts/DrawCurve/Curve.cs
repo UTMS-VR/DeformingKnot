@@ -177,15 +177,15 @@ namespace DrawCurve
 
         public void Optimize()
         {
-            DiscreteMoebius optimizer = new DiscreteMoebius(this);
-            //Electricity optimizer = new Electricity(this);
+            //DiscreteMoebius optimizer = new DiscreteMoebius(this);
+            Electricity optimizer = new Electricity(this);
             optimizer.MomentumFlow();
             //this.ScaleTranslation();
 
             while (true)
             {
                 Elasticity optimizer2 = new Elasticity(this);
-                if (optimizer2.MaxError() < this.segment * 0.5f) break;
+                if (optimizer2.MaxError() < this.segment * 0.01f) break;
                 optimizer2.Flow();
             }
 

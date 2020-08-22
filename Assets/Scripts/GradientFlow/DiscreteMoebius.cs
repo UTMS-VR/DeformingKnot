@@ -22,7 +22,7 @@ public class DiscreteMoebius
         this.len = curve.positions.Count;
         this.arc = ArcLength();
         this.seg = this.arc / this.len;
-        this.gradient = Gradient();
+        this.gradient = ModifiedGradient();
     }
 
     public void Flow()
@@ -54,12 +54,12 @@ public class DiscreteMoebius
 
             for (int j = 1; j < this.len; j++)
             {
-                first += Coulomb(i, Sum(i, j));
+                first += CoulombDiff(i, Sum(i, j));
             }
 
             first *= 2 * Mathf.Pow(this.seg, 2);
 
-            Vector3 second = energy * 2 * this.seg * this.SegmentDiff(i);
+            Vector3 second = energy * 2 * this.seg * SegmentDiff(i);
 
             gradient.Add(this.lr * (first + second));
         }
@@ -82,7 +82,7 @@ public class DiscreteMoebius
         {
             for (int j = 1; j < this.len; j++)
             {
-                energy += 1 / Mathf.Pow(Vector3.Distance(this.pos[i], this.pos[Sum(i, j)]), 2);
+                energy += Coulomb(i, Sum(i, j));
             }
         }
 
@@ -97,12 +97,12 @@ public class DiscreteMoebius
         for (int i = 0; i < this.len; i++)
         {
             Vector3 first = new Vector3();
-            first += RelativeVector(i, Succ(i));
-            first += RelativeVector(i, Pred(i));
+            first += CoulombDiff(i, Succ(i));
+            first += CoulombDiff(i, Pred(i));
 
             for (int j = 2; j <= this.len - 2; j++)
             {
-                first += ModifiedCoulomb(i, Sum(i, j));
+                first += ModifiedCoulombDiff(i, Sum(i, j));
             }
 
             first *= 2 * Mathf.Pow(this.seg, 2);
@@ -126,37 +126,65 @@ public class DiscreteMoebius
 
         for (int i = 0; i < this.len; i++)
         {
-            energy += 1 / Mathf.Pow(Vector3.Distance(this.pos[i], this.pos[Succ(i)]), 2);
-            energy += 1 / Mathf.Pow(Vector3.Distance(this.pos[i], this.pos[Pred(i)]), 2);
+            energy += Coulomb(i, Succ(i));
+            energy += Coulomb(i, Pred(i));
 
             for (int j = 2; j <= this.len - 2; j++)
             {
-                float first = Vector3.Distance(this.pos[i], this.pos[Sum(i, j)]);
-                float second = this.seg / Mathf.Sqrt(2);
-                energy += 1 / Mathf.Pow(first - second, 2);
+                energy += ModifiedCoulomb(i, Sum(i, j));
             }
         }
 
         return energy;
     }
 
-    private Vector3 Coulomb(int i, int j)
+    private float Coulomb(int i, int j)
     {
-        return - 2 * (this.pos[i] - this.pos[j]) / Mathf.Pow(Vector3.Distance(this.pos[i], this.pos[j]), 4);
+        return 1 / Mathf.Pow(Distance(i, j), 2);
     }
 
-    private Vector3 ModifiedCoulomb(int i, int j)
+    private Vector3 CoulombDiff(int i, int j)
     {
-        Vector3 v0 = RelativeVector(i, j);
-        Vector3 v1 = RelativeVector(i, Succ(i));
-        Vector3 v2 = RelativeVector(i, Pred(i));
-        float denom = Vector3.Distance(this.pos[i], this.pos[j]) - this.seg / Mathf.Sqrt(2);
-        return - 2 * (v0 - (v1 + v2) / (this.len * Mathf.Sqrt(2))) / Mathf.Pow(denom, 3);
+        return - 2 * (this.pos[i] - this.pos[j]) / Mathf.Pow(Distance(i, j), 4);
+    }
+
+    private float ModifiedCoulomb(int i, int j)
+    {
+        float denom = Distance(i, j) - this.seg / Mathf.Sqrt(2);
+        return 1 / Mathf.Pow(denom, 2);
+    }
+
+    private Vector3 ModifiedCoulombDiff(int i, int j)
+    {
+        float denom = Distance(i, j) - this.seg / Mathf.Sqrt(2);
+        return - 2 * (DistanceDiff(i, j) - SegmentDiff(i) / Mathf.Sqrt(2)) / Mathf.Pow(denom, 3);
+    }
+
+    private float ArcLength()
+    {
+        float arc = 0.0f;
+
+        for (int i = 0; i < this.len; i++)
+        {
+            arc += Vector3.Distance(this.pos[i], this.pos[Succ(i)]);
+        }
+
+        return arc;
     }
 
     private Vector3 SegmentDiff(int i)
     {
-        return (RelativeVector(i, Succ(i)) + RelativeVector(i, Pred(i))) / this.len;
+        return (DistanceDiff(i, Succ(i)) + DistanceDiff(i, Pred(i))) / this.len;
+    }
+
+    private float Distance(int i, int j)
+    {
+        return Vector3.Distance(this.pos[i], this.pos[j]);
+    }
+
+    private Vector3 DistanceDiff(int i, int j)
+    {
+        return (this.pos[i] - this.pos[j]).normalized;
     }
 
     private float ElasticEnergy()
@@ -173,26 +201,9 @@ public class DiscreteMoebius
 
     private Vector3 ElasticForce(int i)
     {
-        Vector3 next = 2 * (Vector3.Distance(this.pos[i], this.pos[Succ(i)]) - this.seg) * (RelativeVector(i, Succ(i)) - SegmentDiff(i));
-        Vector3 previous = 2 * (Vector3.Distance(this.pos[i], this.pos[Pred(i)]) - this.seg) * (RelativeVector(i, Pred(i)) - SegmentDiff(i));
+        Vector3 next = 2 * (Vector3.Distance(this.pos[i], this.pos[Succ(i)]) - this.seg) * (DistanceDiff(i, Succ(i)) - SegmentDiff(i));
+        Vector3 previous = 2 * (Vector3.Distance(this.pos[i], this.pos[Pred(i)]) - this.seg) * (DistanceDiff(i, Pred(i)) - SegmentDiff(i));
         return next + previous;
-    }
-
-    private float ArcLength()
-    {
-        float arc = 0.0f;
-
-        for (int i = 0; i < this.len; i++)
-        {
-            arc += Vector3.Distance(this.pos[i], this.pos[Succ(i)]);
-        }
-
-        return arc;
-    }
-
-    private Vector3 RelativeVector(int i, int j)
-    {
-        return (this.pos[i] - this.pos[j]).normalized;
     }
 
     private int Succ(int i)
