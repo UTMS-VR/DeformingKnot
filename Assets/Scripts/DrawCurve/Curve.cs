@@ -177,17 +177,17 @@ namespace DrawCurve
 
         public void Optimize()
         {
-            //DiscreteMoebius optimizer = new DiscreteMoebius(this);
-            Electricity optimizer = new Electricity(this);
+            DiscreteMoebius optimizer = new DiscreteMoebius(this);
+            //Electricity optimizer = new Electricity(this);
             optimizer.MomentumFlow();
             //this.ScaleTranslation();
 
-            while (true)
+            /*while (true)
             {
                 Elasticity optimizer2 = new Elasticity(this);
                 if (optimizer2.MaxError() < this.segment * 0.01f) break;
                 optimizer2.Flow();
-            }
+            }*/
 
             this.MeshUpdate();
             this.MeshAtPositionsUpdate();
@@ -312,6 +312,23 @@ namespace DrawCurve
             }
 
             return (num, min);
+        }
+
+        public float MinSegmentDist()
+        {
+            List<Vector3> seq = this.positions;
+            float min = SegmentDist.SSDist(seq[0], seq[1], seq[2], seq[3]);
+
+            for (int i = 0; i <= Length() - 3; i++)
+            {
+                for (int j = i + 2; j <= (i == 0 ? Length() - 2 : Length() - 1); j++)
+                {
+                    float dist = SegmentDist.SSDist(seq[i], seq[i + 1], seq[j], seq[(j + 1) % Length()]);
+                    if (dist < min) min = dist;
+                }
+            }
+
+            return min;
         }
 
         public Curve DeepCopy()

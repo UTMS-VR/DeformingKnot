@@ -148,7 +148,7 @@ public static class Player
 
     public static void Optimize(List<Curve> curves)
     {
-        if (controller.GetButton(button.optimize))
+        if (controller.GetButtonDown(button.optimize))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 

@@ -17,7 +17,7 @@ public class EnergyTest : MonoBehaviour
         for (int i = 0; i < longitude; i++)
         {
             float t = (float)i / longitude;
-            positions.Add(ExampleCurve(t));
+            positions.Add(ExampleCurve5(t));
         }
 
         float segment = AdjustParameter.ArcLength(positions, true) / positions.Count;
@@ -36,16 +36,19 @@ public class EnergyTest : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space))
         {
+            Debug.Log(curve.MinSegmentDist());
+
             for (int i = 0; i < repeat; i++)
             {
-                Constraint optimizer = new Constraint(curve);
-                //DiscreteMoebius optimizer = new DiscreteMoebius(curve);
+                //Constraint optimizer = new Constraint(curve);
+                DiscreteMoebius optimizer = new DiscreteMoebius(curve);
                 //Electricity optimizer = new Electricity(curve);
-                Debug.Log(optimizer.IntervalEnergy());
-                Debug.Log(optimizer.CrossingEnergy());
+                //Debug.Log(optimizer.IntervalEnergy() * 0.01f + optimizer.CrossingEnergy());
+                //Debug.Log(optimizer.IntervalEnergy());
+                //Debug.Log(optimizer.CrossingEnergy());
                 //Debug.Log(curve.segment);
                 //Debug.Log(optimizer.ArcLength() / curve.positions.Count);
-                optimizer.Flow();
+                optimizer.MomentumFlow();
                 //curve.ScaleTranslation();
             }
 
