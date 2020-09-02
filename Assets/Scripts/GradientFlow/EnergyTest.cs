@@ -17,7 +17,7 @@ public class EnergyTest : MonoBehaviour
         for (int i = 0; i < longitude; i++)
         {
             float t = (float)i / longitude;
-            positions.Add(ExampleCurve5(t));
+            positions.Add(ExampleCurve1(t));
         }
 
         float segment = AdjustParameter.ArcLength(positions, true) / positions.Count;

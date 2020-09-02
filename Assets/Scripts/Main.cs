@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,7 @@ public class Main : MonoBehaviour
     private Curve drawingCurve;
     private List<int> movingCurves;
     private string text;
+    private Text text1;
 
     // Start is called before the first frame update
     void Start()
@@ -27,11 +29,15 @@ public class Main : MonoBehaviour
         preCurves = new List<Curve>();
         drawingCurve = new Curve(new List<Vector3>(), false);
         movingCurves = new List<int>();
+
+        text1 = GameObject.Find("Text").GetComponent<Text>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        //text = "SegmentDist :";
+        text1.text = "SegmentDist :";
         MyController.Update(this.controller);
 
         if (button.ValidButtonInput())
@@ -45,6 +51,13 @@ public class Main : MonoBehaviour
             Player.Remove(ref curves);
             Player.Optimize(curves);
             Player.Undo(ref curves, preCurves);
+        }
+
+        List<Curve> selection = curves.Where(curve => curve.selected).ToList();
+        foreach (Curve curve in selection)
+        {
+            //text += " " + curve.MinSegmentDist();
+            text1.text += " " + Mathf.Floor(curve.MinSegmentDist() * 100000) / 100000;
         }
 
         Player.Display(curves);

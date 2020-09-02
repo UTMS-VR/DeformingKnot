@@ -163,6 +163,7 @@ namespace DrawCurve
             if (Distance(this.positions, nowPosition).Item2 < collision)
             {
                 this.selected = !this.selected;
+                this.MomentumInitialize();
             }
         }
 
@@ -177,17 +178,17 @@ namespace DrawCurve
 
         public void Optimize()
         {
-            DiscreteMoebius optimizer = new DiscreteMoebius(this);
-            //Electricity optimizer = new Electricity(this);
-            optimizer.MomentumFlow();
-            //this.ScaleTranslation();
-
-            /*while (true)
+            while (true)
             {
                 Elasticity optimizer2 = new Elasticity(this);
                 if (optimizer2.MaxError() < this.segment * 0.01f) break;
                 optimizer2.Flow();
-            }*/
+            }
+
+            DiscreteMoebius optimizer = new DiscreteMoebius(this);
+            //Electricity optimizer = new Electricity(this);
+            optimizer.MomentumFlow();
+            //this.ScaleTranslation();
 
             this.MeshUpdate();
             this.MeshAtPositionsUpdate();

@@ -47,7 +47,7 @@ namespace DrawCurve
 
         public static float SSDist(Vector3 v1, Vector3 v2, Vector3 w1, Vector3 w2)
         {
-            if (Vector3.Cross(v2 - v1, w2 - w1).magnitude == 0)
+            if (Vector3.Cross(v2 - v1, w2 - w1).magnitude > 0)
             {
                 float s = SSRate(v1, v2, w1, w2).Item1;
                 float t = SSRate(v1, v2, w1, w2).Item2;

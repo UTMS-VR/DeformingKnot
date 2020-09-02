@@ -154,10 +154,10 @@ public static class Player
 
             foreach (Curve curve in selection)
             {
-                if (controller.GetButtonDown(button.optimize))
+                /*if (controller.GetButtonDown(button.optimize))
                 {
                     curve.MomentumInitialize();
-                }
+                }*/
 
                 curve.Optimize();
             }
