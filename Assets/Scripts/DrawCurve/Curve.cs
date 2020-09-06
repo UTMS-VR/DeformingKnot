@@ -163,7 +163,6 @@ namespace DrawCurve
             if (Distance(this.positions, nowPosition).Item2 < collision)
             {
                 this.selected = !this.selected;
-                this.MomentumInitialize();
             }
         }
 
@@ -178,17 +177,44 @@ namespace DrawCurve
 
         public void Optimize()
         {
+            DiscreteMoebius optimizer = new DiscreteMoebius(this);
+            
+            for (int i = 0; i < this.Length(); i++)
+            {
+                this.positions[i] -= this.momentum[i] + optimizer.gradient[i];
+            }
+
+            List<Vector3> tempPositions = new List<Vector3>();
+
+            for (int i = 0; i < this.Length(); i++)
+            {
+                tempPositions.Add(this.positions[i]);
+            }
+
             while (true)
             {
                 Elasticity optimizer2 = new Elasticity(this);
-                if (optimizer2.MaxError() < this.segment * 0.01f) break;
+                if (optimizer2.MaxError() < this.segment * 0.1f) break;
                 optimizer2.Flow();
             }
 
-            DiscreteMoebius optimizer = new DiscreteMoebius(this);
+            for (int i = 0; i < this.Length(); i++)
+            {
+                this.momentum[i] = (this.momentum[i] + optimizer.gradient[i]) * 0.95f
+                                    + (tempPositions[i] - this.positions[i]) * 0.3f;
+            }
+
+            /*DiscreteMoebius optimizer = new DiscreteMoebius(this);
             //Electricity optimizer = new Electricity(this);
             optimizer.MomentumFlow();
             //this.ScaleTranslation();
+
+            while (true)
+            {
+                Elasticity optimizer2 = new Elasticity(this);
+                if (optimizer2.MaxError() < this.segment * 0.1f) break;
+                optimizer2.MomentumFlow();
+            }*/
 
             this.MeshUpdate();
             this.MeshAtPositionsUpdate();
@@ -370,6 +396,21 @@ namespace DrawCurve
             }
 
             return m;
+        }
+
+        public float MinCos()
+        {
+            float max = 1.0f;
+
+            for (int i = 0; i < Length(); i++)
+            {
+                Vector3 next = this.positions[(i + 1) % Length()] - this.positions[i];
+                Vector3 previous = this.positions[i] - this.positions[(i + Length() - 1) % Length()];
+                float cos = Vector3.Dot(next.normalized, previous.normalized);
+                if (cos < max) max = cos;
+            }
+
+            return max;
         }
     }
 }

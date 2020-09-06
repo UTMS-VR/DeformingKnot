@@ -6,11 +6,13 @@ namespace DrawCurve
 {
     public static class SegmentDist
     {
+        // 点 v から直線 w1w2 へ下ろした垂線の足を点 w3 としたときの, w3 - w1 = s * (w2 - w1) を満たす s を返す. 
         private static float PSRate(Vector3 v, Vector3 w1, Vector3 w2)
         {
             return Vector3.Dot(v - w1, (w2 - w1).normalized) / (w2 - w1).magnitude;
         }
 
+        // 点 v と線分 w1w2 の間の距離を返す. 
         private static float PSDist(Vector3 v, Vector3 w1, Vector3 w2)
         {
             if (w1 == w2)
@@ -34,6 +36,8 @@ namespace DrawCurve
             }
         }
 
+        // 直線 v1v2, 直線 w1w2 と, その両方に直交する直線との交点をそれぞれ v3, w3 としたときの, 
+        // v3 - v1 = s * (v2 - v1), w3 - w1 = t * (w2 - w1) を満たす s, t を返す. 
         private static (float, float) SSRate(Vector3 v1, Vector3 v2, Vector3 w1, Vector3 w2)
         {
             Vector3 d = v2 - v1;
@@ -45,6 +49,7 @@ namespace DrawCurve
             return (s, t);
         }
 
+        // 線分 v1v2 と線分 w1w2 の間の距離を返す. 
         public static float SSDist(Vector3 v1, Vector3 v2, Vector3 w1, Vector3 w2)
         {
             if (Vector3.Cross(v2 - v1, w2 - w1).magnitude > 0)

@@ -12,7 +12,7 @@ namespace DrawCurve
             List<Vector3> newpositions = new List<Vector3>();
             newpositions.Add(positions[0]);
             float remainder = 0.0f;
-            float temporarySegment = ArcLength(positions, closed) / DivisionNumber(positions, segment, closed);
+            float temporarySegment = TemporarySegment(positions, segment, closed);
 
             for (int i = 1; i < length; i++)
             {
@@ -55,6 +55,11 @@ namespace DrawCurve
             }
 
             return arclength;
+        }
+
+        public static float TemporarySegment(List<Vector3> positions, float segment, bool closed)
+        {
+            return ArcLength(positions, closed) / DivisionNumber(positions, segment, closed);
         }
 
         private static int DivisionNumber(List<Vector3> positions, float segment, bool closed)

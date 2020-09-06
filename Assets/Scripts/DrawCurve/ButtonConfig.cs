@@ -24,8 +24,8 @@ namespace DrawCurve
             OVRInput.RawButton select = OVRInput.RawButton.A,
             OVRInput.RawButton cut = OVRInput.RawButton.B,
             OVRInput.RawButton combine = OVRInput.RawButton.X,
-            OVRInput.RawButton remove = OVRInput.RawButton.LIndexTrigger,
-            OVRInput.RawButton optimize = OVRInput.RawButton.Y,
+            OVRInput.RawButton remove = OVRInput.RawButton.Y,
+            OVRInput.RawButton optimize = OVRInput.RawButton.LIndexTrigger,
             OVRInput.RawButton undo = OVRInput.RawButton.LHandTrigger)
         {
             this.controller = controller;

@@ -148,20 +148,69 @@ public static class Player
 
     public static void Optimize(List<Curve> curves)
     {
+        if (controller.GetButton(button.optimize))
+        {
+            List<Curve> selection = curves.Where(curve => curve.selected).ToList();
+
+            foreach (Curve curve in selection)
+            {
+                if (controller.GetButtonDown(button.optimize))
+                {
+                    float tempSegment = AdjustParameter.TemporarySegment(curve.positions, curve.segment, curve.close);
+                    AdjustParameter.Equalize(ref curve.positions, curve.segment, curve.close);
+                    curve.segment = tempSegment;
+                    curve.MomentumInitialize();
+                }
+
+                curve.Optimize();
+            }
+        }
+
+        /*if (controller.GetButtonDown(button.remove))
+        {
+            List<Curve> selection = curves.Where(curve => curve.selected).ToList();
+
+            foreach (Curve curve in selection)
+            {
+                float tempSegment = AdjustParameter.TemporarySegment(curve.positions, curve.segment, curve.close);
+                AdjustParameter.Equalize(ref curve.positions, curve.segment, curve.close);
+                curve.segment = tempSegment;
+                curve.MomentumInitialize();
+                curve.MeshUpdate();
+                curve.MeshAtPositionsUpdate();
+            }
+        }
+
         if (controller.GetButtonDown(button.optimize))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
             foreach (Curve curve in selection)
             {
-                /*if (controller.GetButtonDown(button.optimize))
-                {
-                    curve.MomentumInitialize();
-                }*/
-
-                curve.Optimize();
+                DiscreteMoebius optimizer = new DiscreteMoebius(curve);
+                optimizer.MomentumFlow();
+                curve.MeshUpdate();
+                curve.MeshAtPositionsUpdate();
             }
         }
+
+        if (controller.GetButtonDown(button.undo))
+        {
+            List<Curve> selection = curves.Where(curve => curve.selected).ToList();
+
+            foreach (Curve curve in selection)
+            {
+                while (true)
+                {
+                    Elasticity optimizer2 = new Elasticity(curve);
+                    if (optimizer2.MaxError() < curve.segment * 1.0f) break;
+                    optimizer2.Flow();
+                }
+
+                curve.MeshUpdate();
+                curve.MeshAtPositionsUpdate();
+            }
+        }*/
     }
 
     public static void Undo(ref List<Curve> curves, List<Curve> preCurves)

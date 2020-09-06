@@ -63,8 +63,8 @@ public class EnergyTest : MonoBehaviour
             curve.MeshAtPositionsUpdate();
         }
 
-        Graphics.DrawMesh(curve.mesh, new Vector3(0, 0, 0.3f), Quaternion.identity, MakeMesh.CurveMaterial, 0);
-        Graphics.DrawMesh(curve.meshAtPositions, new Vector3(0, 0, 0.3f), Quaternion.identity, MakeMesh.PositionMaterial, 0);
+        //Graphics.DrawMesh(curve.mesh, new Vector3(0, 0, 0.3f), Quaternion.identity, MakeMesh.CurveMaterial, 0);
+        //Graphics.DrawMesh(curve.meshAtPositions, new Vector3(0, 0, 0.3f), Quaternion.identity, MakeMesh.PositionMaterial, 0);
     }
 
     //circle

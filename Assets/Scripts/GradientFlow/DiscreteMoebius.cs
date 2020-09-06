@@ -13,7 +13,7 @@ public class DiscreteMoebius
     private float seg;
     private float lr = 1e-05f; // longitude 64, segment 0.03f -> 1e-05f;
     private float alpha = 0.95f;
-    private List<Vector3> gradient;
+    public List<Vector3> gradient;
 
     public DiscreteMoebius(Curve curve)
     {
