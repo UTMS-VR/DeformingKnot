@@ -5,6 +5,12 @@ using UnityEngine;
 using DrawCurve;
 using DebugUtil;
 
+public enum State
+{
+    Base,
+    ContiDeform
+}
+
 public static class Player
 {
     public static Controller controller;
@@ -18,7 +24,8 @@ public static class Player
 
     public static void DeepCopy(List<Curve> curves, ref List<Curve> preCurves)
     {
-        if (controller.GetButtonDown(button.draw)
+        if (controller.GetButtonDown(button.changeState)
+            || controller.GetButtonDown(button.draw)
             || controller.GetButtonDown(button.move)
             || controller.GetButtonDown(button.select)
             || controller.GetButtonDown(button.cut)
@@ -30,6 +37,33 @@ public static class Player
             foreach (Curve curve in curves)
             {
                 preCurves.Add(curve.DeepCopy());
+            }
+        }
+    }
+
+    public static void ChangeState(ref List<Curve> curves, ref State state, ref Knot deformingCurve)
+    {
+        if (state == State.Base)
+        {
+            List<Curve> selection = curves.Where(curve => curve.selected).ToList();
+
+            if (controller.GetButtonDown(button.changeState) && selection.Count == 1 && selection[0].close)
+            {
+                state = State.ContiDeform;
+                deformingCurve = new Knot(selection[0].positions, controller,
+                                          segment: selection[0].segment,
+                                          meridian: selection[0].meridian,
+                                          radius: selection[0].radius,
+                                          collisionPoints: new List<Vector3>());
+                curves.Remove(selection[0]);
+            }
+        }
+        else if (state == State.ContiDeform)
+        {
+            if (controller.GetButtonDown(button.changeState))
+            {
+                state = State.Base;
+                curves.Add(new Curve(deformingCurve.GetPoints(), true));
             }
         }
     }
@@ -146,7 +180,7 @@ public static class Player
         }
     }
 
-    public static void Optimize(List<Curve> curves)
+    /*public static void Optimize(List<Curve> curves)
     {
         if (controller.GetButton(button.optimize))
         {
@@ -166,7 +200,7 @@ public static class Player
             }
         }
 
-        /*if (controller.GetButtonDown(button.remove))
+        if (controller.GetButtonDown(button.remove))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
@@ -210,8 +244,8 @@ public static class Player
                 curve.MeshUpdate();
                 curve.MeshAtPositionsUpdate();
             }
-        }*/
-    }
+        }
+    }*/
 
     public static void Undo(ref List<Curve> curves, List<Curve> preCurves)
     {

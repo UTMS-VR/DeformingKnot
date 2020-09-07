@@ -9,7 +9,7 @@ namespace DrawCurve
     public class Curve
     {
         public List<Vector3> positions;
-        public List<Vector3> momentum;
+        //public List<Vector3> momentum;
         public Mesh mesh;
         public Mesh meshAtPositions;
         public bool close;
@@ -17,8 +17,8 @@ namespace DrawCurve
         public Vector3 position = Vector3.zero;
         public Quaternion rotation = Quaternion.identity;
         public float segment;
-        private int meridian;
-        private float radius;
+        public int meridian;
+        public float radius;
         public static float collision = 0.05f;
         public static Controller controller;
         public static OVRInput.RawButton drawButton;
@@ -27,7 +27,7 @@ namespace DrawCurve
         public Curve(List<Vector3> positions, bool close, float segment = 0.03f, int meridian = 10, float radius = 0.002f)
         {
             this.positions = positions;
-            this.momentum = new List<Vector3>();
+            //this.momentum = new List<Vector3>();
             this.close = close;
             this.segment = segment;
             this.meridian = meridian;
@@ -57,7 +57,7 @@ namespace DrawCurve
             this.meshAtPositions = MakeMesh.GetMeshAtEndPosition(this.positions, this.radius * 2.0f);
         }
 
-        public void MomentumInitialize()
+        /*public void MomentumInitialize()
         {
             this.momentum = new List<Vector3>();
 
@@ -65,7 +65,7 @@ namespace DrawCurve
             {
                 this.momentum.Add(Vector3.zero);
             }
-        }
+        }*/
 
         private int Length()
         {
@@ -175,9 +175,9 @@ namespace DrawCurve
             }
         }
 
-        public void Optimize()
+        /*public void Optimize()
         {
-            DiscreteMoebius optimizer = new DiscreteMoebius(this);
+            DiscreteMoebius optimizer = new DiscreteMoebius(this.positions, this.momentum);
             
             for (int i = 0; i < this.Length(); i++)
             {
@@ -193,7 +193,7 @@ namespace DrawCurve
 
             while (true)
             {
-                Elasticity optimizer2 = new Elasticity(this);
+                Elasticity optimizer2 = new Elasticity(this.positions, this.momentum, this.segment);
                 if (optimizer2.MaxError() < this.segment * 0.1f) break;
                 optimizer2.Flow();
             }
@@ -204,7 +204,7 @@ namespace DrawCurve
                                     + (tempPositions[i] - this.positions[i]) * 0.3f;
             }
 
-            /*DiscreteMoebius optimizer = new DiscreteMoebius(this);
+            DiscreteMoebius optimizer = new DiscreteMoebius(this);
             //Electricity optimizer = new Electricity(this);
             optimizer.MomentumFlow();
             //this.ScaleTranslation();
@@ -214,11 +214,11 @@ namespace DrawCurve
                 Elasticity optimizer2 = new Elasticity(this);
                 if (optimizer2.MaxError() < this.segment * 0.1f) break;
                 optimizer2.MomentumFlow();
-            }*/
+            }
 
             this.MeshUpdate();
             this.MeshAtPositionsUpdate();
-        }
+        }*/
 
         public List<Curve> Cut()
         {
@@ -362,7 +362,7 @@ namespace DrawCurve
         {
             List<Vector3> positions = ListVector3Copy(this.positions);
             Curve curve = new Curve(positions, this.close, this.segment);
-            curve.momentum = ListVector3Copy(this.momentum);
+            //curve.momentum = ListVector3Copy(this.momentum);
             curve.mesh = this.mesh;
             curve.meshAtPositions = this.meshAtPositions;
             curve.close = this.close;
