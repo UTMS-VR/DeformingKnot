@@ -48,8 +48,8 @@ public class PullableCurve
         {
             if (weights.Count != this.points.Count)
             {
-                Debug.Log("PullableCurveのコンストラクタの引数において、weightsとinitialPointsの長さが一致していません");
-                throw new System.Exception("PullableCurveのコンストラクタの引数において、weightsとinitialPointsの長さが一致していません");
+                Debug.Log("PullableCurveのコンストラクタの引数において、weightsとpointsの長さが一致していません");
+                throw new System.Exception("PullableCurveのコンストラクタの引数において、weightsとpointsの長さが一致していません");
             }
             this.weights = weights;
         }        
@@ -122,7 +122,6 @@ public class PullableCurve
                 return PullableCurve.BumpFunction(t);
             }
         }
-
     }
 
     public static List<float> GetWeights(int numPoints, int start = 0, int end = -1)
@@ -135,53 +134,94 @@ public class PullableCurve
         return MakeMesh.GetMesh(this.points, this.meridian, this.radius, this.closed);
     }
 
-    public void Update(List<Vector3> collisionPoints = null)
+    public void Update(List<Curve> collisionCurves = null)
     {
-        this.UpdatePoints(collisionPoints);
-        this.NormalizePoints();
+        Vector3 controllerNewPosition = this.vrController.GetPosition();
+        Vector3 vrControllerMove = controllerNewPosition - this.controllerPosition;
+        this.controllerPosition = controllerNewPosition;
+        List<Vector3> newPoints = this.UpdatePoints(vrControllerMove);
+
+        bool noSelfIntersection = (this.points.Count <= 3)
+                                    || (this.MinSegmentDist(newPoints, this.closed) > this.distanceThreshold * 0.2f);
+        bool noIntersection = true;
+
+        foreach (Curve curve in collisionCurves)
+        {
+            if (this.CurveDistance(newPoints, this.closed, curve) <= this.distanceThreshold * 0.1f)
+            {
+                noIntersection = false;
+            }
+        }
+
+        if (noSelfIntersection && noIntersection)
+        {
+            this.points = newPoints;
+            this.NormalizePoints();
+        }
         //Mesh mesh = MakeMesh.GetMesh(this.points, this.meridian, this.radius, this.closed);
         //Mesh meshAtPositions = MakeMesh.GetMeshAtPositions(this.points, this.radius * 2.0f);
         //Graphics.DrawMesh(mesh, Vector3.zero, Quaternion.identity, MakeMesh.CurveMaterial, 0);
         //Graphics.DrawMesh(meshAtPositions, Vector3.zero, Quaternion.identity, MakeMesh.PositionMaterial, 0);
+
+        for (int i = 0; i < this.points.Count; i++)
+        {
+            Debug.Log(this.weights[i]);
+        }
     }
 
-    void UpdatePoints(List<Vector3> collisionPoints = null)
+    List<Vector3> UpdatePoints(Vector3 vrControllerMove)
     {
-        var newPoints = new List<Vector3>();
-        int n = this.points.Count;
-        Vector3 controllerNewPosition = this.vrController.GetPosition();
-        Vector3 vrControllerMove = controllerNewPosition - this.controllerPosition;
-        this.controllerPosition = controllerNewPosition;
-        for (int i = 0; i < n; i++)
+        List<Vector3> newPoints = new List<Vector3>();
+
+        for (int i = 0; i < this.points.Count; i++)
         {
-            // float t = (float)i / n;
-            Vector3 p;
-            if (this.weights[i] == 0)
-            {
-                // weight が 0 なら衝突判定はしない
-                p = this.points[i];
-            }
-            else
-            {
-                p = this.points[i] + vrControllerMove * this.weights[i];
-                if (collisionPoints != null)
-                {
-                    foreach (var collision in collisionPoints)
-                    {
-                        if (Vector3.Distance(p, collision) < this.radius)
-                        {
-                            return;
-                        }
-                    }
-                }
-            }
-            newPoints.Add(p);
+            newPoints.Add(this.points[i] + vrControllerMove * this.weights[i]);
         }
-        this.points = newPoints;
+
+        return newPoints;
+    }
+
+    float MinSegmentDist(List<Vector3> seq, bool closed)
+    {
+        int n = seq.Count;
+        float min = SegmentDist.SSDist(seq[0], seq[1], seq[2], seq[3]);
+        int endi = closed ? n - 3 : n - 4;
+
+        for (int i = 0; i <= endi; i++)
+        {
+            int endj = (i == 0 || !closed) ? n - 2 : n - 1;
+            for (int j = i + 2; j <= endj; j++)
+            {
+                float dist = SegmentDist.SSDist(seq[i], seq[i + 1], seq[j], seq[(j + 1) % n]);
+                if (dist < min) min = dist;
+            }
+        }
+
+        return min;
+    }
+
+    float CurveDistance(List<Vector3> seq1, bool closed, Curve curve)
+    {
+        List<Vector3> seq2 = curve.positions;
+        float min = SegmentDist.SSDist(seq1[0], seq1[1], seq2[0], seq2[1]);
+        int end1 = closed ? seq1.Count - 1 : seq1.Count - 2;
+        int end2 = curve.close ? seq2.Count - 1 : seq2.Count - 2;
+
+        for (int i = 0; i <= end1; i++)
+        {
+            for (int j = 0; j <= end2; j++)
+            {
+                float dist = SegmentDist.SSDist(seq1[i], seq1[(i + 1) % seq1.Count], seq2[j], seq2[(j + 1) % seq2.Count]);
+                if (dist < min) min = dist;
+            }
+        }
+
+        return min;
     }
 
     void NormalizePoints()
     {
+        // AdjustParameter.EqualizeWithWeight(ref this.points, this.distanceThreshold, this.closed, ref this.weights);
         this.NormalizePoints_Remove();
         this.NormalizePoints_Add();
     }
@@ -200,7 +240,7 @@ public class PullableCurve
         for (int i = 1; i < n; i++)
         {
             accumDist += Vector3.Distance(this.points[i - 1], this.points[i]);
-            if ( accumDist > this.distanceThreshold / 2)
+            if (this.weights[i] == 0 || accumDist > this.distanceThreshold / 2)
             {
                 newPoints.Add(this.points[i]);
                 newWeights.Add(this.weights[i]);
@@ -223,7 +263,7 @@ public class PullableCurve
         // i <= i < n
         for (int i = 1; i < n; i++)
         {
-            if ( Vector3.Distance(this.points[i-1], this.points[i]) > 2 * this.distanceThreshold)
+            if (Vector3.Distance(this.points[i - 1], this.points[i]) > 2 * this.distanceThreshold)
             {
                 Vector3 addedPoint = (this.points[i - 1] + this.points[i]) / 2;
                 float addedWeight = (this.weights[i - 1] + this.weights[i]) / 2;
@@ -238,6 +278,15 @@ public class PullableCurve
                 newWeights.Add(this.weights[i]);
             }
         }
+
+        if (Vector3.Distance(this.points[n - 1], this.points[0]) > 2 * this.distanceThreshold)
+        {
+            Vector3 addedPoint = (this.points[n - 1] + this.points[0]) / 2;
+            float addedWeight = (this.weights[n - 1] + this.weights[0]) / 2;
+            newPoints.Add(addedPoint);
+            newWeights.Add(addedWeight);
+        }
+
         this.points = newPoints;
         this.weights = newWeights;
     }
@@ -260,15 +309,28 @@ public class PullableCurve
         return distanceSum / n;
     }
 
-//    private float BumpFunction(float t)
-//    {
-//        if (t < 0.5f)
-//        {
-//            return 2 * t;
-//        }
-//        else
-//        {
-//            return 2 - 2 * t;
-//        }
-//    }
-  }
+    public (int first, int second) ChosenPoints()
+    {
+        int first = -1;
+        int second = -1;
+
+        if (this.weights[0] == 0)
+        {
+            for (int i = 0; i < this.weights.Count; i++)
+            {
+                if (first < 0 && this.weights[i] > 0) first = i - 1;
+                if (first >= 0 && second < 0 && this.weights[i] == 0) second = i;
+            }    
+        }
+        else
+        {
+            for (int i = 0; i < this.weights.Count; i++)
+            {
+                if (second < 0 && this.weights[i] == 0) second = i;
+                if (second >= 0 && first < 0 && this.weights[i] > 0) first = i - 1;
+            }
+        }
+
+        return (first, second);
+    }
+}

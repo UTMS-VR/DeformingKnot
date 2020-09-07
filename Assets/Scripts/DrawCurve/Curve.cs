@@ -344,13 +344,16 @@ namespace DrawCurve
         public float MinSegmentDist()
         {
             List<Vector3> seq = this.positions;
+            int n = Length();
             float min = SegmentDist.SSDist(seq[0], seq[1], seq[2], seq[3]);
+            int endi = this.close ? n - 3 : n - 4;
 
-            for (int i = 0; i <= Length() - 3; i++)
+            for (int i = 0; i <= endi; i++)
             {
-                for (int j = i + 2; j <= (i == 0 ? Length() - 2 : Length() - 1); j++)
+                int endj = (i == 0 && !this.close) ? n - 2 : n - 1;
+                for (int j = i + 2; j <= endj; j++)
                 {
-                    float dist = SegmentDist.SSDist(seq[i], seq[i + 1], seq[j], seq[(j + 1) % Length()]);
+                    float dist = SegmentDist.SSDist(seq[i], seq[i + 1], seq[j], seq[(j + 1) % n]);
                     if (dist < min) min = dist;
                 }
             }

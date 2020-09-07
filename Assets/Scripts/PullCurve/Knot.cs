@@ -12,11 +12,10 @@ public class Knot
     public Knot(
         List<Vector3> points,
         Controller controller,
-        float segment = 0.03f,
         int meridian = 20,
         float radius = 0.1f,
         float distanceThreshold = -1,
-        List<Vector3> collisionPoints = null,
+        List<Curve> collisionCurves = null,
         OVRInput.RawButton selectButton = OVRInput.RawButton.A,
         OVRInput.RawButton cancelButton = OVRInput.RawButton.B,
         OVRInput.RawButton optimizeButton = OVRInput.RawButton.RIndexTrigger
@@ -24,7 +23,7 @@ public class Knot
     {
         int count = points.Count;
         (int first, int second) chosenPoints = (count / 3, 2 * count / 3);
-        KnotData data = new KnotData(points, chosenPoints, controller, segment, radius, meridian, distanceThreshold, collisionPoints,
+        KnotData data = new KnotData(points, chosenPoints, controller, radius, meridian, distanceThreshold, collisionCurves,
                         selectButton, cancelButton, optimizeButton);
         this.state = new KnotStateBase(data);
     }

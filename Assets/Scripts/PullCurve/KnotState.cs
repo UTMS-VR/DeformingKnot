@@ -16,11 +16,10 @@ class KnotData
     public List<Vector3> points;
     public (int first, int second) chosenPoints;
     public readonly Controller controller;
-    public readonly float segment;
     public readonly int meridian;
     public readonly float radius;
     public readonly float distanceThreshold;
-    public readonly List<Vector3> collisionPoints;
+    public readonly List<Curve> collisionCurves;
     public readonly OVRInput.RawButton selectButton;
     public readonly OVRInput.RawButton cancelButton;
     public readonly OVRInput.RawButton optimizeButton;
@@ -29,11 +28,10 @@ class KnotData
         List<Vector3> points,
         (int first, int second) chosenPoints,
         Controller controller,
-        float segment,
         float radius,
         int meridian,
         float distanceThreshold,
-        List<Vector3> collisionPoints,
+        List<Curve> collisionCurves,
         OVRInput.RawButton selectButton,
         OVRInput.RawButton cancelButton,
         OVRInput.RawButton optimizeButton
@@ -42,11 +40,10 @@ class KnotData
         this.points = points;
         this.chosenPoints = chosenPoints;
         this.controller = controller;
-        this.segment = segment;
         this.meridian = meridian;
         this.radius = radius;
         this.distanceThreshold = distanceThreshold;
-        this.collisionPoints = collisionPoints;
+        this.collisionCurves = collisionCurves;
         this.selectButton = selectButton;
         this.cancelButton = cancelButton;
         this.optimizeButton = optimizeButton;
@@ -95,14 +92,13 @@ class KnotStateBase : IKnotState
 class KnotStatePull : IKnotState
 {
     private KnotData data;
-    private List<Vector3> collisionPoints;
+    private List<Curve> collisionCurves;
     private PullableCurve pullableCurve;
 
     public KnotStatePull(KnotData data)
     {
         this.data = data;
-        this.collisionPoints = this.GetCompliment(this.data.chosenPoints.first, this.data.chosenPoints.second);
-        this.collisionPoints = this.collisionPoints.Concat(this.data.collisionPoints).ToList();
+        this.collisionCurves = this.data.collisionCurves;
         int count = this.data.points.Count;
         this.pullableCurve = new PullableCurve(this.data.points, this.data.controller.rightHand, closed: true,
             meridian: this.data.meridian, radius: this.data.radius, distanceThreshold: this.data.distanceThreshold,
@@ -114,15 +110,18 @@ class KnotStatePull : IKnotState
         // List<Vector3> collisionPoints = this.collisionPoints;
         // List<Vector3> collisionPoints = this.GetCompliment(this.chosenPoints.first, this.chosenPoints.second);
         // collisionPoints = collisionPoints.Concat(this.collisionPoints).ToList();
-        this.pullableCurve.Update(this.collisionPoints);
+        this.pullableCurve.Update(this.collisionCurves);
         Mesh knotMesh = this.pullableCurve.GetMesh();
+        Mesh pointsMesh = MakeMesh.GetMeshAtPositions(this.pullableCurve.GetPoints(), this.data.radius * 3); 
         Graphics.DrawMesh(knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
+        Graphics.DrawMesh(pointsMesh, Vector3.zero, Quaternion.identity, MakeMesh.PositionMaterial, 0);
         // this.pointMesh = MakeMesh.GetMeshAtPositions(collisionPoints, this.radius * 2);
 
         if (this.data.controller.GetButtonDown(this.data.selectButton))
         {
             List<Vector3> newPoints = this.pullableCurve.GetPoints();
             this.data.points = newPoints;
+            this.data.chosenPoints = this.pullableCurve.ChosenPoints();
             return new KnotStateBase(this.data);
         }
         else if (this.data.controller.GetButton(this.data.cancelButton))
@@ -281,7 +280,7 @@ class KnotStateOptimize : IKnotState
     {
         this.data = data;
         this.newPoints = data.points;
-        AdjustParameter.Equalize(ref this.newPoints, this.data.segment, true);
+        AdjustParameter.Equalize(ref this.newPoints, this.data.distanceThreshold, true);
         this.momentum = new List<Vector3>();
 
         for (int i = 0; i < newPoints.Count; i++)
@@ -332,8 +331,8 @@ class KnotStateOptimize : IKnotState
 
         while (true)
         {
-            Elasticity optimizer2 = new Elasticity(this.newPoints, this.momentum, this.data.segment);
-            if (optimizer2.MaxError() < this.data.segment * 0.1f) break;
+            Elasticity optimizer2 = new Elasticity(this.newPoints, this.momentum, this.data.distanceThreshold);
+            if (optimizer2.MaxError() < this.data.distanceThreshold * 0.1f) break;
             optimizer2.Flow();
         }
 
@@ -348,8 +347,8 @@ class KnotStateOptimize : IKnotState
 
         while (true)
         {
-            Elasticity optimizer2 = new Elasticity(this.newPoints, this.momentum, this.data.segment);
-            if (optimizer2.MaxError() < this.data.segment * 0.1f) break;
+            Elasticity optimizer2 = new Elasticity(this.newPoints, this.momentum, this.data.distanceThreshold);
+            if (optimizer2.MaxError() < this.data.distanceThreshold * 0.1f) break;
             optimizer2.Flow();
         }
     }

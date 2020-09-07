@@ -51,10 +51,10 @@ public static class Player
             {
                 state = State.ContiDeform;
                 deformingCurve = new Knot(selection[0].positions, controller,
-                                          segment: selection[0].segment,
                                           meridian: selection[0].meridian,
                                           radius: selection[0].radius,
-                                          collisionPoints: new List<Vector3>());
+                                          distanceThreshold: selection[0].segment,
+                                          collisionCurves: new List<Curve>());
                 curves.Remove(selection[0]);
             }
         }
