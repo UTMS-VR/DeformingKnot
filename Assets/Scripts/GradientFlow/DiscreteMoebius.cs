@@ -6,8 +6,8 @@ using DrawCurve;
 // 暗黙の仮定：隣接する2点の間隔は一定
 public class DiscreteMoebius
 {
-    private Curve curve;
     private List<Vector3> pos;
+    private List<Vector3> momentum;
     private int len;
     private float arc;
     private float seg;
@@ -15,11 +15,11 @@ public class DiscreteMoebius
     private float alpha = 0.95f;
     public List<Vector3> gradient;
 
-    public DiscreteMoebius(Curve curve)
+    public DiscreteMoebius(List<Vector3> positions, List<Vector3> momentum)
     {
-        this.curve = curve;
-        this.pos = curve.positions;
-        this.len = curve.positions.Count;
+        this.pos = positions;
+        this.momentum = momentum;
+        this.len = positions.Count;
         this.arc = ArcLength();
         this.seg = this.arc / this.len;
         this.gradient = Gradient();
@@ -29,7 +29,7 @@ public class DiscreteMoebius
     {
         for (int i = 0; i < this.len; i++)
         {
-            this.curve.positions[i] -= this.gradient[i];
+            this.pos[i] -= this.gradient[i];
         }
     }
 
@@ -38,8 +38,8 @@ public class DiscreteMoebius
     {
         for (int i = 0; i < this.len; i++)
         {
-            this.curve.momentum[i] = this.alpha * this.curve.momentum[i] + this.gradient[i];
-            this.curve.positions[i] -= this.curve.momentum[i];
+            this.momentum[i] = this.alpha * this.momentum[i] + this.gradient[i];
+            this.pos[i] -= this.momentum[i];
         }
     }
 

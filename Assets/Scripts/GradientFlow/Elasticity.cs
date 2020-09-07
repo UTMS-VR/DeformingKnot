@@ -5,20 +5,19 @@ using DrawCurve;
 
 public class Elasticity
 {
-    private Curve curve;
     private List<Vector3> pos;
+    private List<Vector3> momentum;
     private int len;
-    private float seg;
+    private float seg; 
     private float lr = 1e-02f;
     private float alpha = 0.95f;
     private List<Vector3> gradient;
 
-    public Elasticity(Curve curve)
+    public Elasticity(List<Vector3> positions, List<Vector3> momentum, float segment)
     {
-        this.curve = curve;
-        this.pos = curve.positions;
-        this.len = curve.positions.Count;
-        this.seg = curve.segment;
+        this.pos = positions;
+        this.len = positions.Count;
+        this.seg = segment;
         this.gradient = Gradient();
     }
 
@@ -26,7 +25,7 @@ public class Elasticity
     {
         for (int i = 0; i < this.len; i++)
         {
-            this.curve.positions[i] -= this.gradient[i];
+            this.pos[i] -= this.gradient[i];
         }
     }
 
@@ -35,8 +34,8 @@ public class Elasticity
     {
         for (int i = 0; i < this.len; i++)
         {
-            this.curve.momentum[i] = this.alpha * this.curve.momentum[i] + this.gradient[i];
-            this.curve.positions[i] -= this.curve.momentum[i];
+            this.momentum[i] = this.alpha * this.momentum[i] + this.gradient[i];
+            this.pos[i] -= this.momentum[i];
         }
     }
 
