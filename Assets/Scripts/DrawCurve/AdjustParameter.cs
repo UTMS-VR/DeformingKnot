@@ -39,46 +39,6 @@ namespace DrawCurve
             positions = newPositions;
         }
 
-        public static void EqualizeWithWeight(ref List<Vector3> positions, float segment, bool closed, ref List<float> weights)
-        {
-            int length = positions.Count;
-            List<Vector3> newPositions = new List<Vector3>();
-            List<float> newWeights = new List<float>();
-            newPositions.Add(positions[0]);
-            newWeights.Add(weights[0]);
-            float remainder = 0.0f;
-            float temporarySegment = TemporarySegment(positions, segment, closed);
-
-            for (int i = 1; i < length; i++)
-            {
-                CompletionWithWeight(ref newPositions, positions[i - 1], positions[i], ref remainder, temporarySegment,
-                            ref newWeights, weights[i - 1], weights[i]);
-            }
-
-            if (closed)
-            {
-                CompletionWithWeight(ref newPositions, positions[length - 1], positions[0], ref remainder, temporarySegment,
-                            ref newWeights, weights[length - 1], weights[0]);
-
-                if (newPositions.Count > DivisionNumber(positions, segment, closed))
-                {
-                    newPositions.Remove(newPositions[newPositions.Count - 1]);
-                    newWeights.Remove(newWeights[newWeights.Count - 1]);
-                }
-            }
-            else
-            {
-                if (newPositions.Count < DivisionNumber(positions, segment, closed) + 1)
-                {
-                    newPositions.Add(positions[length - 1]);
-                    newWeights.Add(weights[length - 1]);
-                }
-            }
-
-            positions = newPositions;
-            weights = newWeights; 
-        }
-
         public static float ArcLength(List<Vector3> positions, bool closed)
         {
             int length = positions.Count;
@@ -117,21 +77,6 @@ namespace DrawCurve
                 remainder -= segment;
                 float s = (distance - remainder) / distance;
                 newPositions.Add(start + (end - start) * s);
-            }
-        }
-
-        private static void CompletionWithWeight(ref List<Vector3> newPositions, Vector3 start, Vector3 end, ref float remainder, float segment,
-                                                    ref List<float> newWeights, float wStart, float wEnd)
-        {
-            float distance = Vector3.Distance(start, end);
-            remainder += distance;
-
-            while (segment < remainder)
-            {
-                remainder -= segment;
-                float s = (distance - remainder) / distance;
-                newPositions.Add(start + (end - start) * s);
-                newWeights.Add((1 - s) * wStart + s * wEnd);
             }
         }
 

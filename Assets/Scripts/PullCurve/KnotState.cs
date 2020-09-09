@@ -99,10 +99,12 @@ class KnotStatePull : IKnotState
     {
         this.data = data;
         this.collisionCurves = this.data.collisionCurves;
-        int count = this.data.points.Count;
-        this.pullableCurve = new PullableCurve(this.data.points, this.data.controller.rightHand, closed: true,
-            meridian: this.data.meridian, radius: this.data.radius, distanceThreshold: this.data.distanceThreshold,
-            weights: PullableCurve.GetWeights(count, this.data.chosenPoints.first, this.data.chosenPoints.second));
+        this.pullableCurve = new PullableCurve(this.data.points,
+                                                this.data.chosenPoints,
+                                                this.data.controller.rightHand,
+                                                meridian: this.data.meridian,
+                                                radius: this.data.radius,
+                                                distanceThreshold: this.data.distanceThreshold);
     }
 
     public IKnotState Update()
@@ -119,9 +121,8 @@ class KnotStatePull : IKnotState
 
         if (this.data.controller.GetButtonDown(this.data.selectButton))
         {
-            List<Vector3> newPoints = this.pullableCurve.GetPoints();
-            this.data.points = newPoints;
-            this.data.chosenPoints = this.pullableCurve.ChosenPoints();
+            this.data.points = this.pullableCurve.GetPoints();
+            this.data.chosenPoints = (0, this.pullableCurve.GetCount() - 1);
             return new KnotStateBase(this.data);
         }
         else if (this.data.controller.GetButton(this.data.cancelButton))
