@@ -75,7 +75,8 @@ class KnotStateBase : IKnotState
         {
             return new KnotStateChoose1(this.data);
         }
-        else if (this.data.controller.GetButtonDown(this.data.optimizeButton))
+        else if (this.data.controller.GetButtonDown(this.data.optimizeButton)
+                || this.data.controller.GetButtonDown(OVRInput.RawButton.RHandTrigger))
         {
             return new KnotStateOptimize(this.data);
         }
@@ -284,7 +285,7 @@ class KnotStateOptimize : IKnotState
         AdjustParameter.Equalize(ref this.newPoints, this.data.distanceThreshold, true);
         this.momentum = new List<Vector3>();
 
-        for (int i = 0; i < newPoints.Count; i++)
+        for (int i = 0; i < this.newPoints.Count; i++)
         {
             this.momentum.Add(Vector3.zero);
         }
@@ -292,7 +293,32 @@ class KnotStateOptimize : IKnotState
 
     public IKnotState Update()
     {
-        if (this.data.controller.GetButton(this.data.optimizeButton)) this.Optimize();
+        if (this.data.controller.GetButton(this.data.optimizeButton))
+        {
+            this.Optimize();
+        }
+        else if (this.data.controller.GetButtonUp(this.data.optimizeButton))
+        {
+            this.momentum = new List<Vector3>();
+            for (int i = 0; i < this.newPoints.Count; i++)
+            {
+                this.momentum.Add(Vector3.zero);
+            }
+        }
+
+        if (this.data.controller.GetButton(OVRInput.RawButton.RHandTrigger))
+        {
+            DiscreteMoebius optimizer1 = new DiscreteMoebius(this.newPoints, this.momentum);
+            optimizer1.Flow();
+
+            while (true)
+            {
+                Elasticity optimizer2 = new Elasticity(this.newPoints, this.momentum, this.data.distanceThreshold);
+                if (optimizer2.MaxError() < this.data.distanceThreshold * 0.1f) break;
+                optimizer2.Flow();
+            }
+        }
+
         Mesh knotMesh = MakeMesh.GetMesh(this.newPoints, this.data.meridian, this.data.radius, true);
         Graphics.DrawMesh(knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
 
@@ -314,7 +340,7 @@ class KnotStateOptimize : IKnotState
         return this.newPoints;
     }
 
-    public void Optimize()
+    private void Optimize()
     {
         /*DiscreteMoebius optimizer1 = new DiscreteMoebius(this.newPoints, this.momentum);
 

@@ -63,7 +63,7 @@ public static class Player
             if (controller.GetButtonDown(button.changeState))
             {
                 state = State.Base;
-                curves.Add(new Curve(deformingCurve.GetPoints(), true));
+                curves.Add(new Curve(deformingCurve.GetPoints(), true, selected: true));
             }
         }
     }

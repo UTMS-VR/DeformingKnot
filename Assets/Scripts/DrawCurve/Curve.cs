@@ -13,7 +13,7 @@ namespace DrawCurve
         public Mesh mesh;
         public Mesh meshAtPositions;
         public bool close;
-        public bool selected = false;
+        public bool selected;
         public Vector3 position = Vector3.zero;
         public Quaternion rotation = Quaternion.identity;
         public float segment;
@@ -24,11 +24,12 @@ namespace DrawCurve
         public static OVRInput.RawButton drawButton;
         public static OVRInput.RawButton moveButton;
 
-        public Curve(List<Vector3> positions, bool close, float segment = 0.03f, int meridian = 10, float radius = 0.002f)
+        public Curve(List<Vector3> positions, bool close, bool selected = false, float segment = 0.03f, int meridian = 10, float radius = 0.002f)
         {
             this.positions = positions;
             //this.momentum = new List<Vector3>();
             this.close = close;
+            this.selected = selected;
             this.segment = segment;
             this.meridian = meridian;
             this.radius = radius;
@@ -258,7 +259,7 @@ namespace DrawCurve
                 newPositions.Add(this.positions[i]);
             }
 
-            Curve cutKnot = new Curve(newPositions, false);
+            Curve cutKnot = new Curve(newPositions, false, selected: true);
 
             return cutKnot;
         }
@@ -278,8 +279,8 @@ namespace DrawCurve
                 newPositions2.Add(this.positions[i]);
             }
 
-            Curve newCurve1 = new Curve(newPositions1, false);
-            Curve newCurve2 = new Curve(newPositions2, false);
+            Curve newCurve1 = new Curve(newPositions1, false, selected: true);
+            Curve newCurve2 = new Curve(newPositions2, false, selected: true);
 
             return (newCurve1, newCurve2);
         }
@@ -299,7 +300,7 @@ namespace DrawCurve
                 }
 
                 bool close = Vector3.Distance(positions1.First(), positions2.Last()) < collision ? true : false;
-                newCurves.Add(new Curve(positions1, close));
+                newCurves.Add(new Curve(positions1, close, selected: true));
             }
 
             return newCurves;
@@ -364,7 +365,7 @@ namespace DrawCurve
         public Curve DeepCopy()
         {
             List<Vector3> positions = ListVector3Copy(this.positions);
-            Curve curve = new Curve(positions, this.close, this.segment);
+            Curve curve = new Curve(positions, this.close, segment: this.segment);
             //curve.momentum = ListVector3Copy(this.momentum);
             curve.mesh = this.mesh;
             curve.meshAtPositions = this.meshAtPositions;
