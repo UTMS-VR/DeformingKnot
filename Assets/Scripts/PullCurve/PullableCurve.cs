@@ -107,11 +107,11 @@ public class PullableCurve
 
         List<Vector3> newPullablePoints = this.UpdatePoints(vrControllerMove);
         List<Vector3> newPoints = newPullablePoints.Concat(remainingPoints).ToList();
-        if (newPoints.Count >= 4 && this.MinSegmentDist(newPoints, true) <= this.distanceThreshold * 0.2f) return;
+        if (newPoints.Count >= 4 && MinSegmentDist(newPoints, true) <= this.distanceThreshold * 0.2f) return;
 
         foreach (Curve curve in collisionCurves)
         {
-            if (this.CurveDistance(newPoints, true, curve) <= this.distanceThreshold * 0.2f) return;
+            if (CurveDistance(newPoints, true, curve) <= this.distanceThreshold * 0.2f) return;
         }
         
         this.pullablePoints = newPullablePoints;
@@ -130,7 +130,7 @@ public class PullableCurve
         return newPoints;
     }
 
-    float MinSegmentDist(List<Vector3> seq, bool closed)
+    public static float MinSegmentDist(List<Vector3> seq, bool closed)
     {
         int n = seq.Count;
         float min = SegmentDist.SSDist(seq[0], seq[1], seq[2], seq[3]);
@@ -149,7 +149,7 @@ public class PullableCurve
         return min;
     }
 
-    float CurveDistance(List<Vector3> seq1, bool closed, Curve curve)
+    public static float CurveDistance(List<Vector3> seq1, bool closed, Curve curve)
     {
         List<Vector3> seq2 = curve.positions;
         float min = SegmentDist.SSDist(seq1[0], seq1[1], seq2[0], seq2[1]);

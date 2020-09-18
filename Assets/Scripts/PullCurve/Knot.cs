@@ -8,7 +8,6 @@ public class Knot
 {
     private IKnotState state;
 
-
     public Knot(
         List<Vector3> points,
         Controller controller,

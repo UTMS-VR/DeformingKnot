@@ -115,9 +115,9 @@ class KnotStatePull : IKnotState
         // collisionPoints = collisionPoints.Concat(this.collisionPoints).ToList();
         this.pullableCurve.Update(this.collisionCurves);
         Mesh knotMesh = this.pullableCurve.GetMesh();
-        Mesh pointsMesh = MakeMesh.GetMeshAtPositions(this.pullableCurve.GetPoints(), this.data.radius * 3); 
+        // Mesh pointsMesh = MakeMesh.GetMeshAtPositions(this.pullableCurve.GetPoints(), this.data.radius * 3); 
         Graphics.DrawMesh(knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
-        Graphics.DrawMesh(pointsMesh, Vector3.zero, Quaternion.identity, MakeMesh.PositionMaterial, 0);
+        // Graphics.DrawMesh(pointsMesh, Vector3.zero, Quaternion.identity, MakeMesh.PositionMaterial, 0);
         // this.pointMesh = MakeMesh.GetMeshAtPositions(collisionPoints, this.radius * 2);
 
         if (this.data.controller.GetButtonDown(this.data.selectButton))
@@ -293,7 +293,19 @@ class KnotStateOptimize : IKnotState
 
     public IKnotState Update()
     {
-        if (this.data.controller.GetButton(this.data.optimizeButton))
+        bool selfIntersection = false;
+        if (this.newPoints.Count >= 4
+            && PullableCurve.MinSegmentDist(this.newPoints, true) <= this.data.distanceThreshold * 0.2f)
+        {
+            selfIntersection = true;
+        }
+        foreach (Curve curve in this.data.collisionCurves)
+        {
+            if (PullableCurve.CurveDistance(this.newPoints, true, curve) <= this.data.distanceThreshold * 0.2f)
+            selfIntersection = true;
+        }
+
+        if (this.data.controller.GetButton(this.data.optimizeButton) && !selfIntersection)
         {
             this.Optimize();
         }
@@ -306,7 +318,7 @@ class KnotStateOptimize : IKnotState
             }
         }
 
-        if (this.data.controller.GetButton(OVRInput.RawButton.RHandTrigger))
+        if (this.data.controller.GetButton(OVRInput.RawButton.RHandTrigger) && !selfIntersection)
         {
             DiscreteMoebius optimizer1 = new DiscreteMoebius(this.newPoints, this.momentum);
             optimizer1.Flow();
