@@ -67,7 +67,8 @@ namespace FixedInterface {
       if (productName == null || productName == "") {
         return this.canvas.GetComponent<RectTransform>().sizeDelta;
       } else {
-        return new Vector2(800, 500);
+        // return new Vector2(800, 500);
+        return new Vector2(500, 300);
       }
     }
 

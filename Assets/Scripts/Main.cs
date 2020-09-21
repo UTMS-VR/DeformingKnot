@@ -22,7 +22,7 @@ public class Main : MonoBehaviour
     void Start()
     {
         MyController.SetUp(ref controller);
-        state = State.Base;
+        state = State.BasicDeform;
         button = new ButtonConfig(controller);
         Player.SetUp(controller, button);
         Curve.SetUp(controller, button.draw, button.move);
@@ -39,7 +39,7 @@ public class Main : MonoBehaviour
         MyController.Update(this.controller);
         text = state.ToString();
 
-        if (state == State.Base && button.ValidBaseButtonInput())
+        if (state == State.BasicDeform && button.ValidBaseButtonInput())
         {
             Player.DeepCopy(curves, ref preCurves);
             Player.ChangeState(ref curves, ref state, ref deformingCurve);

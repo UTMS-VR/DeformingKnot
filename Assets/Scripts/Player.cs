@@ -7,7 +7,7 @@ using DebugUtil;
 
 public enum State
 {
-    Base,
+    BasicDeform,
     ContiDeform
 }
 
@@ -43,7 +43,7 @@ public static class Player
 
     public static void ChangeState(ref List<Curve> curves, ref State state, ref Knot deformingCurve)
     {
-        if (state == State.Base)
+        if (state == State.BasicDeform)
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
@@ -62,7 +62,7 @@ public static class Player
         {
             if (controller.GetButtonDown(button.changeState))
             {
-                state = State.Base;
+                state = State.BasicDeform;
                 curves.Add(new Curve(deformingCurve.GetPoints(), true, selected: true));
             }
         }
