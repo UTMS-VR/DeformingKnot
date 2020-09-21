@@ -24,7 +24,7 @@ namespace DrawCurve
         public static OVRInput.RawButton drawButton;
         public static OVRInput.RawButton moveButton;
 
-        public Curve(List<Vector3> positions, bool close, bool selected = false, float segment = 0.03f, int meridian = 10, float radius = 0.002f)
+        public Curve(List<Vector3> positions, bool close, bool selected = false, float segment = 0.03f, int meridian = 10, float radius = 0.005f)
         {
             this.positions = positions;
             //this.momentum = new List<Vector3>();

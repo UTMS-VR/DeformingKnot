@@ -21,7 +21,7 @@ public class PullableCurve
         (int first, int second) chosenPoints,
         VRController vrController,
         int meridian = 10,
-        float radius = 0.002f,
+        float radius = 0.05f,
         float distanceThreshold = -1)
     {
         AdjustParameter.Shift(ref points, chosenPoints.first);

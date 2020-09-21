@@ -171,7 +171,7 @@ class KnotStateChoose1 : IKnotState
     {
         int ind1 = KnotStateChoose1.FindClosestPoint(this.data.controller, this.data.points);
         var positions = new List<Vector3>() { this.data.points[ind1] };
-        Mesh pointMesh = MakeMesh.GetMeshAtPositions(positions, this.data.radius * 5);
+        Mesh pointMesh = MakeMesh.GetMeshAtPositions(positions, this.data.radius * 3);
 
         Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
         Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, MakeMesh.PositionMaterial, 0);
@@ -232,7 +232,7 @@ class KnotStateChoose2 : IKnotState
                     this.data.points[this.ind1],
                     this.data.points[ind2]
                 };
-        Mesh pointMesh = MakeMesh.GetMeshAtPositions(positions, this.data.radius * 5);
+        Mesh pointMesh = MakeMesh.GetMeshAtPositions(positions, this.data.radius * 3);
 
         Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
         Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, MakeMesh.PositionMaterial, 0);
