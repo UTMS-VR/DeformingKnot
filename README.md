@@ -2,7 +2,7 @@
 ====
 結び目を自由に描画、移動、変形させることのできるツール。
 
-## Oculus Questのコントローラーのボタンとpcのキーの対応
+# Oculus Questのコントローラーのボタンとpcのキーの対応
 
 | コントローラー | pc |
 | ---- | ---- |
@@ -15,10 +15,10 @@
 | Xボタン | X |
 | Yボタン | Y |
 
-## 使い方
+# 使い方
 `BasicDeform`、`ContiDeform`の2つの状態がある。現在の状態は画面左上に表示される。左人差し指のトリガーで状態を切り替える。
 
-### Base
+## Base
 | 操作 | ボタン | 詳細 |
 | ---- | ---- | ---- |
 | 描画 | 右人差し指のトリガー | 右手の動きに合わせて曲線を描画する。|
@@ -31,33 +31,33 @@
 
 <!-- * 左人差し指のトリガー : 選択されている曲線を Bezier 曲線で整形する。整形し終えると選択が解除される。 -->
 
-### ContiDeform
+## ContiDeform
 `KnotStateBase`、`KnotStateChoose1`、`KnotStateChoose2`、`KnotStatePull`、`KnotStateOptimize`の5つの状態がある。
 
 基本的にAボタンで"決定"、Bボタンで"キャンセル"する。
-#### KnotStateBase
+### KnotStateBase
 | ボタン | 結果 |
 | ---- | ---- |
 | Aボタン | `KnotStatePull`に移る。 |
 | Bボタン | `KnotStateChoose1`に移る。 |
 | 右人差し指<br>または右中指のトリガー | `KnotStateOptimize`に移る。 |
-#### KnotStateChoose1
+### KnotStateChoose1
 | ボタン | 結果 |
 | ---- | ---- |
 | Aボタン | 1つ目の点を確定して`KnotStateChoose2`に移る。 |
 | Bボタン | `KnotStateBase`に戻る。 |
-#### KnotStateChoose2
+### KnotStateChoose2
 | ボタン | 結果 |
 | ---- | ---- |
 | Aボタン | 2つ目の点を確定して`KnotStateBase`に移る。 |
 | Bボタン | `KnotStateBase`に戻る。 |
-#### KnotStatePull
+### KnotStatePull
 右手の動きに合わせて、選択した2点の間の短い方の弧を変形させる。
 | ボタン | 結果 |
 | ---- | ---- |
 | Aボタン | 変更を確定して`KnotStateBase`に移る。 |
 | Bボタン | 変更を取り消して`KnotStateBase`に移る。 |
-#### KnotStateOptimize
+### KnotStateOptimize
 右人差し指または右中指のトリガーを押している間、結び目のエネルギーの勾配に沿って自動で変形する。
 | ボタン | 結果 |
 | ---- | ---- |
@@ -66,7 +66,7 @@
 | 右人差し指のトリガー | 自動で変形する。慣性を加えたため収束が早いが、ガタつくことがある。 |
 | 右中指のトリガー | 自動で変形する。慣性は無いため収束は遅いが、なめらか。 |
 
-### pc上の場合のコントローラーの位置操作
+## pc上の場合のコントローラーの位置操作
 pc上で動作させる場合は白いキューブがコントローラーを表している。
 コントローラーとカメラが同じ位置にあるのでPlay開始時にはコントローラーは見えない。
 z軸正方向にいくらか動かすと視界に入るようになる。
