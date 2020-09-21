@@ -16,7 +16,7 @@ namespace FixedInterface {
     public Font font = Resources.GetBuiltinResource<Font>("Arial.ttf");
     public int fontSize = 30;
     public Color color = new Color(0, 0, 0);
-    public TextAnchor alignment = TextAnchor.MiddleCenter;
+    public TextAnchor alignment = TextAnchor.UpperLeft;
 
   }
 

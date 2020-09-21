@@ -9,34 +9,34 @@ namespace DrawCurve
         public static void Equalize(ref List<Vector3> positions, float segment, bool closed)
         {
             int length = positions.Count;
-            List<Vector3> newpositions = new List<Vector3>();
-            newpositions.Add(positions[0]);
+            List<Vector3> newPositions = new List<Vector3>();
+            newPositions.Add(positions[0]);
             float remainder = 0.0f;
-            float temporarySegment = ArcLength(positions, closed) / DivisionNumber(positions, segment, closed);
+            float temporarySegment = TemporarySegment(positions, segment, closed);
 
             for (int i = 1; i < length; i++)
             {
-                Completion(ref newpositions, positions[i - 1], positions[i], ref remainder, temporarySegment);
+                Completion(ref newPositions, positions[i - 1], positions[i], ref remainder, temporarySegment);
             }
 
             if (closed)
             {
-                Completion(ref newpositions, positions[length - 1], positions[0], ref remainder, temporarySegment);
+                Completion(ref newPositions, positions[length - 1], positions[0], ref remainder, temporarySegment);
 
-                if (newpositions.Count > DivisionNumber(positions, segment, closed))
+                if (newPositions.Count > DivisionNumber(positions, segment, closed))
                 {
-                    newpositions.Remove(newpositions[newpositions.Count - 1]);
+                    newPositions.Remove(newPositions[newPositions.Count - 1]);
                 }
             }
             else
             {
-                if (newpositions.Count < DivisionNumber(positions, segment, closed) + 1)
+                if (newPositions.Count < DivisionNumber(positions, segment, closed) + 1)
                 {
-                    newpositions.Add(positions[length - 1]);
+                    newPositions.Add(positions[length - 1]);
                 }
             }
 
-            positions = newpositions;
+            positions = newPositions;
         }
 
         public static float ArcLength(List<Vector3> positions, bool closed)
@@ -57,6 +57,11 @@ namespace DrawCurve
             return arclength;
         }
 
+        public static float TemporarySegment(List<Vector3> positions, float segment, bool closed)
+        {
+            return ArcLength(positions, closed) / DivisionNumber(positions, segment, closed);
+        }
+
         private static int DivisionNumber(List<Vector3> positions, float segment, bool closed)
         {
             return Mathf.FloorToInt(ArcLength(positions, closed) / segment + 0.5f);
@@ -70,25 +75,26 @@ namespace DrawCurve
             while (segment < remainder)
             {
                 remainder -= segment;
-                newPositions.Add(start + (end - start) * (distance - remainder) / distance);
+                float s = (distance - remainder) / distance;
+                newPositions.Add(start + (end - start) * s);
             }
         }
 
         public static void Shift(ref List<Vector3> positions, int n) // 0 <= n < positions.Count
         {
-            List<Vector3> newpositions = new List<Vector3>();
+            List<Vector3> newPositions = new List<Vector3>();
 
             for (int i = n; i < positions.Count; i++)
             {
-                newpositions.Add(positions[i]);
+                newPositions.Add(positions[i]);
             }
 
             for (int i = 0; i < n; i++)
             {
-                newpositions.Add(positions[i]);
+                newPositions.Add(positions[i]);
             }
 
-            positions = newpositions;
+            positions = newPositions;
         }
     }
 }

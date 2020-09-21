@@ -8,6 +8,7 @@ namespace DrawCurve
     public class ButtonConfig
     {
         public Controller controller;
+        public OVRInput.RawButton changeState;
         public OVRInput.RawButton draw;
         public OVRInput.RawButton move;
         public OVRInput.RawButton select;
@@ -18,6 +19,7 @@ namespace DrawCurve
 
         public ButtonConfig(
             Controller controller,
+            OVRInput.RawButton changeState = OVRInput.RawButton.LIndexTrigger,
             OVRInput.RawButton draw = OVRInput.RawButton.RIndexTrigger,
             OVRInput.RawButton move = OVRInput.RawButton.RHandTrigger,
             OVRInput.RawButton select = OVRInput.RawButton.A,
@@ -26,6 +28,7 @@ namespace DrawCurve
             OVRInput.RawButton remove = OVRInput.RawButton.Y,
             OVRInput.RawButton undo = OVRInput.RawButton.LHandTrigger)
         {
+            this.changeState = changeState;
             this.controller = controller;
             this.draw = draw;
             this.move = move;
@@ -36,10 +39,11 @@ namespace DrawCurve
             this.undo = undo;
         }
 
-        public bool ValidButtonInput()
+        public bool ValidBaseButtonInput()
         {
             int valid = 0;
 
+            if (controller.GetButtonDown(this.changeState)) valid++;
             if (controller.GetButton(this.draw) || controller.GetButtonUp(this.draw)) valid++;
             if (controller.GetButton(this.move) || controller.GetButtonUp(this.move)) valid++;
             if (controller.GetButtonDown(this.select)) valid++;

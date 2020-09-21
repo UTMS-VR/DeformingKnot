@@ -52,14 +52,24 @@ namespace FixedInterface {
       var textObject = new GameObject("Fixed Text");
       var text = textObject.AddComponent<Text>();
       var textRectTransform = text.GetComponent<RectTransform>();
-      var canvasRectTransform = this.canvas.GetComponent<RectTransform>();
       textObject.transform.parent = this.transform;
       textRectTransform.localPosition = new Vector3(0, 0, 0);
       textRectTransform.localRotation = new Quaternion(0, 0, 0, 0);
       textRectTransform.localScale = new Vector3(1, 1, 1);
-      textRectTransform.sizeDelta = canvasRectTransform.sizeDelta;
+      textRectTransform.sizeDelta = this.GetTextSizeDelta();
       this.text = text;
       this.textRectTransform = textRectTransform;
+    }
+
+    private Vector2 GetTextSizeDelta() {
+      // Fixed size on VR headset
+      string productName = OVRPlugin.productName;
+      if (productName == null || productName == "") {
+        return this.canvas.GetComponent<RectTransform>().sizeDelta;
+      } else {
+        // return new Vector2(800, 500);
+        return new Vector2(500, 300);
+      }
     }
 
     private void SetupEvents() {
