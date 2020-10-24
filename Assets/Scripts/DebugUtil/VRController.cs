@@ -77,7 +77,7 @@ namespace DebugUtil
             }
             else
             {
-                Debug.Log("GetRotation is not suppported on non-VRheadset environment");
+                // Debug.Log("GetRotation is not suppported on non-VRheadset environment");
                 return Quaternion.identity;
             }
         }

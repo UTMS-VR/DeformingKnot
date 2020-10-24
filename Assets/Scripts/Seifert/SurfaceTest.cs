@@ -1,8 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DrawCurve;
 using DebugUtil;
+using MinimizeSurface;
 
 public class SurfaceTest : MonoBehaviour
 {
@@ -35,7 +38,21 @@ public class SurfaceTest : MonoBehaviour
 
         if (controller.GetButtonDown(OVRInput.RawButton.A))
         {
-            surface = new Surface(curve.positions, 20);
+            surface = new Surface(curve.positions, 1);
+            surface.MeshUpdate();
+        }
+
+        if (controller.GetButtonDown(OVRInput.RawButton.B))
+        {
+            surface.LaplacianFairing();
+            surface.MeshUpdate();
+        }
+
+        if (controller.GetButtonDown(OVRInput.RawButton.Y))
+        {
+            Debug.Log(surface.Valid().ToString());
+            surface.DebugLog();
+            surface.EdgeSwapping();
             surface.MeshUpdate();
         }
 
