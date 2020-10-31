@@ -33,12 +33,12 @@ public class SurfaceTest : MonoBehaviour
         controller.Update();
         curve.Draw();
         curve.Move();
-        if(controller.GetButtonDown(OVRInput.RawButton.X)) curve.Close();
+        if (controller.GetButtonDown(OVRInput.RawButton.X)) curve.Close();
         Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, MakeMesh.CurveMaterial, 0);
 
         if (controller.GetButtonDown(OVRInput.RawButton.A))
         {
-            surface = new Surface(curve.positions, 1);
+            surface = new Surface(curve.positions, 10);
             surface.MeshUpdate();
         }
 
@@ -50,13 +50,16 @@ public class SurfaceTest : MonoBehaviour
 
         if (controller.GetButtonDown(OVRInput.RawButton.Y))
         {
-            Debug.Log(surface.Valid().ToString());
-            surface.DebugLog();
+            // Debug.Log(surface.Valid().ToString());
+            // surface.DebugLog();
             surface.EdgeSwapping();
             surface.MeshUpdate();
         }
 
-        Graphics.DrawMesh(surface.mesh, Vector3.zero, Quaternion.identity, MakeMesh.CurveMaterial, 0);
+        if (surface != null)
+        {
+            Graphics.DrawMesh(surface.mesh, Vector3.zero, Quaternion.identity, MakeMesh.CurveMaterial, 0);
+        }
     }
 
     private ButtonMap LiteralKeysPlus

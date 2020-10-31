@@ -181,7 +181,8 @@ namespace MinimizeSurface
 
         private float TriangleArea(Vector3 x, Vector3 y, Vector3 z)
         {
-            return Mathf.Sqrt(Mathf.Pow((y - x).magnitude * (z - x).magnitude, 2) - Mathf.Pow(Vector3.Dot(y - x, z - x), 2)) / 2;
+            return Vector3.Cross(y - x, z - x).magnitude / 2;
+            // return Mathf.Sqrt(Mathf.Pow((y - x).magnitude * (z - x).magnitude, 2) - Mathf.Pow(Vector3.Dot(y - x, z - x), 2)) / 2;
         }
 
         private float SurfaceArea(List<Vector3> vertexList)
@@ -215,13 +216,27 @@ namespace MinimizeSurface
                     float newArea = this.TriangleArea(this.vertices[i], this.vertices[k0], this.vertices[k1])
                                     + this.TriangleArea(this.vertices[j], this.vertices[k0], this.vertices[k1]);
 
-                    if (nowArea > newArea)
+                    if (this.ValidSwapping(i, j, k0, k1))
                     {
                         this.UpdateTriangles(i, j, k0, k1, b0, b1);
                         this.UpdateNeighborhood(i, j, k0, k1, b0, b1);
                     }
                 }
             }
+        }
+
+        private bool ValidSwapping(int i, int j, int k0, int k1)
+        {
+            float nowArea = this.TriangleArea(this.vertices[i], this.vertices[j], this.vertices[k0])
+                            + this.TriangleArea(this.vertices[i], this.vertices[j], this.vertices[k1]);
+            float newArea = this.TriangleArea(this.vertices[i], this.vertices[k0], this.vertices[k1])
+                            + this.TriangleArea(this.vertices[j], this.vertices[k0], this.vertices[k1]);
+            
+            return (nowArea > newArea)
+                   && (this.neighborhood[i][this.FindNeighborIndex(i, k0)].Item2.FindIndex(x => x.Item1 == k1) < 0)
+                   && (this.neighborhood[i][this.FindNeighborIndex(i, k1)].Item2.FindIndex(x => x.Item1 == k0) < 0)
+                   && (this.neighborhood[j][this.FindNeighborIndex(j, k0)].Item2.FindIndex(x => x.Item1 == k1) < 0)
+                   && (this.neighborhood[j][this.FindNeighborIndex(j, k1)].Item2.FindIndex(x => x.Item1 == k0) < 0);
         }
 
         private void UpdateTriangles(int i, int j, int k0, int k1, bool b0, bool b1)
@@ -287,7 +302,7 @@ namespace MinimizeSurface
             return this.neighborhood[i].FindIndex(x => x.Item1 == j);
         }
 
-        public (int, int) Valid()
+        /*public (int, int) Valid()
         {
             int b0 = 0;
             int b1 = 0;
@@ -319,6 +334,6 @@ namespace MinimizeSurface
                 }
                 Debug.Log(s);
             }
-        }
+        }*/
     }
 }
