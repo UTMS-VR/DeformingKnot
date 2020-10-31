@@ -145,9 +145,138 @@ namespace MinimizeSurface
 
         }
 
-        private void AreaMinimizing()
+        public void AreaMinimizing()
         {
+            List<Vector3> newVertices = new List<Vector3>();
 
+            for (int i = 0; i < this.boundaryCount; i++)
+            {
+                newVertices.Add(this.vertices[i]);
+            }
+
+            for (int i = this.boundaryCount; i < this.vertices.Count; i++)
+            {
+                Vector3 v = new Vector3();
+                float[,] c = new float[3, 3];
+
+                foreach ((int, List<(int, bool)>) x in this.neighborhood[i])
+                {
+                    Vector3 vi = vertices[i];
+                    Vector3 vj = vertices[x.Item1];
+                    Vector3 vk0 = vertices[x.Item2[0].Item1];
+                    Vector3 vk1 = vertices[x.Item2[1].Item1];
+
+                    v += (- Vector3.Dot(vk0 - vj, vj) * (vk0 - vj) + (vk0 - vj).sqrMagnitude * vj)
+                         / Vector3.Cross(vk0 - vj, vi - vj).sqrMagnitude;
+                    v += (-Vector3.Dot(vk1 - vj, vj) * (vk1 - vj) + (vk1 - vj).sqrMagnitude * vj)
+                         / Vector3.Cross(vk1 - vj, vi - vj).sqrMagnitude;
+
+                    float[,] a0 = this.ScalerMatrix(- (vk0 - vj).sqrMagnitude);
+                    float[,] b0 = this.VectorToMatrix(vk0 - vj, vk0 - vj);
+                    float s0 = 1.0f / Vector3.Cross(vk0 - vj, vi - vj).sqrMagnitude;
+                    c = this.AddMatrix(c, this.MultipleMatrix(this.AddMatrix(a0, b0), s0));
+                    
+                    float[,] a1 = this.ScalerMatrix(- (vk1 - vj).sqrMagnitude);
+                    float[,] b1 = this.VectorToMatrix(vk1 - vj, vk1 - vj);
+                    float s1 = 1.0f / Vector3.Cross(vk1 - vj, vi - vj).sqrMagnitude;
+                    c = this.AddMatrix(c, this.MultipleMatrix(this.AddMatrix(a1, b1), s1));
+                }
+
+                newVertices.Add(- this.AppMatrix(this.InverseMatrix(c), v));
+            }
+
+            if (this.SurfaceArea(this.vertices) > this.SurfaceArea(newVertices))
+            {
+                this.vertices = newVertices;
+            }
+        }
+
+        private float[,] AddMatrix(float[,] a, float[,] b)
+        {
+            float[,] sum = new float[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    sum[i, j] = a[i, j] + b[i, j];
+                }
+            }
+
+            return sum;
+        }
+
+        private float[,] MultipleMatrix(float[,] a, float x)
+        {
+            float[,] prod = new float[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    prod[i, j] = a[i, j] * x;
+                }
+            }
+
+            return prod;
+        }
+
+        private float[,] ScalerMatrix(float x)
+        {
+            float [,] scaler = new float[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (i == j) scaler[i, j] = x;
+                    else scaler[i, j] = 0.0f;
+                }
+            }
+
+            return scaler;
+        }
+
+        private Vector3 AppMatrix(float[,] a, Vector3 v)
+        {
+            Vector3 w = new Vector3();
+            w.x = a[0, 0] * v.x + a[0, 1] * v.y + a[0, 2] * v.z;
+            w.y = a[1, 0] * v.x + a[1, 1] * v.y + a[1, 2] * v.z;
+            w.z = a[2, 0] * v.x + a[2, 1] * v.y + a[2, 2] * v.z;
+
+            return w;
+        }
+
+        private float[,] VectorToMatrix(Vector3 v, Vector3 w)
+        {
+            float[,] a = new float[3, 3];
+            a[0, 0] = v.x * w.x;
+            a[0, 1] = v.x * w.y;
+            a[0, 2] = v.x * w.z;
+            a[1, 0] = v.y * w.x;
+            a[1, 1] = v.y * w.y;
+            a[1, 2] = v.y * w.z;
+            a[2, 0] = v.z * w.x;
+            a[2, 1] = v.z * w.y;
+            a[2, 2] = v.z * w.z;
+
+            return a;
+        }
+
+        private float[,] InverseMatrix(float[,] a)
+        {
+            float[,] inv = new float[3, 3];
+            float determinant = a[0, 0] * a[1, 1] * a[2, 2] + a[0, 1] * a[1, 2] * a[2, 0] + a[0, 2] * a[1, 0] * a[2, 1]
+                                - a[0, 0] * a[1, 2] * a[2, 1] - a[0, 1] * a[1, 0] * a[2, 2] - a[0, 2] * a[1, 1] * a[2, 0];
+            // 正則じゃない時に処理する？
+            inv[0, 0] = (a[1, 1] * a[2, 2] - a[1, 2] * a[2, 1]) / determinant;
+            inv[0, 1] = - (a[1, 0] * a[2, 2] - a[1, 2] * a[2, 0]) / determinant;
+            inv[0, 2] = (a[1, 0] * a[2, 1] - a[1, 1] * a[2, 0]) / determinant;
+            inv[1, 0] = - (a[0, 1] * a[2, 2] - a[0, 2] * a[2, 1]) / determinant;
+            inv[1, 1] = (a[0, 0] * a[2, 2] - a[0, 2] * a[2, 0]) / determinant;
+            inv[1, 2] = - (a[0, 0] * a[2, 1] - a[0, 1] * a[2, 0]) / determinant;
+            inv[2, 0] = (a[0, 1] * a[1, 2] - a[0, 2] * a[1, 1]) / determinant;
+            inv[2, 1] = - (a[0, 0] * a[1, 2] - a[0, 2] * a[1, 0]) / determinant;
+            inv[2, 2] = (a[0, 0] * a[1, 1] - a[0, 1] * a[1, 0]) / determinant;
+
+            return inv;
         }
 
         public void LaplacianFairing()

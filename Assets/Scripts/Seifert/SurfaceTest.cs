@@ -38,11 +38,17 @@ public class SurfaceTest : MonoBehaviour
 
         if (controller.GetButtonDown(OVRInput.RawButton.A))
         {
-            surface = new Surface(curve.positions, 10);
+            surface = new Surface(curve.positions, 20);
             surface.MeshUpdate();
         }
 
-        if (controller.GetButtonDown(OVRInput.RawButton.B))
+        if (controller.GetButtonDown(OVRInput.RawButton.LHandTrigger))
+        {
+            surface.AreaMinimizing();
+            surface.MeshUpdate();
+        }
+
+        if (controller.GetButtonDown(OVRInput.RawButton.LIndexTrigger))
         {
             surface.LaplacianFairing();
             surface.MeshUpdate();
