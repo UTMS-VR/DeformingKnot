@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MinimizeSurface
 {
-    using Neighbor = List<(int, List<(int, bool)>)>;
+    using Neighbor = Dictionary<int, List<(int, bool)>>;
     
     public class Surface
     {
@@ -90,9 +90,14 @@ namespace MinimizeSurface
 
         private void AddNeighbor(int l, int m, int n, bool b)
         {
-            int index = this.neighborhood[l].FindIndex(x => (x.Item1 == m));
-            if (index < 0) this.neighborhood[l].Add((m, new List<(int, bool)> { (n, b) }));
-            else this.neighborhood[l][index].Item2.Add((n, b));
+            if (this.neighborhood[l].ContainsKey(m))
+            {
+                this.neighborhood[l][m].Add((n, b));
+            }
+            else
+            {
+                this.neighborhood[l].Add(m, new List<(int, bool)> { (n, b) });
+            }
         }
 
         private int Succ(int i)
@@ -157,126 +162,34 @@ namespace MinimizeSurface
             for (int i = this.boundaryCount; i < this.vertices.Count; i++)
             {
                 Vector3 v = new Vector3();
-                float[,] c = new float[3, 3];
+                Matrix3 c = new Matrix3(0.0f);
 
-                foreach ((int, List<(int, bool)>) x in this.neighborhood[i])
+                foreach (var x in this.neighborhood[i])
                 {
                     Vector3 vi = vertices[i];
-                    Vector3 vj = vertices[x.Item1];
-                    Vector3 vk0 = vertices[x.Item2[0].Item1];
-                    Vector3 vk1 = vertices[x.Item2[1].Item1];
+                    Vector3 vj = vertices[x.Key];
+                    Vector3 vji = vi - vj;
 
-                    v += (- Vector3.Dot(vk0 - vj, vj) * (vk0 - vj) + (vk0 - vj).sqrMagnitude * vj)
-                         / Vector3.Cross(vk0 - vj, vi - vj).sqrMagnitude;
-                    v += (-Vector3.Dot(vk1 - vj, vj) * (vk1 - vj) + (vk1 - vj).sqrMagnitude * vj)
-                         / Vector3.Cross(vk1 - vj, vi - vj).sqrMagnitude;
+                    foreach (var y in x.Value)
+                    {
+                        Vector3 vk = vertices[y.Item1];
+                        Vector3 vjk = vk - vj;
+                        float s = 1.0f / Vector3.Cross(vjk, vji).sqrMagnitude;
+                        v += (- Vector3.Dot(vjk, vj) * vjk + vjk.sqrMagnitude * vj) * s;
 
-                    float[,] a0 = this.ScalerMatrix(- (vk0 - vj).sqrMagnitude);
-                    float[,] b0 = this.VectorToMatrix(vk0 - vj, vk0 - vj);
-                    float s0 = 1.0f / Vector3.Cross(vk0 - vj, vi - vj).sqrMagnitude;
-                    c = this.AddMatrix(c, this.MultipleMatrix(this.AddMatrix(a0, b0), s0));
-                    
-                    float[,] a1 = this.ScalerMatrix(- (vk1 - vj).sqrMagnitude);
-                    float[,] b1 = this.VectorToMatrix(vk1 - vj, vk1 - vj);
-                    float s1 = 1.0f / Vector3.Cross(vk1 - vj, vi - vj).sqrMagnitude;
-                    c = this.AddMatrix(c, this.MultipleMatrix(this.AddMatrix(a1, b1), s1));
+                        Matrix3 a = new Matrix3(- vjk.sqrMagnitude);
+                        Matrix3 b = new Matrix3(vjk, vjk);
+                        c = Matrix3.Add(c, Matrix3.Add(a, b).Mult(s));
+                    }
                 }
 
-                newVertices.Add(- this.AppMatrix(this.InverseMatrix(c), v));
+                newVertices.Add(- c.Inverse().Apply(v));
             }
 
             if (this.SurfaceArea(this.vertices) > this.SurfaceArea(newVertices))
             {
                 this.vertices = newVertices;
             }
-        }
-
-        private float[,] AddMatrix(float[,] a, float[,] b)
-        {
-            float[,] sum = new float[3, 3];
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    sum[i, j] = a[i, j] + b[i, j];
-                }
-            }
-
-            return sum;
-        }
-
-        private float[,] MultipleMatrix(float[,] a, float x)
-        {
-            float[,] prod = new float[3, 3];
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    prod[i, j] = a[i, j] * x;
-                }
-            }
-
-            return prod;
-        }
-
-        private float[,] ScalerMatrix(float x)
-        {
-            float [,] scaler = new float[3, 3];
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    if (i == j) scaler[i, j] = x;
-                    else scaler[i, j] = 0.0f;
-                }
-            }
-
-            return scaler;
-        }
-
-        private Vector3 AppMatrix(float[,] a, Vector3 v)
-        {
-            Vector3 w = new Vector3();
-            w.x = a[0, 0] * v.x + a[0, 1] * v.y + a[0, 2] * v.z;
-            w.y = a[1, 0] * v.x + a[1, 1] * v.y + a[1, 2] * v.z;
-            w.z = a[2, 0] * v.x + a[2, 1] * v.y + a[2, 2] * v.z;
-
-            return w;
-        }
-
-        private float[,] VectorToMatrix(Vector3 v, Vector3 w)
-        {
-            float[,] a = new float[3, 3];
-            a[0, 0] = v.x * w.x;
-            a[0, 1] = v.x * w.y;
-            a[0, 2] = v.x * w.z;
-            a[1, 0] = v.y * w.x;
-            a[1, 1] = v.y * w.y;
-            a[1, 2] = v.y * w.z;
-            a[2, 0] = v.z * w.x;
-            a[2, 1] = v.z * w.y;
-            a[2, 2] = v.z * w.z;
-
-            return a;
-        }
-
-        private float[,] InverseMatrix(float[,] a)
-        {
-            float[,] inv = new float[3, 3];
-            float determinant = a[0, 0] * a[1, 1] * a[2, 2] + a[0, 1] * a[1, 2] * a[2, 0] + a[0, 2] * a[1, 0] * a[2, 1]
-                                - a[0, 0] * a[1, 2] * a[2, 1] - a[0, 1] * a[1, 0] * a[2, 2] - a[0, 2] * a[1, 1] * a[2, 0];
-            // 正則じゃない時に処理する？
-            inv[0, 0] = (a[1, 1] * a[2, 2] - a[1, 2] * a[2, 1]) / determinant;
-            inv[0, 1] = - (a[1, 0] * a[2, 2] - a[1, 2] * a[2, 0]) / determinant;
-            inv[0, 2] = (a[1, 0] * a[2, 1] - a[1, 1] * a[2, 0]) / determinant;
-            inv[1, 0] = - (a[0, 1] * a[2, 2] - a[0, 2] * a[2, 1]) / determinant;
-            inv[1, 1] = (a[0, 0] * a[2, 2] - a[0, 2] * a[2, 0]) / determinant;
-            inv[1, 2] = - (a[0, 0] * a[2, 1] - a[0, 1] * a[2, 0]) / determinant;
-            inv[2, 0] = (a[0, 1] * a[1, 2] - a[0, 2] * a[1, 1]) / determinant;
-            inv[2, 1] = - (a[0, 0] * a[1, 2] - a[0, 2] * a[1, 0]) / determinant;
-            inv[2, 2] = (a[0, 0] * a[1, 1] - a[0, 1] * a[1, 0]) / determinant;
-
-            return inv;
         }
 
         public void LaplacianFairing()
@@ -292,17 +205,20 @@ namespace MinimizeSurface
             {
                 Vector3 v = new Vector3();
                 float sum = 0.0f;
-                foreach ((int, List<(int, bool)>) x in this.neighborhood[i])
+                foreach (var x in this.neighborhood[i])
                 {
-                    float s = this.TriangleArea(vertices[i], vertices[x.Item1], vertices[x.Item2[0].Item1])
-                              + this.TriangleArea(vertices[i], vertices[x.Item1], vertices[x.Item2[1].Item1]);
-                    v += s * vertices[x.Item1];
+                    float s = 0.0f;
+                    foreach (var y in x.Value)
+                    {
+                        s += this.TriangleArea(vertices[i], vertices[x.Key], vertices[y.Item1]);
+                    }
+                    v += s * vertices[x.Key];
                     sum += s;
                 }
                 newVertices.Add(v / sum);
             }
 
-            if (this.SurfaceArea(this.vertices) > this.SurfaceArea(newVertices))
+            if (true) // (this.SurfaceArea(this.vertices) > this.SurfaceArea(newVertices))
             {
                 this.vertices = newVertices;
             }
@@ -330,20 +246,18 @@ namespace MinimizeSurface
         {
             for (int i = this.boundaryCount; i < this.vertices.Count; i++)
             {
-                int neighborNum = this.neighborhood[i].Count;
-                for (int n = neighborNum - 1; n >= 0; n--)
+                List<int> neighborhoodKeys = new List<int>();
+                foreach (int j in this.neighborhood[i].Keys)
                 {
-                    (int, List<(int, bool)>) x = this.neighborhood[i][n];
-                    int j = x.Item1;
-                    int k0 = x.Item2[0].Item1;
-                    int k1 = x.Item2[1].Item1;
-                    bool b0 = x.Item2[0].Item2;
-                    bool b1 = x.Item2[1].Item2;
+                    neighborhoodKeys.Add(j);
+                }
 
-                    float nowArea = this.TriangleArea(this.vertices[i], this.vertices[j], this.vertices[k0])
-                                    + this.TriangleArea(this.vertices[i], this.vertices[j], this.vertices[k1]);
-                    float newArea = this.TriangleArea(this.vertices[i], this.vertices[k0], this.vertices[k1])
-                                    + this.TriangleArea(this.vertices[j], this.vertices[k0], this.vertices[k1]);
+                foreach (int j in neighborhoodKeys)
+                {
+                    int k0 = this.neighborhood[i][j][0].Item1;
+                    int k1 = this.neighborhood[i][j][1].Item1;
+                    bool b0 = this.neighborhood[i][j][0].Item2;
+                    bool b1 = this.neighborhood[i][j][1].Item2;
 
                     if (this.ValidSwapping(i, j, k0, k1))
                     {
@@ -360,12 +274,8 @@ namespace MinimizeSurface
                             + this.TriangleArea(this.vertices[i], this.vertices[j], this.vertices[k1]);
             float newArea = this.TriangleArea(this.vertices[i], this.vertices[k0], this.vertices[k1])
                             + this.TriangleArea(this.vertices[j], this.vertices[k0], this.vertices[k1]);
-            
-            return (nowArea > newArea)
-                   && (this.neighborhood[i][this.FindNeighborIndex(i, k0)].Item2.FindIndex(x => x.Item1 == k1) < 0)
-                   && (this.neighborhood[i][this.FindNeighborIndex(i, k1)].Item2.FindIndex(x => x.Item1 == k0) < 0)
-                   && (this.neighborhood[j][this.FindNeighborIndex(j, k0)].Item2.FindIndex(x => x.Item1 == k1) < 0)
-                   && (this.neighborhood[j][this.FindNeighborIndex(j, k1)].Item2.FindIndex(x => x.Item1 == k0) < 0);
+
+            return (nowArea > newArea) && (!this.neighborhood[k0].ContainsKey(k1));
         }
 
         private void UpdateTriangles(int i, int j, int k0, int k1, bool b0, bool b1)
@@ -403,66 +313,27 @@ namespace MinimizeSurface
 
         private void UpdateNeighborhood(int i, int j, int k0, int k1, bool b0, bool b1)
         {
-            this.neighborhood[i].RemoveAt(FindNeighborIndex(i, j));
-            this.neighborhood[j].RemoveAt(FindNeighborIndex(j, i));
-            this.neighborhood[i][FindNeighborIndex(i, k0)].Item2.Remove((j, !b0));
-            this.neighborhood[i][FindNeighborIndex(i, k1)].Item2.Remove((j, !b1));
-            this.neighborhood[j][FindNeighborIndex(j, k0)].Item2.Remove((i, b0));
-            this.neighborhood[j][FindNeighborIndex(j, k1)].Item2.Remove((i, b1));
-            this.neighborhood[k0][FindNeighborIndex(k0, i)].Item2.Remove((j, b0));
-            this.neighborhood[k0][FindNeighborIndex(k0, j)].Item2.Remove((i, !b0));
-            this.neighborhood[k1][FindNeighborIndex(k1, i)].Item2.Remove((j, b1));
-            this.neighborhood[k1][FindNeighborIndex(k1, j)].Item2.Remove((i, !b1));
+            this.neighborhood[i].Remove(j);
+            this.neighborhood[j].Remove(i);
+            this.neighborhood[i][k0].Remove((j, !b0));
+            this.neighborhood[i][k1].Remove((j, !b1));
+            this.neighborhood[j][k0].Remove((i, b0));
+            this.neighborhood[j][k1].Remove((i, b1));
+            this.neighborhood[k0][i].Remove((j, b0));
+            this.neighborhood[k0][j].Remove((i, !b0));
+            this.neighborhood[k1][i].Remove((j, b1));
+            this.neighborhood[k1][j].Remove((i, !b1));
 
-            this.neighborhood[k0].Add((k1, new List<(int, bool)> { (i, !b0), (j, b0) }));
-            this.neighborhood[k1].Add((k0, new List<(int, bool)> { (i, b0), (j, !b0) }));
-            this.neighborhood[i][FindNeighborIndex(i, k0)].Item2.Add((k1, !b0));
-            this.neighborhood[i][FindNeighborIndex(i, k1)].Item2.Add((k0, !b1));
-            this.neighborhood[j][FindNeighborIndex(j, k0)].Item2.Add((k1, b0));
-            this.neighborhood[j][FindNeighborIndex(j, k1)].Item2.Add((k0, b1));
-            this.neighborhood[k0][FindNeighborIndex(k0, i)].Item2.Add((k1, b0));
-            this.neighborhood[k0][FindNeighborIndex(k0, j)].Item2.Add((k1, !b0));
-            this.neighborhood[k1][FindNeighborIndex(k1, i)].Item2.Add((k0, b1));
-            this.neighborhood[k1][FindNeighborIndex(k1, j)].Item2.Add((k0, !b1));
+            this.neighborhood[k0].Add(k1, new List<(int, bool)> { (i, !b0), (j, b0) });
+            this.neighborhood[k1].Add(k0, new List<(int, bool)> { (i, b0), (j, !b0) });
+            this.neighborhood[i][k0].Add((k1, !b0));
+            this.neighborhood[i][k1].Add((k0, !b1));
+            this.neighborhood[j][k0].Add((k1, b0));
+            this.neighborhood[j][k1].Add((k0, b1));
+            this.neighborhood[k0][i].Add((k1, b0));
+            this.neighborhood[k0][j].Add((k1, !b0));
+            this.neighborhood[k1][i].Add((k0, b1));
+            this.neighborhood[k1][j].Add((k0, !b1));
         }
-
-        private int FindNeighborIndex(int i, int j)
-        {
-            return this.neighborhood[i].FindIndex(x => x.Item1 == j);
-        }
-
-        /*public (int, int) Valid()
-        {
-            int b0 = 0;
-            int b1 = 0;
-            int b2 = 0;
-
-            for (int i = this.boundaryCount; i < this.vertices.Count; i++)
-            {
-                foreach ((int, List<(int, bool)>) x in this.neighborhood[i])
-                {
-                    if (x.Item2.Count != 2) b0++;
-                    else if (x.Item2[0].Item2 == x.Item2[1].Item2) b1++;
-                    b2++;
-                }
-            }
-
-            return (b0, b1);
-        }
-
-        public void DebugLog()
-        {
-            for (int i = 0; i < this.neighborhood.Count; i++)
-            {
-                string s = i.ToString();
-                foreach ((int, List<(int, bool)>) x in this.neighborhood[i])
-                {
-                    s += ", (" + x.Item1.ToString();
-                    for (int j = 0; j < x.Item2.Count; j++) s += ", " + x.Item2[j].ToString();
-                    s += ")";
-                }
-                Debug.Log(s);
-            }
-        }*/
     }
 }

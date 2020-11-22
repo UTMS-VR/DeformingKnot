@@ -25,6 +25,10 @@ public class SurfaceTest : MonoBehaviour
 
         Curve.SetUp(controller, drawButton: OVRInput.RawButton.RIndexTrigger, moveButton: OVRInput.RawButton.RHandTrigger);
         curve = new Curve(new List<Vector3>(), false);
+
+        //List<Vector3> vec = new List<Vector3> {new Vector3(0.0f, 0.0f, 1.0f), new Vector3(1.0f, 0.0f, 1.0f), new Vector3(0.5f, 0.86f, 1.0f)};
+        //List<Vector3> vec = new List<Vector3> {new Vector3(0.0f, 0.0f, 1.0f), new Vector3(0.5f, 0.86f, 1.0f), new Vector3(1.0f, 0.0f, 1.0f)};
+        //curve = new Curve(vec, true);
     }
 
     // Update is called once per frame
@@ -38,7 +42,7 @@ public class SurfaceTest : MonoBehaviour
 
         if (controller.GetButtonDown(OVRInput.RawButton.A))
         {
-            surface = new Surface(curve.positions, 20);
+            surface = new Surface(curve.positions, 5);
             surface.MeshUpdate();
         }
 
