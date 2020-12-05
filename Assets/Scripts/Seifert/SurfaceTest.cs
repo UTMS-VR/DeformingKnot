@@ -12,6 +12,7 @@ public class SurfaceTest : MonoBehaviour
     private Curve curve;
     private Surface surface;
     private Controller controller;
+    private string text;
 
     // Start is called before the first frame update
     void Start()
@@ -37,10 +38,16 @@ public class SurfaceTest : MonoBehaviour
         controller.Update();
         curve.Draw();
         curve.Move();
-        if (controller.GetButtonDown(OVRInput.RawButton.X)) curve.Close();
+        if (controller.GetButtonDown(OVRInput.RawButton.A)) curve.Close();
         Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, MakeMesh.CurveMaterial, 0);
 
-        if (controller.GetButtonDown(OVRInput.RawButton.A))
+        if (controller.GetButtonDown(OVRInput.RawButton.B))
+        {
+            curve = new Curve(new List<Vector3>(), false);
+            surface = null;
+        }
+
+        if (controller.GetButtonDown(OVRInput.RawButton.X))
         {
             surface = new Surface(curve.positions, 5);
             surface.MeshUpdate();
@@ -48,7 +55,7 @@ public class SurfaceTest : MonoBehaviour
 
         if (controller.GetButtonDown(OVRInput.RawButton.LHandTrigger))
         {
-            surface.AreaMinimizing();
+            surface.GetMinimal();
             surface.MeshUpdate();
         }
 
@@ -68,8 +75,15 @@ public class SurfaceTest : MonoBehaviour
 
         if (surface != null)
         {
-            Graphics.DrawMesh(surface.mesh, Vector3.zero, Quaternion.identity, MakeMesh.CurveMaterial, 0);
+            Graphics.DrawMesh(surface.mesh1, Vector3.zero, Quaternion.identity, MakeMesh.CurveMaterial, 0);
+            Graphics.DrawMesh(surface.mesh2, Vector3.zero, Quaternion.identity, MakeMesh.CurveMaterial, 0);
+            text = surface.SurfaceArea().ToString();
         }
+    }
+
+    public void UpdateFixedInterface(FixedInterface.FixedInterfaceSetting setting)
+    {
+        setting.text = text;
     }
 
     private ButtonMap LiteralKeysPlus

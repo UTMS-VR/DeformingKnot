@@ -15,7 +15,8 @@ namespace MinimizeSurface
         private List<Vector3> vertices;
         private List<Neighbor> neighborhood;
         private List<(int, int, int)> triangles;
-        public Mesh mesh;
+        public Mesh mesh1;
+        public Mesh mesh2;
 
         public Surface(List<Vector3> boundary, int divisionNumber)
         {
@@ -23,7 +24,8 @@ namespace MinimizeSurface
             this.divisionNumber = divisionNumber;
             this.vertices = boundary;
             this.Initialize(boundary);
-            this.mesh = new Mesh();
+            this.mesh1 = new Mesh();
+            this.mesh2 = new Mesh();
         }
 
         private void Initialize(List<Vector3> boundary)
@@ -123,9 +125,13 @@ namespace MinimizeSurface
 
         public void MeshUpdate()
         {
-            this.mesh.vertices = this.vertices.ToArray();
-            this.mesh.triangles = this.ToListInt(this.triangles).ToArray();
-            this.mesh.RecalculateNormals();
+            this.mesh1.vertices = this.vertices.ToArray();
+            this.mesh1.triangles = this.ToListInt(this.triangles).ToArray();
+            this.mesh1.RecalculateNormals();
+
+            this.mesh2.vertices = this.vertices.ToArray();
+            this.mesh2.triangles = this.ToListIntReverse(this.triangles).ToArray();
+            this.mesh2.RecalculateNormals();
         }
 
         private List<int> ToListInt(List<(int, int, int)> triangels)
@@ -140,6 +146,18 @@ namespace MinimizeSurface
             return list;
         }
 
+        private List<int> ToListIntReverse(List<(int, int, int)> triangels)
+        {
+            List<int> list = new List<int>();
+            for (int i = 0; i < triangels.Count; i++)
+            {
+                list.Add(triangles[i].Item1);
+                list.Add(triangles[i].Item3);
+                list.Add(triangles[i].Item2);
+            }
+            return list;
+        }
+
         public int TriangleNumber()
         {
             return (2 * this.divisionNumber + 1) * this.boundaryCount;
@@ -147,7 +165,16 @@ namespace MinimizeSurface
 
         public void GetMinimal()
         {
+            float preArea = Mathf.Infinity;
+            float nowArea = this.SurfaceArea(this.vertices);
 
+            while (Mathf.Abs(preArea - nowArea) > 1e-4f)
+            {
+                this.LaplacianFairing();
+                this.EdgeSwapping();
+                preArea = nowArea;
+                nowArea = this.SurfaceArea(this.vertices);
+            }
         }
 
         public void AreaMinimizing()
@@ -230,8 +257,13 @@ namespace MinimizeSurface
             // return Mathf.Sqrt(Mathf.Pow((y - x).magnitude * (z - x).magnitude, 2) - Mathf.Pow(Vector3.Dot(y - x, z - x), 2)) / 2;
         }
 
-        private float SurfaceArea(List<Vector3> vertexList)
+        public float SurfaceArea(List<Vector3> vertexList = null)
         {
+            if (vertexList == null)
+            {
+                vertexList = this.vertices;
+            }
+
             float area = 0.0f;
 
             foreach ((int, int, int) t in this.triangles)
