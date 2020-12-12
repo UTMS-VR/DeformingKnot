@@ -372,7 +372,7 @@ MonoBehaviour:
   events:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1231080746}
         m_MethodName: UpdateFixedInterface
         m_Mode: 0
         m_Arguments:

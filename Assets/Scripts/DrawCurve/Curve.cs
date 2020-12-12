@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DebugUtil;
+using InputManager;
 
 namespace DrawCurve
 {
@@ -20,9 +20,9 @@ namespace DrawCurve
         public int meridian;
         public float radius;
         public static float collision = 0.05f;
-        public static Controller controller;
-        public static OVRInput.RawButton drawButton;
-        public static OVRInput.RawButton moveButton;
+        public static OculusTouch oculusTouch;
+        public static LogicalButton drawButton;
+        public static LogicalButton moveButton;
 
         public Curve(List<Vector3> positions, bool close, bool selected = false, float segment = 0.03f, int meridian = 10, float radius = 0.005f)
         {
@@ -36,9 +36,9 @@ namespace DrawCurve
             this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.close);
         }
 
-        public static void SetUp(Controller controller, OVRInput.RawButton drawButton, OVRInput.RawButton moveButton)
+        public static void SetUp(OculusTouch oculusTouch, LogicalButton drawButton, LogicalButton moveButton)
         {
-            Curve.controller = controller;
+            Curve.oculusTouch = oculusTouch;
             Curve.drawButton = drawButton;
             Curve.moveButton = moveButton;
         }
@@ -100,9 +100,9 @@ namespace DrawCurve
 
         public void Draw()
         {
-            if (controller.GetButton(drawButton))
+            if (oculusTouch.GetButton(drawButton))
             {
-                Vector3 nowPosition = controller.rightHand.GetPosition();
+                Vector3 nowPosition = oculusTouch.GetPositionR();
 
                 if (Length() == 0)
                 {
@@ -118,20 +118,20 @@ namespace DrawCurve
 
         public void Move()
         {
-            Vector3 nowPosition = controller.rightHand.GetPosition();
-            Quaternion nowRotation = controller.rightHand.GetRotation();
+            Vector3 nowPosition = oculusTouch.GetPositionR();
+            Quaternion nowRotation = oculusTouch.GetRotationR();
 
-            if (controller.GetButtonDown(moveButton))
+            if (oculusTouch.GetButtonDown(moveButton))
             {
                 MoveSetUp(nowPosition, nowRotation);
             }
 
-            if (controller.GetButton(moveButton))
+            if (oculusTouch.GetButton(moveButton))
             {
                 MoveUpdate(nowPosition, nowRotation);
             }
 
-            if (controller.GetButtonUp(moveButton))
+            if (oculusTouch.GetButtonUp(moveButton))
             {
                 MoveCleanUp();
             }
@@ -159,7 +159,7 @@ namespace DrawCurve
 
         public void Select()
         {
-            Vector3 nowPosition = controller.rightHand.GetPosition();
+            Vector3 nowPosition = oculusTouch.GetPositionR();
 
             if (Distance(this.positions, nowPosition).Item2 < collision)
             {
@@ -224,7 +224,7 @@ namespace DrawCurve
         public List<Curve> Cut()
         {
             List<Curve> newCurves = new List<Curve>();
-            Vector3 nowPosition = controller.rightHand.GetPosition();
+            Vector3 nowPosition = oculusTouch.GetPositionR();
             (int, float) distance = Distance(this.positions, nowPosition);
             int num = distance.Item1;
 

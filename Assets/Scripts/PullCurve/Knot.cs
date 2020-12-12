@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DebugUtil;
+using InputManager;
 using DrawCurve;
 
 public class Knot
@@ -10,20 +10,17 @@ public class Knot
 
     public Knot(
         List<Vector3> points,
-        Controller controller,
+        OculusTouch oculusTouch,
         int meridian = 20,
         float radius = 0.1f,
         float distanceThreshold = -1,
-        List<Curve> collisionCurves = null,
-        OVRInput.RawButton selectButton = OVRInput.RawButton.A,
-        OVRInput.RawButton cancelButton = OVRInput.RawButton.B,
-        OVRInput.RawButton optimizeButton = OVRInput.RawButton.RIndexTrigger
+        List<Curve> collisionCurves = null
         )
     {
         int count = points.Count;
         (int first, int second) chosenPoints = (count / 3, 2 * count / 3);
-        KnotData data = new KnotData(points, chosenPoints, controller, radius, meridian, distanceThreshold, collisionCurves,
-                        selectButton, cancelButton, optimizeButton);
+        KnotData data = new KnotData(points, chosenPoints, oculusTouch, radius, meridian, distanceThreshold, collisionCurves,
+                        LogicalOVRInput.RawButton.A, LogicalOVRInput.RawButton.B, LogicalOVRInput.RawButton.RIndexTrigger);
         this.state = new KnotStateBase(data);
     }
 

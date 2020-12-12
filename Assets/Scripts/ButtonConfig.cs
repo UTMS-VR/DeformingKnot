@@ -1,58 +1,46 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DebugUtil;
+using InputManager;
 
-namespace DrawCurve
+public class ButtonConfig
 {
-    public class ButtonConfig
+    public OculusTouch oculusTouch;
+    public LogicalButton changeState;
+    public LogicalButton draw;
+    public LogicalButton move;
+    public LogicalButton select;
+    public LogicalButton cut;
+    public LogicalButton combine;
+    public LogicalButton remove;
+    public LogicalButton undo;
+
+    public ButtonConfig(OculusTouch oculusTouch)
     {
-        public Controller controller;
-        public OVRInput.RawButton changeState;
-        public OVRInput.RawButton draw;
-        public OVRInput.RawButton move;
-        public OVRInput.RawButton select;
-        public OVRInput.RawButton cut;
-        public OVRInput.RawButton combine;
-        public OVRInput.RawButton remove;
-        public OVRInput.RawButton undo;
+        this.oculusTouch = oculusTouch;
+        this.changeState = LogicalOVRInput.RawButton.LIndexTrigger;
+        this.draw = LogicalOVRInput.RawButton.RIndexTrigger;
+        this.move = LogicalOVRInput.RawButton.RHandTrigger;
+        this.select = LogicalOVRInput.RawButton.A;
+        this.cut = LogicalOVRInput.RawButton.B;
+        this.combine = LogicalOVRInput.RawButton.X;
+        this.remove = LogicalOVRInput.RawButton.Y;
+        this.undo = LogicalOVRInput.RawButton.LHandTrigger;
+    }
 
-        public ButtonConfig(
-            Controller controller,
-            OVRInput.RawButton changeState = OVRInput.RawButton.LIndexTrigger,
-            OVRInput.RawButton draw = OVRInput.RawButton.RIndexTrigger,
-            OVRInput.RawButton move = OVRInput.RawButton.RHandTrigger,
-            OVRInput.RawButton select = OVRInput.RawButton.A,
-            OVRInput.RawButton cut = OVRInput.RawButton.B,
-            OVRInput.RawButton combine = OVRInput.RawButton.X,
-            OVRInput.RawButton remove = OVRInput.RawButton.Y,
-            OVRInput.RawButton undo = OVRInput.RawButton.LHandTrigger)
-        {
-            this.changeState = changeState;
-            this.controller = controller;
-            this.draw = draw;
-            this.move = move;
-            this.select = select;
-            this.cut = cut;
-            this.combine = combine;
-            this.remove = remove;
-            this.undo = undo;
-        }
+    public bool ValidBaseButtonInput()
+    {
+        int valid = 0;
 
-        public bool ValidBaseButtonInput()
-        {
-            int valid = 0;
+        if (this.oculusTouch.GetButtonDown(this.changeState)) valid++;
+        if (this.oculusTouch.GetButton(this.draw) || this.oculusTouch.GetButtonUp(this.draw)) valid++;
+        if (this.oculusTouch.GetButton(this.move) || this.oculusTouch.GetButtonUp(this.move)) valid++;
+        if (this.oculusTouch.GetButtonDown(this.select)) valid++;
+        if (this.oculusTouch.GetButtonDown(this.cut)) valid++;
+        if (this.oculusTouch.GetButtonDown(this.combine)) valid++;
+        if (this.oculusTouch.GetButtonDown(this.remove)) valid++;
+        if (this.oculusTouch.GetButtonDown(this.undo)) valid++;
 
-            if (controller.GetButtonDown(this.changeState)) valid++;
-            if (controller.GetButton(this.draw) || controller.GetButtonUp(this.draw)) valid++;
-            if (controller.GetButton(this.move) || controller.GetButtonUp(this.move)) valid++;
-            if (controller.GetButtonDown(this.select)) valid++;
-            if (controller.GetButtonDown(this.cut)) valid++;
-            if (controller.GetButtonDown(this.combine)) valid++;
-            if (controller.GetButtonDown(this.remove)) valid++;
-            if (controller.GetButtonDown(this.undo)) valid++;
-
-            return (valid == 1) ? true : false;
-        }
+        return (valid == 1) ? true : false;
     }
 }

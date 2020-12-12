@@ -4,27 +4,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DrawCurve;
-using DebugUtil;
+using InputManager;
 using MinimizeSurface;
 
 public class SurfaceTest : MonoBehaviour
 {
     private Curve curve;
     private Surface surface;
-    private Controller controller;
+    private OculusTouch oculusTouch;
     private string text;
 
     // Start is called before the first frame update
     void Start()
     {
-        controller = new Controller(
+        oculusTouch = new OculusTouch
+        (
             buttonMap: LiteralKeysPlus,
-            rightHandMover: Stick3DMap.OKLSemiIComma,
+            rightStickKey: PredefinedMaps.WASD,
+            rightHandKey: PredefinedMaps.OKLSemiIComma,
             handScale: 0.03f,
             handSpeed: 0.01f
         );
 
-        Curve.SetUp(controller, drawButton: OVRInput.RawButton.RIndexTrigger, moveButton: OVRInput.RawButton.RHandTrigger);
+        Curve.SetUp(oculusTouch, drawButton: LogicalOVRInput.RawButton.RIndexTrigger, moveButton: LogicalOVRInput.RawButton.RHandTrigger);
         curve = new Curve(new List<Vector3>(), false);
 
         //List<Vector3> vec = new List<Vector3> {new Vector3(0.0f, 0.0f, 1.0f), new Vector3(1.0f, 0.0f, 1.0f), new Vector3(0.5f, 0.86f, 1.0f)};
@@ -35,37 +37,38 @@ public class SurfaceTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        controller.Update();
+        oculusTouch.UpdateFirst();
+
         curve.Draw();
         curve.Move();
-        if (controller.GetButtonDown(OVRInput.RawButton.A)) curve.Close();
+        if (oculusTouch.GetButtonDown(LogicalOVRInput.RawButton.A)) curve.Close();
         Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, MakeMesh.CurveMaterial, 0);
 
-        if (controller.GetButtonDown(OVRInput.RawButton.B))
+        if (oculusTouch.GetButtonDown(LogicalOVRInput.RawButton.B))
         {
             curve = new Curve(new List<Vector3>(), false);
             surface = null;
         }
 
-        if (controller.GetButtonDown(OVRInput.RawButton.X))
+        if (oculusTouch.GetButtonDown(LogicalOVRInput.RawButton.X))
         {
             surface = new Surface(curve.positions, 5);
             surface.MeshUpdate();
         }
 
-        if (controller.GetButtonDown(OVRInput.RawButton.LHandTrigger))
+        if (oculusTouch.GetButtonDown(LogicalOVRInput.RawButton.LHandTrigger))
         {
             surface.GetMinimal();
             surface.MeshUpdate();
         }
 
-        if (controller.GetButtonDown(OVRInput.RawButton.LIndexTrigger))
+        if (oculusTouch.GetButtonDown(LogicalOVRInput.RawButton.LIndexTrigger))
         {
             surface.LaplacianFairing();
             surface.MeshUpdate();
         }
 
-        if (controller.GetButtonDown(OVRInput.RawButton.Y))
+        if (oculusTouch.GetButtonDown(LogicalOVRInput.RawButton.Y))
         {
             // Debug.Log(surface.Valid().ToString());
             // surface.DebugLog();
@@ -79,6 +82,8 @@ public class SurfaceTest : MonoBehaviour
             Graphics.DrawMesh(surface.mesh2, Vector3.zero, Quaternion.identity, MakeMesh.CurveMaterial, 0);
             text = surface.SurfaceArea().ToString();
         }
+
+        oculusTouch.UpdateLast();
     }
 
     public void UpdateFixedInterface(FixedInterface.FixedInterfaceSetting setting)
@@ -86,15 +91,16 @@ public class SurfaceTest : MonoBehaviour
         setting.text = text;
     }
 
-    private ButtonMap LiteralKeysPlus
-    = new ButtonMap(new List<(OVRInput.RawButton, KeyCode)>{
-        ( OVRInput.RawButton.A, KeyCode.A ),
-        ( OVRInput.RawButton.B, KeyCode.B ),
-        ( OVRInput.RawButton.X, KeyCode.X ),
-        ( OVRInput.RawButton.Y, KeyCode.Y ),
-        ( OVRInput.RawButton.RIndexTrigger, KeyCode.R ),
-        ( OVRInput.RawButton.RHandTrigger, KeyCode.E ),
-        ( OVRInput.RawButton.LIndexTrigger, KeyCode.Q ),
-        ( OVRInput.RawButton.LHandTrigger, KeyCode.W )
+    private static ButtonMap LiteralKeysPlus
+    = new ButtonMap(new List<(LogicalButton logicalButton, IPhysicalButton physicalButton)>
+    {
+        ( LogicalOVRInput.RawButton.A, new PhysicalKey(KeyCode.A) ),
+        ( LogicalOVRInput.RawButton.B, new PhysicalKey(KeyCode.B) ),
+        ( LogicalOVRInput.RawButton.X, new PhysicalKey(KeyCode.X) ),
+        ( LogicalOVRInput.RawButton.Y, new PhysicalKey(KeyCode.Y) ),
+        ( LogicalOVRInput.RawButton.RIndexTrigger, new PhysicalKey(KeyCode.R) ),
+        ( LogicalOVRInput.RawButton.RHandTrigger, new PhysicalKey(KeyCode.E) ),
+        ( LogicalOVRInput.RawButton.LIndexTrigger, new PhysicalKey(KeyCode.Q) ),
+        ( LogicalOVRInput.RawButton.LHandTrigger, new PhysicalKey(KeyCode.W) )
     });
 }

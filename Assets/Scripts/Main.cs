@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DrawCurve;
-using DebugUtil;
+using InputManager;
 
 public class Main : MonoBehaviour
 {
-    private Controller controller;
+    private OculusTouch oculusTouch;
     private State state;
     private ButtonConfig button;
     private List<Curve> curves;
@@ -21,11 +21,11 @@ public class Main : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        MyController.SetUp(ref controller);
+        MyController.SetUp(ref oculusTouch);
         state = State.BasicDeform;
-        button = new ButtonConfig(controller);
-        Player.SetUp(controller, button);
-        Curve.SetUp(controller, button.draw, button.move);
+        button = new ButtonConfig(oculusTouch);
+        Player.SetUp(oculusTouch, button);
+        Curve.SetUp(oculusTouch, button.draw, button.move);
 
         curves = new List<Curve>();
         preCurves = new List<Curve>();
@@ -36,7 +36,8 @@ public class Main : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        MyController.Update(this.controller);
+        this.oculusTouch.UpdateFirst();
+
         text = state.ToString();
 
         if (state == State.BasicDeform && button.ValidBaseButtonInput())
@@ -58,6 +59,8 @@ public class Main : MonoBehaviour
         }
 
         Player.Display(curves);
+        
+        this.oculusTouch.UpdateLast();
     }
 
     public void UpdateFixedInterface(FixedInterface.FixedInterfaceSetting setting)

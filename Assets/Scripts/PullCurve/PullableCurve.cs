@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using DebugUtil;
+using InputManager;
 using DrawCurve;
 
 public class PullableCurve
 {
     private List<Vector3> pullablePoints;
     private List<Vector3> remainingPoints;
-    private VRController vrController;
+    private OculusTouch oculusTouch;
     private Vector3 controllerPosition;
     private List<float> weights;
     private int meridian;
@@ -19,7 +19,7 @@ public class PullableCurve
     public PullableCurve(
         List<Vector3> points,
         (int first, int second) chosenPoints,
-        VRController vrController,
+        OculusTouch oculusTouch,
         int meridian = 10,
         float radius = 0.05f,
         float distanceThreshold = -1)
@@ -28,8 +28,8 @@ public class PullableCurve
         int count = (chosenPoints.second - chosenPoints.first + 1 + points.Count) % points.Count;
         this.pullablePoints = points.Take(count).ToList();
         this.remainingPoints = points.Skip(count).ToList();
-        this.vrController = vrController;
-        this.controllerPosition = vrController.GetPosition();
+        this.oculusTouch = oculusTouch;
+        this.controllerPosition = oculusTouch.GetPositionR();
         this.weights = this.GetWeights();
         this.meridian = meridian;
         this.radius = radius;
@@ -44,7 +44,7 @@ public class PullableCurve
         }
     }
 
-    public static PullableCurve Line(Vector3 start, Vector3 end, int numPoints, VRController vrController)
+    public static PullableCurve Line(Vector3 start, Vector3 end, int numPoints, OculusTouch oculusTouch)
     {
         var points = new List<Vector3>();
         for (int i = 0; i < numPoints; i++)
@@ -53,7 +53,7 @@ public class PullableCurve
             Vector3 p = (1.0f - t) * start + t * end;
             points.Add(p);
         }
-        return new PullableCurve(points, (0, numPoints - 1), vrController);
+        return new PullableCurve(points, (0, numPoints - 1), oculusTouch);
     }
 
     public List<Vector3> GetPoints()
@@ -95,17 +95,17 @@ public class PullableCurve
 
     public void Update(List<Curve> collisionCurves = null)
     {
-        Vector3 controllerNewPosition = this.vrController.GetPosition();
-        Vector3 vrControllerMove = controllerNewPosition - this.controllerPosition;
+        Vector3 controllerNewPosition = this.oculusTouch.GetPositionR();
+        Vector3 oculusTouchMove = controllerNewPosition - this.controllerPosition;
 
-        if (this.distanceThreshold * 0.2f < vrControllerMove.magnitude)
+        if (this.distanceThreshold * 0.2f < oculusTouchMove.magnitude)
         {
-            vrControllerMove = vrControllerMove.normalized * this.distanceThreshold * 0.2f;
+            oculusTouchMove = oculusTouchMove.normalized * this.distanceThreshold * 0.2f;
         }
 
         this.controllerPosition = controllerNewPosition;
 
-        List<Vector3> newPullablePoints = this.UpdatePoints(vrControllerMove);
+        List<Vector3> newPullablePoints = this.UpdatePoints(oculusTouchMove);
         List<Vector3> newPoints = newPullablePoints.Concat(remainingPoints).ToList();
         if (newPoints.Count >= 4 && MinSegmentDist(newPoints, true) <= this.distanceThreshold * 0.2f) return;
 
@@ -118,13 +118,13 @@ public class PullableCurve
         this.NormalizePoints();
     }
 
-    List<Vector3> UpdatePoints(Vector3 vrControllerMove)
+    List<Vector3> UpdatePoints(Vector3 oculusTouchMove)
     {
         List<Vector3> newPoints = new List<Vector3>();
 
         for (int i = 0; i < this.pullablePoints.Count; i++)
         {
-            newPoints.Add(this.pullablePoints[i] + vrControllerMove * this.weights[i]);
+            newPoints.Add(this.pullablePoints[i] + oculusTouchMove * this.weights[i]);
         }
 
         return newPoints;

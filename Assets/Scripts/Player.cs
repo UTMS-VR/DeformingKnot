@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DrawCurve;
-using DebugUtil;
+using InputManager;
 
 public enum State
 {
@@ -13,24 +13,24 @@ public enum State
 
 public static class Player
 {
-    public static Controller controller;
+    public static OculusTouch oculusTouch;
     public static ButtonConfig button;
 
-    public static void SetUp(Controller argController, ButtonConfig argButton)
+    public static void SetUp(OculusTouch oculusTouch, ButtonConfig button)
     {
-        controller = argController;
-        button = argButton;
+        Player.oculusTouch = oculusTouch;
+        Player.button = button;
     }
 
     public static void DeepCopy(List<Curve> curves, ref List<Curve> preCurves)
     {
-        if (controller.GetButtonDown(button.changeState)
-            || controller.GetButtonDown(button.draw)
-            || controller.GetButtonDown(button.move)
-            || controller.GetButtonDown(button.select)
-            || controller.GetButtonDown(button.cut)
-            || controller.GetButtonDown(button.combine)
-            || controller.GetButtonDown(button.remove))
+        if (oculusTouch.GetButtonDown(button.changeState)
+            || oculusTouch.GetButtonDown(button.draw)
+            || oculusTouch.GetButtonDown(button.move)
+            || oculusTouch.GetButtonDown(button.select)
+            || oculusTouch.GetButtonDown(button.cut)
+            || oculusTouch.GetButtonDown(button.combine)
+            || oculusTouch.GetButtonDown(button.remove))
         {
             preCurves = new List<Curve>();
 
@@ -47,10 +47,10 @@ public static class Player
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
-            if (controller.GetButtonDown(button.changeState) && selection.Count == 1 && selection[0].close)
+            if (oculusTouch.GetButtonDown(button.changeState) && selection.Count == 1 && selection[0].close)
             {
                 state = State.ContiDeform;
-                deformingCurve = new Knot(selection[0].positions, controller,
+                deformingCurve = new Knot(selection[0].positions, oculusTouch,
                                           meridian: selection[0].meridian,
                                           radius: selection[0].radius,
                                           distanceThreshold: selection[0].segment,
@@ -60,7 +60,7 @@ public static class Player
         }
         else if (state == State.ContiDeform)
         {
-            if (controller.GetButtonDown(button.changeState))
+            if (oculusTouch.GetButtonDown(button.changeState))
             {
                 state = State.BasicDeform;
                 curves.Add(new Curve(deformingCurve.GetPoints(), true, selected: true));
@@ -72,7 +72,7 @@ public static class Player
     {
         curve.Draw();
 
-        if (controller.GetButtonUp(button.draw))
+        if (oculusTouch.GetButtonUp(button.draw))
         {
             if (curve.positions.Count >= 2)
             {
@@ -90,9 +90,9 @@ public static class Player
 
     public static void Move(List<Curve> curves, ref List<int> movingCurves)
     {
-        Vector3 nowPosition = controller.rightHand.GetPosition();
+        Vector3 nowPosition = oculusTouch.GetPositionR();
 
-        if (controller.GetButtonDown(button.move))
+        if (oculusTouch.GetButtonDown(button.move))
         {
             for (int i = 0; i < curves.Count; i++)
             {
@@ -108,7 +108,7 @@ public static class Player
             curves[i].Move();
         }
         
-        if (controller.GetButtonUp(button.move))
+        if (oculusTouch.GetButtonUp(button.move))
         {
             movingCurves = new List<int>();
         }
@@ -116,7 +116,7 @@ public static class Player
 
     public static void Select(List<Curve> curves)
     {
-        if (controller.GetButtonDown(button.select))
+        if (oculusTouch.GetButtonDown(button.select))
         {
             for (int i = 0; i < curves.Count; i++)
             {
@@ -127,7 +127,7 @@ public static class Player
 
     public static void Cut(ref List<Curve> curves)
     {
-        if (controller.GetButtonDown(button.cut))
+        if (oculusTouch.GetButtonDown(button.cut))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
@@ -150,7 +150,7 @@ public static class Player
 
     public static void Combine(ref List<Curve> curves)
     {
-        if (controller.GetButtonDown(button.combine))
+        if (oculusTouch.GetButtonDown(button.combine))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
@@ -174,7 +174,7 @@ public static class Player
 
     public static void Remove(ref List<Curve> curves)
     {
-        if (controller.GetButtonDown(button.remove))
+        if (oculusTouch.GetButtonDown(button.remove))
         {
             curves = curves.Where(curve => !curve.selected).ToList();
         }
@@ -182,13 +182,13 @@ public static class Player
 
     /*public static void Optimize(List<Curve> curves)
     {
-        if (controller.GetButton(button.optimize))
+        if (oculusTouch.GetButton(button.optimize))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
             foreach (Curve curve in selection)
             {
-                if (controller.GetButtonDown(button.optimize))
+                if (oculusTouch.GetButtonDown(button.optimize))
                 {
                     float tempSegment = AdjustParameter.TemporarySegment(curve.positions, curve.segment, curve.close);
                     AdjustParameter.Equalize(ref curve.positions, curve.segment, curve.close);
@@ -200,7 +200,7 @@ public static class Player
             }
         }
 
-        if (controller.GetButtonDown(button.remove))
+        if (oculusTouch.GetButtonDown(button.remove))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
@@ -215,7 +215,7 @@ public static class Player
             }
         }
 
-        if (controller.GetButtonDown(button.optimize))
+        if (oculusTouch.GetButtonDown(button.optimize))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
@@ -228,7 +228,7 @@ public static class Player
             }
         }
 
-        if (controller.GetButtonDown(button.undo))
+        if (oculusTouch.GetButtonDown(button.undo))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
@@ -249,7 +249,7 @@ public static class Player
 
     public static void Undo(ref List<Curve> curves, List<Curve> preCurves)
     {
-        if (controller.GetButtonDown(button.undo))
+        if (oculusTouch.GetButtonDown(button.undo))
         {
             curves = preCurves;
         }
