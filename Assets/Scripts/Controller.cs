@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using InputManager;
 
-public class ButtonConfig
+public class Controller
 {
     public OculusTouch oculusTouch;
     public LogicalButton changeState;
@@ -14,10 +14,16 @@ public class ButtonConfig
     public LogicalButton combine;
     public LogicalButton remove;
     public LogicalButton undo;
-
-    public ButtonConfig(OculusTouch oculusTouch)
+    public Controller()
     {
-        this.oculusTouch = oculusTouch;
+        this.oculusTouch = new OculusTouch
+        (
+            buttonMap: LiteralKeysPlus,
+            rightStickKey: PredefinedMaps.WASD,
+            rightHandKey: PredefinedMaps.OKLSemiIComma,
+            handScale: 0.03f,
+            handSpeed: 0.01f
+        );
         this.changeState = LogicalOVRInput.RawButton.LIndexTrigger;
         this.draw = LogicalOVRInput.RawButton.RIndexTrigger;
         this.move = LogicalOVRInput.RawButton.RHandTrigger;
@@ -27,6 +33,19 @@ public class ButtonConfig
         this.remove = LogicalOVRInput.RawButton.Y;
         this.undo = LogicalOVRInput.RawButton.LHandTrigger;
     }
+
+    private static ButtonMap LiteralKeysPlus
+    = new ButtonMap(new List<(LogicalButton logicalButton, IPhysicalButton physicalButton)>
+    {
+        ( LogicalOVRInput.RawButton.A, new PhysicalKey(KeyCode.A) ),
+        ( LogicalOVRInput.RawButton.B, new PhysicalKey(KeyCode.B) ),
+        ( LogicalOVRInput.RawButton.X, new PhysicalKey(KeyCode.X) ),
+        ( LogicalOVRInput.RawButton.Y, new PhysicalKey(KeyCode.Y) ),
+        ( LogicalOVRInput.RawButton.RIndexTrigger, new PhysicalKey(KeyCode.R) ),
+        ( LogicalOVRInput.RawButton.RHandTrigger, new PhysicalKey(KeyCode.E) ),
+        ( LogicalOVRInput.RawButton.LIndexTrigger, new PhysicalKey(KeyCode.Q) ),
+        ( LogicalOVRInput.RawButton.LHandTrigger, new PhysicalKey(KeyCode.W) )
+    });
 
     public bool ValidBaseButtonInput()
     {

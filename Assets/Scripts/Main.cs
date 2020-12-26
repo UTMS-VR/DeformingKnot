@@ -8,67 +8,54 @@ using InputManager;
 
 public class Main : MonoBehaviour
 {
-    private OculusTouch oculusTouch;
-    private State state;
-    private ButtonConfig button;
-    private List<Curve> curves;
-    private List<Curve> preCurves;
-    private Curve drawingCurve;
-    private List<int> movingCurves;
-    private Knot deformingCurve;
+    private Controller controller;
+    private Player player;
     private string text;
 
     // Start is called before the first frame update
     void Start()
     {
-        MyController.SetUp(ref oculusTouch);
-        state = State.BasicDeform;
-        button = new ButtonConfig(oculusTouch);
-        Player.SetUp(oculusTouch, button);
-        Curve.SetUp(oculusTouch, button.draw, button.move);
-
-        curves = new List<Curve>();
-        preCurves = new List<Curve>();
-        drawingCurve = new Curve(new List<Vector3>(), false);
-        movingCurves = new List<int>();
+        this.controller = new Controller();
+        this.player = new Player(this.controller);
+        Curve.SetUp(this.controller.oculusTouch, this.controller.draw, this.controller.move);
     }
 
     // Update is called once per frame
     void Update()
     {
-        this.oculusTouch.UpdateFirst();
+        this.controller.oculusTouch.UpdateFirst();
 
-        text = state.ToString();
+        this.text = this.player.state.ToString();
 
-        if (state == State.BasicDeform && button.ValidBaseButtonInput())
+        if (this.player.state == State.BasicDeform && this.controller.ValidBaseButtonInput())
         {
-            Player.DeepCopy(curves, ref preCurves);
-            Player.ChangeState(ref curves, ref state, ref deformingCurve);
-            Player.Draw(ref drawingCurve, ref curves);
-            Player.Move(curves, ref movingCurves);
-            Player.Select(curves);
-            Player.Cut(ref curves);
-            Player.Combine(ref curves);
-            Player.Remove(ref curves);
-            Player.Undo(ref curves, preCurves);
+            this.player.DeepCopy();
+            this.player.ChangeState();
+            this.player.Draw();
+            this.player.Move();
+            this.player.Select();
+            this.player.Cut();
+            this.player.Combine();
+            this.player.Remove();
+            this.player.Undo();
         }
-        else if (state == State.ContiDeform)
+        else if (this.player.state == State.ContiDeform)
         {
-            Player.ChangeState(ref curves, ref state, ref deformingCurve);
-            deformingCurve.Update();
+            this.player.ChangeState();
+            this.player.deformingCurve.Update();
         }
 
-        Player.Display(curves);
+        this.player.Display();
         
-        this.oculusTouch.UpdateLast();
+        this.controller.oculusTouch.UpdateLast();
     }
 
     public void UpdateFixedInterface(FixedInterface.FixedInterfaceSetting setting)
     {
-        setting.text = text;
-        if (state == State.ContiDeform)
+        setting.text = this.text;
+        if (this.player.state == State.ContiDeform)
         {
-            deformingCurve.UpdateFixedInterface(setting);
+            this.player.deformingCurve.UpdateFixedInterface(setting);
         }
     }
 }
