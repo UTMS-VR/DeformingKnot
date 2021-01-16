@@ -8,11 +8,11 @@ namespace DrawCurve
 {
     public class Curve
     {
-        public List<Vector3> positions;
+        public List<Vector3> points;
         //public List<Vector3> momentum;
         public Mesh mesh;
-        public Mesh meshAtPositions;
-        public bool close;
+        public Mesh meshAtPoints;
+        public bool closed;
         public bool selected;
         public Vector3 position = Vector3.zero;
         public Quaternion rotation = Quaternion.identity;
@@ -24,16 +24,16 @@ namespace DrawCurve
         public static LogicalButton drawButton;
         public static LogicalButton moveButton;
 
-        public Curve(List<Vector3> positions, bool close, bool selected = false, float segment = 0.03f, int meridian = 10, float radius = 0.005f)
+        public Curve(List<Vector3> points, bool closed, bool selected = false, float segment = 0.03f, int meridian = 10, float radius = 0.005f)
         {
-            this.positions = positions;
+            this.points = points;
             //this.momentum = new List<Vector3>();
-            this.close = close;
+            this.closed = closed;
             this.selected = selected;
             this.segment = segment;
             this.meridian = meridian;
             this.radius = radius;
-            this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.close);
+            this.mesh = MakeMesh.GetMesh(this.points, this.meridian, this.radius, this.closed);
         }
 
         public static void SetUp(OculusTouch oculusTouch, LogicalButton drawButton, LogicalButton moveButton)
@@ -45,23 +45,22 @@ namespace DrawCurve
 
         public void MeshUpdate()
         {
-            this.mesh = MakeMesh.GetMesh(this.positions, this.meridian, this.radius, this.close);
+            this.mesh = MakeMesh.GetMesh(this.points, this.meridian, this.radius, this.closed);
         }
 
-        public void MeshAtPositionsUpdate()
+        public void MeshAtPointsUpdate()
         {
-            this.meshAtPositions = MakeMesh.GetMeshAtPositions(this.positions, this.radius * 2.0f);
+            this.meshAtPoints = MakeMesh.GetMeshAtPoints(this.points, this.radius * 2.0f);
         }
 
-        public void MeshAtEndPositionUpdate()
+        public void MeshAtEndPointUpdate()
         {
-            this.meshAtPositions = MakeMesh.GetMeshAtEndPosition(this.positions, this.radius * 2.0f);
+            this.meshAtPoints = MakeMesh.GetMeshAtEndPoint(this.points, this.radius * 2.0f);
         }
 
         /*public void MomentumInitialize()
         {
             this.momentum = new List<Vector3>();
-
             for (int i = 0; i < Length(); i++)
             {
                 this.momentum.Add(Vector3.zero);
@@ -70,7 +69,7 @@ namespace DrawCurve
 
         private int Length()
         {
-            return this.positions.Count;
+            return this.points.Count;
         }
 
         public float ArcLength()
@@ -79,12 +78,12 @@ namespace DrawCurve
 
             for (int i = 1; i < Length(); i++)
             {
-                arclength += Vector3.Distance(positions[i - 1], positions[i]);
+                arclength += Vector3.Distance(points[i - 1], points[i]);
             }
 
-            if (this.close)
+            if (this.closed)
             {
-                arclength += Vector3.Distance(positions[Length() - 1], positions[0]);
+                arclength += Vector3.Distance(points[Length() - 1], points[0]);
             }
 
             return arclength;
@@ -94,7 +93,7 @@ namespace DrawCurve
         {
             for (int i = 0; i < Length(); i++)
             {
-                this.positions[i] *= this.segment * Length() / ArcLength();
+                this.points[i] *= this.segment * Length() / ArcLength();
             }
         }
 
@@ -106,11 +105,11 @@ namespace DrawCurve
 
                 if (Length() == 0)
                 {
-                    this.positions.Add(nowPosition);
+                    this.points.Add(nowPosition);
                 }
-                else if (Vector3.Distance(this.positions.Last(), nowPosition) >= this.segment)
+                else if (Vector3.Distance(this.points.Last(), nowPosition) >= this.segment)
                 {
-                    this.positions.Add(nowPosition);
+                    this.points.Add(nowPosition);
                     this.MeshUpdate();
                 }
             }
@@ -139,7 +138,7 @@ namespace DrawCurve
 
         public void MoveSetUp(Vector3 position, Quaternion rotation)
         {
-            this.positions = this.positions.Select(v => v - position).Select(v => Quaternion.Inverse(rotation) * v).ToList();
+            this.points = this.points.Select(v => v - position).Select(v => Quaternion.Inverse(rotation) * v).ToList();
             MeshUpdate();
         }
 
@@ -151,7 +150,7 @@ namespace DrawCurve
 
         public void MoveCleanUp()
         {
-            this.positions = this.positions.Select(v => this.rotation * v).Select(v => v + this.position).ToList();
+            this.points = this.points.Select(v => this.rotation * v).Select(v => v + this.position).ToList();
             MeshUpdate();
             this.position = Vector3.zero;
             this.rotation = Quaternion.identity;
@@ -161,7 +160,7 @@ namespace DrawCurve
         {
             Vector3 nowPosition = oculusTouch.GetPositionR();
 
-            if (Distance(this.positions, nowPosition).Item2 < collision)
+            if (Distance(this.points, nowPosition).Item2 < collision)
             {
                 this.selected = !this.selected;
             }
@@ -169,68 +168,61 @@ namespace DrawCurve
 
         public void Close()
         {
-            if (Vector3.Distance(this.positions.First(), this.positions.Last()) < collision)
+            if (Vector3.Distance(this.points.First(), this.points.Last()) < collision)
             {
-                this.close = !this.close;
+                this.closed = !this.closed;
                 MeshUpdate();
             }
         }
 
         /*public void Optimize()
         {
-            DiscreteMoebius optimizer = new DiscreteMoebius(this.positions, this.momentum);
+            DiscreteMoebius optimizer = new DiscreteMoebius(this.points, this.momentum);
             
             for (int i = 0; i < this.Length(); i++)
             {
-                this.positions[i] -= this.momentum[i] + optimizer.gradient[i];
+                this.points[i] -= this.momentum[i] + optimizer.gradient[i];
             }
-
-            List<Vector3> tempPositions = new List<Vector3>();
-
+            List<Vector3> tempPoints = new List<Vector3>();
             for (int i = 0; i < this.Length(); i++)
             {
-                tempPositions.Add(this.positions[i]);
+                tempPoints.Add(this.points[i]);
             }
-
             while (true)
             {
-                Elasticity optimizer2 = new Elasticity(this.positions, this.momentum, this.segment);
+                Elasticity optimizer2 = new Elasticity(this.points, this.momentum, this.segment);
                 if (optimizer2.MaxError() < this.segment * 0.1f) break;
                 optimizer2.Flow();
             }
-
             for (int i = 0; i < this.Length(); i++)
             {
                 this.momentum[i] = (this.momentum[i] + optimizer.gradient[i]) * 0.95f
-                                    + (tempPositions[i] - this.positions[i]) * 0.3f;
+                                    + (tempPoints[i] - this.points[i]) * 0.3f;
             }
-
             DiscreteMoebius optimizer = new DiscreteMoebius(this);
             //Electricity optimizer = new Electricity(this);
             optimizer.MomentumFlow();
             //this.ScaleTranslation();
-
             while (true)
             {
                 Elasticity optimizer2 = new Elasticity(this);
                 if (optimizer2.MaxError() < this.segment * 0.1f) break;
                 optimizer2.MomentumFlow();
             }
-
             this.MeshUpdate();
-            this.MeshAtPositionsUpdate();
+            this.MeshAtPointsUpdate();
         }*/
 
         public List<Curve> Cut()
         {
             List<Curve> newCurves = new List<Curve>();
             Vector3 nowPosition = oculusTouch.GetPositionR();
-            (int, float) distance = Distance(this.positions, nowPosition);
+            (int, float) distance = Distance(this.points, nowPosition);
             int num = distance.Item1;
 
             if (distance.Item2 < collision)
             {
-                if (this.close)
+                if (this.closed)
                 {
                     newCurves.Add(CutKnot(num));
                 }
@@ -247,40 +239,40 @@ namespace DrawCurve
 
         private Curve CutKnot(int num)
         {
-            List<Vector3> newPositions = new List<Vector3>();
+            List<Vector3> newPoints = new List<Vector3>();
 
             for (int i = num + 1; i < Length(); i++)
             {
-                newPositions.Add(this.positions[i]);
+                newPoints.Add(this.points[i]);
             }
 
             for (int i = 0; i < num; i++)
             {
-                newPositions.Add(this.positions[i]);
+                newPoints.Add(this.points[i]);
             }
 
-            Curve cutKnot = new Curve(newPositions, false, selected: true);
+            Curve cutKnot = new Curve(newPoints, false, selected: true);
 
             return cutKnot;
         }
 
         private (Curve, Curve) CutCurve(int num)
         {
-            List<Vector3> newPositions1 = new List<Vector3>();
-            List<Vector3> newPositions2 = new List<Vector3>();
+            List<Vector3> newPoints1 = new List<Vector3>();
+            List<Vector3> newPoints2 = new List<Vector3>();
 
             for (int i = 0; i < num; i++)
             {
-                newPositions1.Add(this.positions[i]);
+                newPoints1.Add(this.points[i]);
             }
 
             for (int i = num + 1; i < Length(); i++)
             {
-                newPositions2.Add(this.positions[i]);
+                newPoints2.Add(this.points[i]);
             }
 
-            Curve newCurve1 = new Curve(newPositions1, false, selected: true);
-            Curve newCurve2 = new Curve(newPositions2, false, selected: true);
+            Curve newCurve1 = new Curve(newPoints1, false, selected: true);
+            Curve newCurve2 = new Curve(newPoints2, false, selected: true);
 
             return (newCurve1, newCurve2);
         }
@@ -288,54 +280,54 @@ namespace DrawCurve
         public static List<Curve> Combine(Curve curve1, Curve curve2)
         {
             List<Curve> newCurves = new List<Curve>();
-            List<Vector3> positions1 = curve1.positions;
-            List<Vector3> positions2 = curve2.positions;
-            AdjustOrientation(ref positions1, ref positions2);
+            List<Vector3> points1 = curve1.points;
+            List<Vector3> points2 = curve2.points;
+            AdjustOrientation(ref points1, ref points2);
 
-            if (Vector3.Distance(positions1.Last(), positions2.First()) < collision)
+            if (Vector3.Distance(points1.Last(), points2.First()) < collision)
             {
-                foreach (Vector3 v in positions2)
+                foreach (Vector3 v in points2)
                 {
-                    positions1.Add(v);
+                    points1.Add(v);
                 }
 
-                bool close = Vector3.Distance(positions1.First(), positions2.Last()) < collision ? true : false;
-                newCurves.Add(new Curve(positions1, close, selected: true));
+                bool closed = Vector3.Distance(points1.First(), points2.Last()) < collision ? true : false;
+                newCurves.Add(new Curve(points1, closed, selected: true));
             }
 
             return newCurves;
         }
 
-        private static void AdjustOrientation(ref List<Vector3> positions1, ref List<Vector3> positions2)
+        private static void AdjustOrientation(ref List<Vector3> points1, ref List<Vector3> points2)
         {
-            if (Vector3.Distance(positions1.Last(), positions2.Last()) < collision)
+            if (Vector3.Distance(points1.Last(), points2.Last()) < collision)
             {
-                positions2.Reverse();
+                points2.Reverse();
             }
-            else if (Vector3.Distance(positions1.First(), positions2.First()) < collision)
+            else if (Vector3.Distance(points1.First(), points2.First()) < collision)
             {
-                positions1.Reverse();
+                points1.Reverse();
             }
-            else if (Vector3.Distance(positions1.First(), positions2.Last()) < collision)
+            else if (Vector3.Distance(points1.First(), points2.Last()) < collision)
             {
-                positions1.Reverse();
-                positions2.Reverse();
+                points1.Reverse();
+                points2.Reverse();
             }
         }
 
-        public static (int, float) Distance(List<Vector3> positions, Vector3 position)
+        public static (int, float) Distance(List<Vector3> points, Vector3 position)
         {
-            List<Vector3> relPositions = positions.Select(v => v - position).ToList();
+            List<Vector3> relPoints = points.Select(v => v - position).ToList();
 
             int num = 0;
-            float min = relPositions[0].magnitude;
+            float min = relPoints[0].magnitude;
 
-            for (int i = 0; i < positions.Count - 1; i++)
+            for (int i = 0; i < points.Count - 1; i++)
             {
-                if (relPositions[i + 1].magnitude < min)
+                if (relPoints[i + 1].magnitude < min)
                 {
                     num = i + 1;
-                    min = relPositions[i + 1].magnitude;
+                    min = relPoints[i + 1].magnitude;
                 }
             }
 
@@ -344,14 +336,14 @@ namespace DrawCurve
 
         public float MinSegmentDist()
         {
-            List<Vector3> seq = this.positions;
+            List<Vector3> seq = this.points;
             int n = Length();
             float min = SegmentDist.SSDist(seq[0], seq[1], seq[2], seq[3]);
-            int endi = this.close ? n - 3 : n - 4;
+            int endi = this.closed ? n - 3 : n - 4;
 
             for (int i = 0; i <= endi; i++)
             {
-                int endj = (i == 0 && !this.close) ? n - 2 : n - 1;
+                int endj = (i == 0 && !this.closed) ? n - 2 : n - 1;
                 for (int j = i + 2; j <= endj; j++)
                 {
                     float dist = SegmentDist.SSDist(seq[i], seq[i + 1], seq[j], seq[(j + 1) % n]);
@@ -364,12 +356,12 @@ namespace DrawCurve
 
         public Curve DeepCopy()
         {
-            List<Vector3> positions = ListVector3Copy(this.positions);
-            Curve curve = new Curve(positions, this.close, segment: this.segment);
+            List<Vector3> points = ListVector3Copy(this.points);
+            Curve curve = new Curve(points, this.closed, segment: this.segment);
             //curve.momentum = ListVector3Copy(this.momentum);
             curve.mesh = this.mesh;
-            curve.meshAtPositions = this.meshAtPositions;
-            curve.close = this.close;
+            curve.meshAtPoints = this.meshAtPoints;
+            curve.closed = this.closed;
             curve.selected = this.selected;
             curve.position = Vector3Copy(this.position);
             curve.rotation = QuaternionCopy(this.rotation);
@@ -408,8 +400,8 @@ namespace DrawCurve
 
             for (int i = 0; i < Length(); i++)
             {
-                Vector3 next = this.positions[(i + 1) % Length()] - this.positions[i];
-                Vector3 previous = this.positions[i] - this.positions[(i + Length() - 1) % Length()];
+                Vector3 next = this.points[(i + 1) % Length()] - this.points[i];
+                Vector3 previous = this.points[i] - this.points[(i + Length() - 1) % Length()];
                 float cos = Vector3.Dot(next.normalized, previous.normalized);
                 if (cos < max) max = cos;
             }

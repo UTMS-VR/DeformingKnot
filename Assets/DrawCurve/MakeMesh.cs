@@ -8,20 +8,20 @@ namespace DrawCurve
     public static class MakeMesh
     {
         public static Material CurveMaterial = Resources.Load<Material>("MyPackage/DrawCurve/Curve");
-        public static Material PositionMaterial = Resources.Load<Material>("MyPackage/DrawCurve/Position");
+        public static Material PointMaterial = Resources.Load<Material>("MyPackage/DrawCurve/Point");
         public static Material SelectedCurveMaterial = Resources.Load<Material>("MyPackage/DrawCurve/SelectedCurve");
 
-        public static Mesh GetMesh(List<Vector3> positions, int meridian, float radius, bool closed)
+        public static Mesh GetMesh(List<Vector3> points, int meridian, float radius, bool closed)
         {
-            List<Vector3> positionsCopy = new List<Vector3>();
-            foreach (Vector3 v in positions)
+            List<Vector3> pointsCopy = new List<Vector3>();
+            foreach (Vector3 v in points)
             {
-                positionsCopy.Add(v);
+                pointsCopy.Add(v);
             }
 
             Mesh mesh = new Mesh();
 
-            if (positionsCopy.Count < 2)
+            if (pointsCopy.Count < 2)
             {
                 return mesh;
             }
@@ -32,12 +32,12 @@ namespace DrawCurve
 
             if (closed)
             {
-                positionsCopy.Add(positionsCopy[0]);
-                positionsCopy.Add(positionsCopy[1]);
+                pointsCopy.Add(pointsCopy[0]);
+                pointsCopy.Add(pointsCopy[1]);
             }
 
-            int length = positionsCopy.Count;
-            List<Vector3> tangents = Tangents(positionsCopy, closed);
+            int length = pointsCopy.Count;
+            List<Vector3> tangents = Tangents(pointsCopy, closed);
             List<Vector3> principalNormals = PrincipalNormals(tangents);
 
             for (int j = 0; j < length; j++)
@@ -48,7 +48,7 @@ namespace DrawCurve
                 {
                     float theta = i * 2 * Mathf.PI / meridian;
                     Vector3 direction = Mathf.Cos(theta) * principalNormals[j] + Mathf.Sin(theta) * binormal;
-                    vertices.Add(positionsCopy[j] + radius * direction);
+                    vertices.Add(pointsCopy[j] + radius * direction);
                     normals.Add(direction);
                 }
             }
@@ -63,14 +63,14 @@ namespace DrawCurve
         }
 
 
-        public static Mesh GetMeshAtPositions(List<Vector3> positions, float radius)
+        public static Mesh GetMeshAtPoints(List<Vector3> points, float radius)
         {
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
             var normals = new List<Vector3>();
-            foreach (Vector3 position in positions)
+            foreach (Vector3 point in points)
             {
-                var meshInfo = GetMeshInfoAtPosition(position, radius);
+                var meshInfo = GetMeshInfoAtPoint(point, radius);
                 int offset = vertices.Count;
                 vertices.AddRange(meshInfo.vertices);
                 triangles.AddRange(meshInfo.triangles.Select(i => i + offset));
@@ -85,11 +85,11 @@ namespace DrawCurve
             return mesh;
         }
 
-        public static Mesh GetMeshAtEndPosition(List<Vector3> positions, float radius)
+        public static Mesh GetMeshAtEndPoint(List<Vector3> points, float radius)
         {
             var mesh = new Mesh();
 
-            if (positions.Count == 0)
+            if (points.Count == 0)
             {
                 return mesh;
             }
@@ -98,7 +98,7 @@ namespace DrawCurve
             var triangles = new List<int>();
             var normals = new List<Vector3>();
 
-            var meshInfo = GetMeshInfoAtPosition(positions[0], radius);
+            var meshInfo = GetMeshInfoAtPoint(points[0], radius);
             vertices.AddRange(meshInfo.vertices);
             triangles.AddRange(meshInfo.triangles);
             normals.AddRange(meshInfo.normals);
@@ -110,18 +110,18 @@ namespace DrawCurve
             return mesh;
         }
 
-        private static (List<Vector3> vertices, List<int> triangles, List<Vector3> normals) GetMeshInfoAtPosition(Vector3 position, float radius)
+        private static (List<Vector3> vertices, List<int> triangles, List<Vector3> normals) GetMeshInfoAtPoint(Vector3 point, float radius)
         {
             float r = radius;
 
             var vertices = new List<Vector3>
             {
-                position + new Vector3(r, 0, 0),
-                position + new Vector3(0, r, 0),
-                position + new Vector3(-r, 0, 0),
-                position + new Vector3(0, -r, 0),
-                position + new Vector3(0, 0, r),
-                position + new Vector3(0, 0, -r)
+                point + new Vector3(r, 0, 0),
+                point + new Vector3(0, r, 0),
+                point + new Vector3(-r, 0, 0),
+                point + new Vector3(0, -r, 0),
+                point + new Vector3(0, 0, r),
+                point + new Vector3(0, 0, -r)
             };
 
             var triangles = new List<int>
@@ -149,13 +149,13 @@ namespace DrawCurve
             return (vertices, triangles, normals);
         }
 
-        public static List<Vector3> Tangents(List<Vector3> positions, bool closed)
+        public static List<Vector3> Tangents(List<Vector3> points, bool closed)
         {
             List<Vector3> tangents = new List<Vector3>();
 
-            for (int i = 0; i < positions.Count - 1; i++)
+            for (int i = 0; i < points.Count - 1; i++)
             {
-                tangents.Add((positions[i + 1] - positions[i]).normalized);
+                tangents.Add((points[i + 1] - points[i]).normalized);
             }
 
             if (closed)

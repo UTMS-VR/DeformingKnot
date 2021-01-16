@@ -52,7 +52,7 @@ public class SurfaceTest : MonoBehaviour
 
         if (oculusTouch.GetButtonDown(LogicalOVRInput.RawButton.X))
         {
-            surface = new Surface(curve.positions, 5);
+            surface = new Surface(curve.points, 5);
             surface.MeshUpdate();
         }
 

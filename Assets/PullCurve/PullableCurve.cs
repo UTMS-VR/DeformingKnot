@@ -24,7 +24,7 @@ public class PullableCurve
         float radius = 0.05f,
         float distanceThreshold = -1)
     {
-        AdjustParameter.Shift(ref points, chosenPoints.first);
+        points = AdjustParameter.Shift(points, chosenPoints.first);
         int count = (chosenPoints.second - chosenPoints.first + 1 + points.Count) % points.Count;
         this.pullablePoints = points.Take(count).ToList();
         this.remainingPoints = points.Skip(count).ToList();
@@ -151,10 +151,10 @@ public class PullableCurve
 
     public static float CurveDistance(List<Vector3> seq1, bool closed, Curve curve)
     {
-        List<Vector3> seq2 = curve.positions;
+        List<Vector3> seq2 = curve.points;
         float min = SegmentDist.SSDist(seq1[0], seq1[1], seq2[0], seq2[1]);
         int end1 = closed ? seq1.Count - 1 : seq1.Count - 2;
-        int end2 = curve.close ? seq2.Count - 1 : seq2.Count - 2;
+        int end2 = curve.closed ? seq2.Count - 1 : seq2.Count - 2;
 
         for (int i = 0; i <= end1; i++)
         {

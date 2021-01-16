@@ -115,10 +115,10 @@ class KnotStatePull : IKnotState
         // collisionPoints = collisionPoints.Concat(this.collisionPoints).ToList();
         this.pullableCurve.Update(this.collisionCurves);
         Mesh knotMesh = this.pullableCurve.GetMesh();
-        // Mesh pointsMesh = MakeMesh.GetMeshAtPositions(this.pullableCurve.GetPoints(), this.data.radius * 3); 
+        // Mesh pointsMesh = MakeMesh.GetMeshAtPoints(this.pullableCurve.GetPoints(), this.data.radius * 3); 
         Graphics.DrawMesh(knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
-        // Graphics.DrawMesh(pointsMesh, Vector3.zero, Quaternion.identity, MakeMesh.PositionMaterial, 0);
-        // this.pointMesh = MakeMesh.GetMeshAtPositions(collisionPoints, this.radius * 2);
+        // Graphics.DrawMesh(pointsMesh, Vector3.zero, Quaternion.identity, MakeMesh.PointMaterial, 0);
+        // this.pointMesh = MakeMesh.GetMeshAtPoints(collisionPoints, this.radius * 2);
 
         if (this.data.oculusTouch.GetButtonDown(this.data.selectButton))
         {
@@ -170,11 +170,11 @@ class KnotStateChoose1 : IKnotState
     public IKnotState Update()
     {
         int ind1 = KnotStateChoose1.FindClosestPoint(this.data.oculusTouch, this.data.points);
-        var positions = new List<Vector3>() { this.data.points[ind1] };
-        Mesh pointMesh = MakeMesh.GetMeshAtPositions(positions, this.data.radius * 3);
+        var chosenPoints = new List<Vector3>() { this.data.points[ind1] };
+        Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 3);
 
         Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
-        Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, MakeMesh.PositionMaterial, 0);
+        Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, MakeMesh.PointMaterial, 0);
 
         if (this.data.oculusTouch.GetButtonDown(this.data.selectButton))
         {
@@ -228,14 +228,14 @@ class KnotStateChoose2 : IKnotState
     public IKnotState Update()
     {
         int ind2 = KnotStateChoose1.FindClosestPoint(this.data.oculusTouch, this.data.points);
-        var positions = new List<Vector3>() {
+        var chosenPoints = new List<Vector3>() {
                     this.data.points[this.ind1],
                     this.data.points[ind2]
                 };
-        Mesh pointMesh = MakeMesh.GetMeshAtPositions(positions, this.data.radius * 3);
+        Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 3);
 
         Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
-        Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, MakeMesh.PositionMaterial, 0);
+        Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, MakeMesh.PointMaterial, 0);
 
         if (this.data.oculusTouch.GetButtonDown(this.data.selectButton))
         {
@@ -282,7 +282,7 @@ class KnotStateOptimize : IKnotState
     {
         this.data = data;
         this.newPoints = data.points;
-        AdjustParameter.Equalize(ref this.newPoints, this.data.distanceThreshold, true);
+        this.newPoints = AdjustParameter.Equalize(this.newPoints, this.data.distanceThreshold, true);
         this.momentum = new List<Vector3>();
 
         for (int i = 0; i < this.newPoints.Count; i++)
@@ -361,11 +361,11 @@ class KnotStateOptimize : IKnotState
             this.newPoints[i] -= this.momentum[i] + optimizer1.gradient[i];
         }
 
-        List<Vector3> tempPositions = new List<Vector3>();
+        List<Vector3> tempPoints = new List<Vector3>();
 
         for (int i = 0; i < this.newPoints.Count; i++)
         {
-            tempPositions.Add(this.newPoints[i]);
+            tempPoints.Add(this.newPoints[i]);
         }
 
         while (true)
@@ -378,7 +378,7 @@ class KnotStateOptimize : IKnotState
         for (int i = 0; i < this.newPoints.Count; i++)
         {
             this.momentum[i] = (this.momentum[i] + optimizer1.gradient[i]) * 0.95f
-                                + (tempPositions[i] - this.newPoints[i]) * 0.3f;
+                                + (tempPoints[i] - this.newPoints[i]) * 0.3f;
         }*/
 
         DiscreteMoebius optimizer1 = new DiscreteMoebius(this.newPoints, this.momentum);

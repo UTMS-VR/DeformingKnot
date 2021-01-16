@@ -57,10 +57,10 @@ public class Player
             List<Curve> selection = this.curves.Where(curve => curve.selected).ToList();
 
             if (this.controller.oculusTouch.GetButtonDown(this.controller.changeState)
-                && selection.Count == 1 && selection[0].close)
+                && selection.Count == 1 && selection[0].closed)
             {
                 this.state = State.ContiDeform;
-                this.deformingCurve = new Knot(selection[0].positions, this.controller.oculusTouch,
+                this.deformingCurve = new Knot(selection[0].points, this.controller.oculusTouch,
                                           meridian: selection[0].meridian,
                                           radius: selection[0].radius,
                                           distanceThreshold: selection[0].segment,
@@ -84,7 +84,7 @@ public class Player
 
         if (this.controller.oculusTouch.GetButtonUp(this.controller.draw))
         {
-            if (this.drawingCurve.positions.Count >= 2)
+            if (this.drawingCurve.points.Count >= 2)
             {
                 this.curves.Add(this.drawingCurve);
             }
@@ -92,7 +92,7 @@ public class Player
             this.drawingCurve = new Curve(new List<Vector3>(), false);
         }
         
-        if (this.drawingCurve.positions.Count >= 2)
+        if (this.drawingCurve.points.Count >= 2)
         {
             Graphics.DrawMesh(this.drawingCurve.mesh, this.drawingCurve.position, this.drawingCurve.rotation, MakeMesh.CurveMaterial, 0);
         }
@@ -106,7 +106,7 @@ public class Player
         {
             for (int i = 0; i < this.curves.Count; i++)
             {
-                if (Curve.Distance(this.curves[i].positions, nowPosition).Item2 < Curve.collision)
+                if (Curve.Distance(this.curves[i].points, nowPosition).Item2 < Curve.collision)
                 {
                     this.movingCurves.Add(i);
                 }
@@ -168,7 +168,7 @@ public class Player
             {
                 selection[0].Close();
             }
-            else if (selection.Count == 2 && !selection[0].close && !selection[1].close)
+            else if (selection.Count == 2 && !selection[0].closed && !selection[1].closed)
             {
                 List<Curve> newCurves = Curve.Combine(selection[0], selection[1]);
 
@@ -200,8 +200,8 @@ public class Player
             {
                 if (oculusTouch.GetButtonDown(button.optimize))
                 {
-                    float tempSegment = AdjustParameter.TemporarySegment(curve.positions, curve.segment, curve.close);
-                    AdjustParameter.Equalize(ref curve.positions, curve.segment, curve.close);
+                    float tempSegment = AdjustParameter.TemporarySegment(curve.points, curve.segment, curve.closed);
+                    AdjustParameter.Equalize(ref curve.points, curve.segment, curve.closed);
                     curve.segment = tempSegment;
                     curve.MomentumInitialize();
                 }
@@ -216,12 +216,12 @@ public class Player
 
             foreach (Curve curve in selection)
             {
-                float tempSegment = AdjustParameter.TemporarySegment(curve.positions, curve.segment, curve.close);
-                AdjustParameter.Equalize(ref curve.positions, curve.segment, curve.close);
+                float tempSegment = AdjustParameter.TemporarySegment(curve.points, curve.segment, curve.closed);
+                AdjustParameter.Equalize(ref curve.points, curve.segment, curve.closed);
                 curve.segment = tempSegment;
                 curve.MomentumInitialize();
                 curve.MeshUpdate();
-                curve.MeshAtPositionsUpdate();
+                curve.MeshAtPointsUpdate();
             }
         }
 
@@ -234,7 +234,7 @@ public class Player
                 DiscreteMoebius optimizer = new DiscreteMoebius(curve);
                 optimizer.MomentumFlow();
                 curve.MeshUpdate();
-                curve.MeshAtPositionsUpdate();
+                curve.MeshAtPointsUpdate();
             }
         }
 
@@ -252,7 +252,7 @@ public class Player
                 }
 
                 curve.MeshUpdate();
-                curve.MeshAtPositionsUpdate();
+                curve.MeshAtPointsUpdate();
             }
         }
     }*/
