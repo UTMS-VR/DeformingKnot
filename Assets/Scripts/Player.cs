@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DrawCurve;
-using DebugUtil;
+using InputManager;
 
 public enum State
 {
@@ -11,125 +11,135 @@ public enum State
     ContiDeform
 }
 
-public static class Player
+public class Player
 {
-    public static Controller controller;
-    public static ButtonConfig button;
+    public Controller controller;
+    public State state;
+    private List<Curve> curves;
+    private List<Curve> preCurves;
+    private Curve drawingCurve;
+    private List<int> movingCurves;
+    public Knot deformingCurve;
 
-    public static void SetUp(Controller argController, ButtonConfig argButton)
+    public Player(Controller controller)
     {
-        controller = argController;
-        button = argButton;
+        this.controller = controller;
+        this.state = State.BasicDeform;
+        this.curves = new List<Curve>();
+        this.preCurves = new List<Curve>();
+        this.drawingCurve = new Curve(new List<Vector3>(), false);
+        this.movingCurves = new List<int>();
     }
 
-    public static void DeepCopy(List<Curve> curves, ref List<Curve> preCurves)
+    public void DeepCopy()
     {
-        if (controller.GetButtonDown(button.changeState)
-            || controller.GetButtonDown(button.draw)
-            || controller.GetButtonDown(button.move)
-            || controller.GetButtonDown(button.select)
-            || controller.GetButtonDown(button.cut)
-            || controller.GetButtonDown(button.combine)
-            || controller.GetButtonDown(button.remove))
+        if (this.controller.oculusTouch.GetButtonDown(this.controller.changeState)
+            || this.controller.oculusTouch.GetButtonDown(this.controller.draw)
+            || this.controller.oculusTouch.GetButtonDown(this.controller.move)
+            || this.controller.oculusTouch.GetButtonDown(this.controller.select)
+            || this.controller.oculusTouch.GetButtonDown(this.controller.cut)
+            || this.controller.oculusTouch.GetButtonDown(this.controller.combine)
+            || this.controller.oculusTouch.GetButtonDown(this.controller.remove))
         {
-            preCurves = new List<Curve>();
+            this.preCurves = new List<Curve>();
 
-            foreach (Curve curve in curves)
+            foreach (Curve curve in this.curves)
             {
-                preCurves.Add(curve.DeepCopy());
+                this.preCurves.Add(curve.DeepCopy());
             }
         }
     }
 
-    public static void ChangeState(ref List<Curve> curves, ref State state, ref Knot deformingCurve)
+    public void ChangeState()
     {
-        if (state == State.BasicDeform)
+        if (this.state == State.BasicDeform)
         {
-            List<Curve> selection = curves.Where(curve => curve.selected).ToList();
+            List<Curve> selection = this.curves.Where(curve => curve.selected).ToList();
 
-            if (controller.GetButtonDown(button.changeState) && selection.Count == 1 && selection[0].close)
+            if (this.controller.oculusTouch.GetButtonDown(this.controller.changeState)
+                && selection.Count == 1 && selection[0].closed)
             {
-                state = State.ContiDeform;
-                deformingCurve = new Knot(selection[0].positions, controller,
+                this.state = State.ContiDeform;
+                this.deformingCurve = new Knot(selection[0].points, this.controller.oculusTouch,
                                           meridian: selection[0].meridian,
                                           radius: selection[0].radius,
                                           distanceThreshold: selection[0].segment,
                                           collisionCurves: new List<Curve>());
-                curves.Remove(selection[0]);
+                this.curves.Remove(selection[0]);
             }
         }
-        else if (state == State.ContiDeform)
+        else if (this.state == State.ContiDeform)
         {
-            if (controller.GetButtonDown(button.changeState))
+            if (this.controller.oculusTouch.GetButtonDown(this.controller.changeState))
             {
-                state = State.BasicDeform;
-                curves.Add(new Curve(deformingCurve.GetPoints(), true, selected: true));
+                this.state = State.BasicDeform;
+                this.curves.Add(new Curve(this.deformingCurve.GetPoints(), true, selected: true));
             }
         }
     }
 
-    public static void Draw(ref Curve curve, ref List<Curve> curves)
+    public void Draw()
     {
-        curve.Draw();
+        this.drawingCurve.Draw();
 
-        if (controller.GetButtonUp(button.draw))
+        if (this.controller.oculusTouch.GetButtonUp(this.controller.draw))
         {
-            if (curve.positions.Count >= 2)
+            if (this.drawingCurve.points.Count >= 2)
             {
-                curves.Add(curve);
+                this.curves.Add(this.drawingCurve);
             }
 
-            curve = new Curve(new List<Vector3>(), false);
+            this.drawingCurve = new Curve(new List<Vector3>(), false);
         }
         
-        if (curve.positions.Count >= 2)
+        if (this.drawingCurve.points.Count >= 2)
         {
-            Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, MakeMesh.CurveMaterial, 0);
+            Graphics.DrawMesh(this.drawingCurve.mesh, this.drawingCurve.position, this.drawingCurve.rotation, MakeMesh.CurveMaterial, 0);
         }
     }
 
-    public static void Move(List<Curve> curves, ref List<int> movingCurves)
+    public void Move()
     {
-        Vector3 nowPosition = controller.rightHand.GetPosition();
+        Vector3 nowPosition = this.controller.oculusTouch.GetPositionR();
 
-        if (controller.GetButtonDown(button.move))
+        if (this.controller.oculusTouch.GetButtonDown(this.controller.move))
         {
-            for (int i = 0; i < curves.Count; i++)
+            for (int i = 0; i < this.curves.Count; i++)
             {
-                if (Curve.Distance(curves[i].positions, nowPosition).Item2 < Curve.collision)
+                if (Curve.Distance(this.curves[i].points, nowPosition).Item2 < Curve.collision)
                 {
-                    movingCurves.Add(i);
+                    this.movingCurves.Add(i);
                 }
             }
         }
 
-        foreach (int i in movingCurves)
+        foreach (int i in this.movingCurves)
         {
-            curves[i].Move();
+            this.curves[i].Move();
         }
         
-        if (controller.GetButtonUp(button.move))
+        if (this.controller.oculusTouch.GetButtonUp(this.controller.move))
         {
-            movingCurves = new List<int>();
+            this.movingCurves = new List<int>();
         }
     }
 
-    public static void Select(List<Curve> curves)
+    public void Select()
     {
-        if (controller.GetButtonDown(button.select))
+        if (this.controller.oculusTouch.GetButtonDown(this.controller.select))
         {
-            for (int i = 0; i < curves.Count; i++)
+            for (int i = 0; i < this.curves.Count; i++)
             {
-                curves[i].Select();
+                this.curves[i].Select();
             }
         }
     }
 
-    public static void Cut(ref List<Curve> curves)
+    public void Cut()
     {
-        if (controller.GetButtonDown(button.cut))
+        if (this.controller.oculusTouch.GetButtonDown(this.controller.cut))
         {
-            List<Curve> selection = curves.Where(curve => curve.selected).ToList();
+            List<Curve> selection = this.curves.Where(curve => curve.selected).ToList();
 
             if (selection.Count == 1)
             {
@@ -137,61 +147,61 @@ public static class Player
 
                 if (newCurves.Count != 0)
                 {
-                    curves.Remove(selection[0]);
+                    this.curves.Remove(selection[0]);
                     
                     foreach (Curve curve in newCurves)
                     {
-                        curves.Add(curve);
+                        this.curves.Add(curve);
                     }
                 }
             }
         }
     }
 
-    public static void Combine(ref List<Curve> curves)
+    public void Combine()
     {
-        if (controller.GetButtonDown(button.combine))
+        if (this.controller.oculusTouch.GetButtonDown(this.controller.combine))
         {
-            List<Curve> selection = curves.Where(curve => curve.selected).ToList();
+            List<Curve> selection = this.curves.Where(curve => curve.selected).ToList();
 
             if (selection.Count == 1)
             {
                 selection[0].Close();
             }
-            else if (selection.Count == 2 && !selection[0].close && !selection[1].close)
+            else if (selection.Count == 2 && !selection[0].closed && !selection[1].closed)
             {
                 List<Curve> newCurves = Curve.Combine(selection[0], selection[1]);
 
                 if (newCurves.Count != 0)
                 {
-                    curves.Remove(selection[0]);
-                    curves.Remove(selection[1]);
-                    curves.Add(newCurves[0]);
+                    this.curves.Remove(selection[0]);
+                    this.curves.Remove(selection[1]);
+                    this.curves.Add(newCurves[0]);
                 }
             }
         }
     }
 
-    public static void Remove(ref List<Curve> curves)
+    public void Remove()
     {
-        if (controller.GetButtonDown(button.remove))
+        if (this.controller.oculusTouch.GetButtonDown(this.controller.remove))
         {
-            curves = curves.Where(curve => !curve.selected).ToList();
+            this.curves = this.curves.Where(curve => !curve.selected).ToList();
         }
     }
 
     /*public static void Optimize(List<Curve> curves)
     {
-        if (controller.GetButton(button.optimize))
+        if (oculusTouch.GetButton(button.optimize))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
             foreach (Curve curve in selection)
             {
-                if (controller.GetButtonDown(button.optimize))
+                if (oculusTouch.GetButtonDown(button.optimize))
                 {
-                    float tempSegment = AdjustParameter.TemporarySegment(curve.positions, curve.segment, curve.close);
-                    AdjustParameter.Equalize(ref curve.positions, curve.segment, curve.close);
+                    float tempSegment = AdjustParameter.TemporarySegment(curve.points, curve.segment, curve.closed);
+                    AdjustParameter.Equalize(ref curve.points, curve.segment, curve.closed);
                     curve.segment = tempSegment;
                     curve.MomentumInitialize();
                 }
@@ -200,22 +210,22 @@ public static class Player
             }
         }
 
-        if (controller.GetButtonDown(button.remove))
+        if (oculusTouch.GetButtonDown(button.remove))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
             foreach (Curve curve in selection)
             {
-                float tempSegment = AdjustParameter.TemporarySegment(curve.positions, curve.segment, curve.close);
-                AdjustParameter.Equalize(ref curve.positions, curve.segment, curve.close);
+                float tempSegment = AdjustParameter.TemporarySegment(curve.points, curve.segment, curve.closed);
+                AdjustParameter.Equalize(ref curve.points, curve.segment, curve.closed);
                 curve.segment = tempSegment;
                 curve.MomentumInitialize();
                 curve.MeshUpdate();
-                curve.MeshAtPositionsUpdate();
+                curve.MeshAtPointsUpdate();
             }
         }
 
-        if (controller.GetButtonDown(button.optimize))
+        if (oculusTouch.GetButtonDown(button.optimize))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
@@ -224,11 +234,11 @@ public static class Player
                 DiscreteMoebius optimizer = new DiscreteMoebius(curve);
                 optimizer.MomentumFlow();
                 curve.MeshUpdate();
-                curve.MeshAtPositionsUpdate();
+                curve.MeshAtPointsUpdate();
             }
         }
 
-        if (controller.GetButtonDown(button.undo))
+        if (oculusTouch.GetButtonDown(button.undo))
         {
             List<Curve> selection = curves.Where(curve => curve.selected).ToList();
 
@@ -242,22 +252,22 @@ public static class Player
                 }
 
                 curve.MeshUpdate();
-                curve.MeshAtPositionsUpdate();
+                curve.MeshAtPointsUpdate();
             }
         }
     }*/
 
-    public static void Undo(ref List<Curve> curves, List<Curve> preCurves)
+    public void Undo()
     {
-        if (controller.GetButtonDown(button.undo))
+        if (this.controller.oculusTouch.GetButtonDown(this.controller.undo))
         {
-            curves = preCurves;
+            this.curves = this.preCurves;
         }
     }
 
-    public static void Display(List<Curve> curves)
+    public void Display()
     {
-        foreach (Curve curve in curves)
+        foreach (Curve curve in this.curves)
         {
             Material material = curve.selected ? MakeMesh.SelectedCurveMaterial : MakeMesh.CurveMaterial;
             Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, material, 0);
