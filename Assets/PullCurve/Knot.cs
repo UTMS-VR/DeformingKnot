@@ -15,7 +15,7 @@ public class Knot
         float radius = 0.1f,
         float distanceThreshold = -1,
         List<Curve> collisionCurves = null
-        )
+    )
     {
         int count = points.Count;
         (int first, int second) chosenPoints = (count / 3, 2 * count / 3);

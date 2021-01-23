@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DrawCurve;
 using InputManager;
+using FileManager;
 
 public class Main : MonoBehaviour
 {
@@ -42,6 +43,7 @@ public class Main : MonoBehaviour
         else if (this.player.state == State.ContiDeform)
         {
             this.player.ChangeState();
+            this.player.Select();
             this.player.deformingCurve.Update();
         }
 

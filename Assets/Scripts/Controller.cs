@@ -14,6 +14,9 @@ public class Controller
     public LogicalButton combine;
     public LogicalButton remove;
     public LogicalButton undo;
+    public LogicalButton pull;
+    public LogicalButton energy;
+
     public Controller()
     {
         this.oculusTouch = new OculusTouch
@@ -32,6 +35,8 @@ public class Controller
         this.combine = LogicalOVRInput.RawButton.X;
         this.remove = LogicalOVRInput.RawButton.Y;
         this.undo = LogicalOVRInput.RawButton.LHandTrigger;
+        this.pull = LogicalOVRInput.RawButton.X;
+        this.energy = LogicalOVRInput.RawButton.Y;
     }
 
     private static ButtonMap LiteralKeysPlus

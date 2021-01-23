@@ -4,7 +4,7 @@ using UnityEngine;
 using DrawCurve;
 
 // 暗黙の仮定：隣接する2点の間隔は一定
-public class DiscreteMoebius
+public class Moebius
 {
     private List<Vector3> pos;
     private List<Vector3> momentum;
@@ -15,7 +15,7 @@ public class DiscreteMoebius
     private float alpha = 0.95f;
     public List<Vector3> gradient;
 
-    public DiscreteMoebius(List<Vector3> positions, List<Vector3> momentum)
+    public Moebius(List<Vector3> positions, List<Vector3> momentum)
     {
         this.pos = positions;
         this.momentum = momentum;

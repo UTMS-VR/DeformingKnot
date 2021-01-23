@@ -35,7 +35,7 @@ class KnotData
         LogicalButton selectButton,
         LogicalButton cancelButton,
         LogicalButton optimizeButton
-        )
+    )
     {
         this.points = points;
         this.chosenPoints = chosenPoints;
@@ -320,7 +320,7 @@ class KnotStateOptimize : IKnotState
 
         if (this.data.oculusTouch.GetButton(LogicalOVRInput.RawButton.RHandTrigger) && !selfIntersection)
         {
-            DiscreteMoebius optimizer1 = new DiscreteMoebius(this.newPoints, this.momentum);
+            Moebius optimizer1 = new Moebius(this.newPoints, this.momentum);
             optimizer1.Flow();
 
             while (true)
@@ -381,7 +381,7 @@ class KnotStateOptimize : IKnotState
                                 + (tempPoints[i] - this.newPoints[i]) * 0.3f;
         }*/
 
-        DiscreteMoebius optimizer1 = new DiscreteMoebius(this.newPoints, this.momentum);
+        Moebius optimizer1 = new Moebius(this.newPoints, this.momentum);
         optimizer1.MomentumFlow();
 
         while (true)

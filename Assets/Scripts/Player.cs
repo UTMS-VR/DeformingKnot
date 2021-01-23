@@ -15,11 +15,12 @@ public class Player
 {
     public Controller controller;
     public State state;
-    private List<Curve> curves;
+    public List<Curve> curves;
     private List<Curve> preCurves;
     private Curve drawingCurve;
     private List<int> movingCurves;
     public Knot deformingCurve;
+    public Optimize optimizer;
 
     public Player(Controller controller)
     {
@@ -54,27 +55,38 @@ public class Player
     {
         if (this.state == State.BasicDeform)
         {
-            List<Curve> selection = this.curves.Where(curve => curve.selected).ToList();
-
-            if (this.controller.oculusTouch.GetButtonDown(this.controller.changeState)
-                && selection.Count == 1 && selection[0].closed)
+            bool closed = true;
+            foreach (Curve curve in this.curves)
             {
-                this.state = State.ContiDeform;
-                this.deformingCurve = new Knot(selection[0].points, this.controller.oculusTouch,
-                                          meridian: selection[0].meridian,
-                                          radius: selection[0].radius,
-                                          distanceThreshold: selection[0].segment,
-                                          collisionCurves: new List<Curve>());
-                this.curves.Remove(selection[0]);
+                if (!curve.closed) closed = false;
             }
+            if (closed) this.state = State.ContiDeform;
         }
         else if (this.state == State.ContiDeform)
         {
-            if (this.controller.oculusTouch.GetButtonDown(this.controller.changeState))
-            {
-                this.state = State.BasicDeform;
-                this.curves.Add(new Curve(this.deformingCurve.GetPoints(), true, selected: true));
-            }
+            this.state = State.BasicDeform;
+        }
+    }
+
+    public void SelectHowToDeform()
+    {
+        List<Curve> selection = this.curves.Where(curve => curve.selected).ToList();
+
+        if (this.controller.oculusTouch.GetButtonDown(this.controller.pull) && selection.Count == 1)
+        {
+            this.deformingCurve = new Knot(selection[0].points, this.controller.oculusTouch,
+                                        meridian: selection[0].meridian,
+                                        radius: selection[0].radius,
+                                        distanceThreshold: selection[0].segment,
+                                        collisionCurves: new List<Curve>());
+            this.curves.Remove(selection[0]);
+        }
+        else if (this.controller.oculusTouch.GetButtonDown(this.controller.energy))
+        {
+            this.optimizer = new Optimize(this.curves,
+                                          this.controller.oculusTouch,
+                                          LogicalOVRInput.RawButton.X,
+                                          LogicalOVRInput.RawButton.Y);
         }
     }
 
