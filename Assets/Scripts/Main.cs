@@ -9,55 +9,41 @@ using FileManager;
 
 public class Main : MonoBehaviour
 {
-    private Controller controller;
-    private Player player;
-    private string text;
+    private OculusTouch oculusTouch;
+    private State state;
 
-    // Start is called before the first frame update
     void Start()
     {
-        this.controller = new Controller();
-        this.player = new Player(this.controller);
-        Curve.SetUp(this.controller.oculusTouch, this.controller.draw, this.controller.move);
+        this.oculusTouch = new OculusTouch
+        (
+            buttonMap: LiteralKeysPlus,
+            rightStickKey: PredefinedMaps.WASD,
+            rightHandKey: PredefinedMaps.OKLSemiIComma,
+            handScale: 0.03f,
+            handSpeed: 0.01f
+        );
+        this.state = new BasicDeformation(oculusTouch, new List<Curve>());
     }
 
-    // Update is called once per frame
     void Update()
     {
-        this.controller.oculusTouch.UpdateFirst();
-
-        this.text = this.player.state.ToString();
-
-        if (this.player.state == State.BasicDeform && this.controller.ValidBaseButtonInput())
-        {
-            this.player.DeepCopy();
-            this.player.ChangeState();
-            this.player.Draw();
-            this.player.Move();
-            this.player.Select();
-            this.player.Cut();
-            this.player.Combine();
-            this.player.Remove();
-            this.player.Undo();
-        }
-        else if (this.player.state == State.ContiDeform)
-        {
-            this.player.ChangeState();
-            this.player.Select();
-            this.player.deformingCurve.Update();
-        }
-
-        this.player.Display();
-        
-        this.controller.oculusTouch.UpdateLast();
+        this.oculusTouch.UpdateFirst();
+        State newState = this.state.Update();
+        if (newState != null) this.state = newState;
+        this.state.Display();
+        this.oculusTouch.UpdateFirst();
     }
 
-    public void UpdateFixedInterface(FixedInterface.FixedInterfaceSetting setting)
+    private static ButtonMap LiteralKeysPlus
+    = new ButtonMap(new List<(LogicalButton logicalButton, IPhysicalButton physicalButton)>
     {
-        setting.text = this.text;
-        if (this.player.state == State.ContiDeform)
-        {
-            this.player.deformingCurve.UpdateFixedInterface(setting);
-        }
-    }
+        ( LogicalOVRInput.RawButton.A, new PhysicalKey(KeyCode.A) ),
+        ( LogicalOVRInput.RawButton.B, new PhysicalKey(KeyCode.B) ),
+        ( LogicalOVRInput.RawButton.X, new PhysicalKey(KeyCode.X) ),
+        ( LogicalOVRInput.RawButton.Y, new PhysicalKey(KeyCode.Y) ),
+        ( LogicalOVRInput.RawButton.RIndexTrigger, new PhysicalKey(KeyCode.R) ),
+        ( LogicalOVRInput.RawButton.RHandTrigger, new PhysicalKey(KeyCode.E) ),
+        ( LogicalOVRInput.RawButton.LIndexTrigger, new PhysicalKey(KeyCode.Q) ),
+        ( LogicalOVRInput.RawButton.LHandTrigger, new PhysicalKey(KeyCode.W) )
+    });
 }

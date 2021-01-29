@@ -7,18 +7,17 @@ using InputManager;
 
 public class Optimize
 {
-    public List<Curve> newCurves;
-    public OculusTouch oculusTouch;
-    public LogicalButton button1;
-    public LogicalButton button2;
+    private OculusTouch oculusTouch;
+    private List<Curve> newCurves;
+    private LogicalButton button1;
+    private LogicalButton button2;
 
-    public Optimize(List<Curve> curves,
-                    OculusTouch oculusTouch,
+    public Optimize(OculusTouch oculusTouch,
+                    List<Curve> newCurves,
                     LogicalButton button1,
                     LogicalButton button2)
     {
-        this.newCurves = curves.Where(curve => curve.selected).ToList();
-        curves = curves.Where(curve => !curve.selected).ToList();
+        this.newCurves = newCurves;
         this.oculusTouch = oculusTouch;
 
         for (int i = 0; i < this.newCurves.Count; i++)
@@ -98,5 +97,10 @@ public class Optimize
             curve.MeshUpdate();
             Graphics.DrawMesh(curve.mesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
         }
+    }
+
+    public List<Curve> GetCurves()
+    {
+        return this.newCurves;
     }
 }
