@@ -8,20 +8,31 @@ public class Knot
 {
     private IKnotState state;
 
+
     public Knot(
         List<Vector3> points,
         OculusTouch oculusTouch,
         int meridian = 20,
         float radius = 0.1f,
         float distanceThreshold = -1,
-        List<Curve> collisionCurves = null
+        List<Curve> collisionCurves = null,
+        LogicalButton buttonA = null,
+        LogicalButton buttonB = null,
+        LogicalButton buttonC = null,
+        LogicalButton buttonD = null
     )
     {
+        buttonA = buttonA ?? LogicalOVRInput.RawButton.A;
+        buttonB = buttonB ?? LogicalOVRInput.RawButton.B;
+        buttonC = buttonC ?? LogicalOVRInput.RawButton.RIndexTrigger;
+        buttonD = buttonD ?? LogicalOVRInput.RawButton.RHandTrigger;
         int count = points.Count;
         (int first, int second) chosenPoints = (count / 3, 2 * count / 3);
         KnotData data = new KnotData(points, chosenPoints, oculusTouch, radius, meridian, distanceThreshold, collisionCurves,
-                        LogicalOVRInput.RawButton.A, LogicalOVRInput.RawButton.B, LogicalOVRInput.RawButton.RIndexTrigger);
+            buttonA, buttonB, buttonC, buttonD);
         this.state = new KnotStateBase(data);
+
+        Curve.SetUp(oculusTouch, drawButton: buttonC, moveButton: buttonD);
     }
 
     public void Update()
@@ -42,7 +53,7 @@ public class Knot
 
     public void UpdateFixedInterface(FixedInterface.FixedInterfaceSetting setting)
     {
-        setting.text += " " + this.state.ToString();
+        setting.text = this.state.ToString();
     }
 
 }

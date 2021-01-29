@@ -7,43 +7,60 @@ using DrawCurve;
 
 public class PullableCurve
 {
+    // private List<Vector3> initialPoints;
     private List<Vector3> pullablePoints;
-    private List<Vector3> remainingPoints;
-    private OculusTouch oculusTouch;
-    private Vector3 controllerPosition;
+    private List<Vector3> fixedPoints;
+    private float distanceThreshold;
     private List<float> weights;
+    private OculusTouch oculusTouch;
+    // private Vector3 initialVRCpoint;
+    private Vector3 controllerPosition;
     private int meridian;
     private float radius;
-    private float distanceThreshold;
+    // private Material material;
+    bool closed;
 
     public PullableCurve(
-        List<Vector3> points,
-        (int first, int second) chosenPoints,
+        List<Vector3> pullablePoints,
+        List<Vector3> fixedPoints,
         OculusTouch oculusTouch,
-        int meridian = 10,
-        float radius = 0.05f,
+        // Material material,
+        List<float> weights = null,
+        int meridian = 20,
+        float radius = 0.1f,
+        bool closed = false,
         float distanceThreshold = -1)
     {
-        points = AdjustParameter.Shift(points, chosenPoints.first);
-        int count = (chosenPoints.second - chosenPoints.first + 1 + points.Count) % points.Count;
-        this.pullablePoints = points.Take(count).ToList();
-        this.remainingPoints = points.Skip(count).ToList();
         this.oculusTouch = oculusTouch;
         this.controllerPosition = oculusTouch.GetPositionR();
-        this.weights = this.GetWeights();
-        this.meridian = meridian;
-        this.radius = radius;
-
+        this.pullablePoints = pullablePoints;
+        this.fixedPoints = fixedPoints;
         if (distanceThreshold <= 0)
         {
-            this.distanceThreshold = AdjustParameter.ArcLength(points, true) / points.Count;
+            this.distanceThreshold = PullableCurve.DistanceAverage(this.pullablePoints);
         }
         else
         {
             this.distanceThreshold = distanceThreshold;
+        }        
+        if (weights == null)
+        {
+            this.weights = PullableCurve.GetWeights(this.pullablePoints.Count);
         }
+        else
+        {
+            if (weights.Count != this.pullablePoints.Count)
+            {
+                Debug.Log("PullableCurveのコンストラクタの引数において、weightsの長さとpullablePointsの長さが一致していません");
+                throw new System.Exception("PullableCurveのコンストラクタの引数において、weightsとpullablePointsの長さが一致していません");
+            }
+            this.weights = weights;
+        }        
+        // this.material = material;
+        this.meridian = meridian;
+        this.radius = radius;
+        this.closed = closed;
     }
-
     public static PullableCurve Line(Vector3 start, Vector3 end, int numPoints, OculusTouch oculusTouch)
     {
         var points = new List<Vector3>();
@@ -53,39 +70,12 @@ public class PullableCurve
             Vector3 p = (1.0f - t) * start + t * end;
             points.Add(p);
         }
-        return new PullableCurve(points, (0, numPoints - 1), oculusTouch);
+        return new PullableCurve(points, new List<Vector3>(), oculusTouch);
     }
 
     public List<Vector3> GetPoints()
     {
-        return this.pullablePoints.Concat(this.remainingPoints).ToList();
-    }
-
-    private float BumpFunction(float t)
-    {
-        float theta = Mathf.PI * (2 * t - 1);
-        return (Mathf.Cos(theta) + 1) / 2;
-    }
-
-    private List<float> GetWeights()
-    {
-        List<float> weights = new List<float>();
-        weights.Add(0);
-        float arc = AdjustParameter.ArcLength(this.pullablePoints, false);
-        float accDist = 0;
-
-        for (int i = 1; i < this.pullablePoints.Count; i++)
-        {
-            accDist += Vector3.Distance(this.pullablePoints[i - 1], this.pullablePoints[i]);
-            weights.Add(BumpFunction(accDist / arc));
-        }
-
-        return weights;
-    }
-
-    public Mesh GetMesh()
-    {
-        return MakeMesh.GetMesh(this.pullablePoints.Concat(this.remainingPoints).ToList(), this.meridian, this.radius, true);
+        return this.pullablePoints.Concat(this.fixedPoints).ToList();
     }
 
     public int GetCount()
@@ -93,47 +83,66 @@ public class PullableCurve
         return this.pullablePoints.Count;
     }
 
+    private static float BumpFunction(float t)
+    {
+        float theta = Mathf.PI * (2 * t - 1);
+        return (Mathf.Cos(theta) + 1) / 2;
+    }
+
+    public static List<float> GetWeights(int numPoints)
+    {
+        int n = numPoints - 1;
+        return Enumerable.Range(0, numPoints).Select(i => PullableCurve.BumpFunction((float)i / n)).ToList();
+    }
+
+    public Mesh GetMesh()
+    {
+        return MakeMesh.GetMesh(this.GetPoints(), this.meridian, this.radius, this.closed);
+    }
+
     public void Update(List<Curve> collisionCurves = null)
     {
+        this.UpdatePoints(collisionCurves);
+        this.NormalizePoints();
+        //Mesh mesh = MakeMesh.GetMesh(this.points, this.meridian, this.radius, this.closed);
+        //Mesh meshAtPoints = MakeMesh.GetMeshAtPoints(this.points, this.radius * 2.0f);
+        //Graphics.DrawMesh(mesh, Vector3.zero, Quaternion.identity, MakeMesh.CurveMaterial, 0);
+        //Graphics.DrawMesh(meshAtPoints, Vector3.zero, Quaternion.identity, MakeMesh.PointMaterial, 0);
+    }
+
+    void UpdatePoints(List<Curve> collisionCurves = null)
+    {
+        float epsilon = this.distanceThreshold * 0.2f;
         Vector3 controllerNewPosition = this.oculusTouch.GetPositionR();
-        Vector3 oculusTouchMove = controllerNewPosition - this.controllerPosition;
-
-        if (this.distanceThreshold * 0.2f < oculusTouchMove.magnitude)
+        Vector3 vrControllerMove = controllerNewPosition - this.controllerPosition;
+        if (epsilon < vrControllerMove.magnitude)
         {
-            oculusTouchMove = oculusTouchMove.normalized * this.distanceThreshold * 0.2f;
+            vrControllerMove = vrControllerMove.normalized * epsilon;
         }
-
         this.controllerPosition = controllerNewPosition;
 
-        List<Vector3> newPullablePoints = this.UpdatePoints(oculusTouchMove);
-        List<Vector3> newPoints = newPullablePoints.Concat(remainingPoints).ToList();
-        if (newPoints.Count >= 4 && MinSegmentDist(newPoints, true) <= this.distanceThreshold * 0.2f) return;
-
-        foreach (Curve curve in collisionCurves)
-        {
-            if (CurveDistance(newPoints, true, curve) <= this.distanceThreshold * 0.2f) return;
-        }
-        
-        this.pullablePoints = newPullablePoints;
-        this.NormalizePoints();
-    }
-
-    List<Vector3> UpdatePoints(Vector3 oculusTouchMove)
-    {
-        List<Vector3> newPoints = new List<Vector3>();
-
+        List<Vector3> newPullablePoints = new List<Vector3>();
         for (int i = 0; i < this.pullablePoints.Count; i++)
         {
-            newPoints.Add(this.pullablePoints[i] + oculusTouchMove * this.weights[i]);
+            newPullablePoints.Add(this.pullablePoints[i] + vrControllerMove * this.weights[i]);
         }
 
-        return newPoints;
+        List<Vector3> newPoints = newPullablePoints.Concat(this.fixedPoints).ToList();
+        if (newPoints.Count >= 4 && PullableCurve.MinSegmentDist(newPoints, true) <= epsilon) return;
+        if (collisionCurves != null)
+        {
+            foreach (Curve curve in collisionCurves)
+            {
+                if (PullableCurve.CurveDistance(newPoints, curve.points, true, curve.closed) <= epsilon) return;
+            }
+        }
+        this.pullablePoints = newPullablePoints;
     }
 
-    public static float MinSegmentDist(List<Vector3> seq, bool closed)
+    public static float MinSegmentDist(List<Vector3> points, bool closed)
     {
-        int n = seq.Count;
-        float min = SegmentDist.SSDist(seq[0], seq[1], seq[2], seq[3]);
+        int n = points.Count;
+        float min = SegmentDist.SSDist(points[0], points[1], points[2], points[3]);
         int endi = closed ? n - 3 : n - 4;
 
         for (int i = 0; i <= endi; i++)
@@ -141,7 +150,7 @@ public class PullableCurve
             int endj = (i == 0 || !closed) ? n - 2 : n - 1;
             for (int j = i + 2; j <= endj; j++)
             {
-                float dist = SegmentDist.SSDist(seq[i], seq[i + 1], seq[j], seq[(j + 1) % n]);
+                float dist = SegmentDist.SSDist(points[i], points[i + 1], points[j], points[(j + 1) % n]);
                 if (dist < min) min = dist;
             }
         }
@@ -149,18 +158,17 @@ public class PullableCurve
         return min;
     }
 
-    public static float CurveDistance(List<Vector3> seq1, bool closed, Curve curve)
+    public static float CurveDistance(List<Vector3> points1, List<Vector3> points2, bool closed1, bool closed2)
     {
-        List<Vector3> seq2 = curve.points;
-        float min = SegmentDist.SSDist(seq1[0], seq1[1], seq2[0], seq2[1]);
-        int end1 = closed ? seq1.Count - 1 : seq1.Count - 2;
-        int end2 = curve.closed ? seq2.Count - 1 : seq2.Count - 2;
+        float min = SegmentDist.SSDist(points1[0], points1[1], points2[0], points2[1]);
+        int end1 = closed1 ? points1.Count - 1 : points1.Count - 2;
+        int end2 = closed2 ? points2.Count - 1 : points2.Count - 2;
 
         for (int i = 0; i <= end1; i++)
         {
             for (int j = 0; j <= end2; j++)
             {
-                float dist = SegmentDist.SSDist(seq1[i], seq1[(i + 1) % seq1.Count], seq2[j], seq2[(j + 1) % seq2.Count]);
+                float dist = SegmentDist.SSDist(points1[i], points1[(i + 1) % points1.Count], points2[j], points2[(j + 1) % points2.Count]);
                 if (dist < min) min = dist;
             }
         }
@@ -170,115 +178,96 @@ public class PullableCurve
 
     void NormalizePoints()
     {
-        NormalizePoints_Remove(ref this.pullablePoints, ref this.weights);
-        NormalizePoints_Add(ref this.pullablePoints, ref this.weights);
-        // AdjustParameter.Equalize(ref deformingPoints, this.distanceThreshold, false);
-        // this.weights = this.GetWeights();
+        this.NormalizePoints_Remove();
+        this.NormalizePoints_Add();
     }
 
-    /*List<Vector3> NormalizePoints_Remove(List<Vector3> seq)
+    void NormalizePoints_Remove()
     {
-        var newSeq = new List<Vector3>();
-        int n = seq.Count;
+        // float ave = this.DistanceAverage();
+        var newPoints = new List<Vector3>();
+        var newWeights = new List<float>();
+        int n = this.pullablePoints.Count;
         float accumDist = 0;
         // i = 0
-        newSeq.Add(seq[0]);
+        newPoints.Add(this.pullablePoints[0]);
+        newWeights.Add(this.weights[0]);
         // 1 <= i < n - 1
         for (int i = 1; i < n - 1; i++)
         {
-            accumDist += Vector3.Distance(seq[i - 1], seq[i]);
+            accumDist += Vector3.Distance(this.pullablePoints[i - 1], this.pullablePoints[i]);
             if (accumDist > this.distanceThreshold / 2)
             {
-                newSeq.Add(seq[i]);
+                newPoints.Add(this.pullablePoints[i]);
+                newWeights.Add(this.weights[i]);
                 accumDist = 0;
             }
         }
         // i = n - 1
-        newSeq.Add(seq[n - 1]);
-
-        return newSeq;
+        newPoints.Add(this.pullablePoints[n - 1]);
+        newWeights.Add(this.weights[n - 1]);
+        this.pullablePoints = newPoints;
+        this.weights = newWeights;
     }
 
-    List<Vector3> NormalizePoints_Add(List<Vector3> seq)
+    void NormalizePoints_Add()
     {
-        var newSeq = new List<Vector3>();
-        int n = seq.Count;
+        // float ave = this.DistanceAverage();
+        var newPoints = new List<Vector3>();
+        var newWeights = new List<float>();
+        int n = this.pullablePoints.Count;
         // i = 0
-        newSeq.Add(seq[0]);
+        newPoints.Add(this.pullablePoints[0]);
+        newWeights.Add(this.weights[0]);
         // i <= i < n
         for (int i = 1; i < n; i++)
         {
-            if (Vector3.Distance(seq[i - 1], seq[i]) > 2 * this.distanceThreshold)
+            if ( Vector3.Distance(this.pullablePoints[i - 1], this.pullablePoints[i]) > 2 * this.distanceThreshold)
             {
-                Vector3 addedPoint = (seq[i - 1] + seq[i]) / 2;
-                newSeq.Add(addedPoint);
-                newSeq.Add(seq[i]);
+                Vector3 addedPoint = (this.pullablePoints[i - 1] + this.pullablePoints[i]) / 2;
+                float addedWeight = (this.weights[i - 1] + this.weights[i]) / 2;
+                newPoints.Add(addedPoint);
+                newWeights.Add(addedWeight);
+                newPoints.Add(this.pullablePoints[i]);
+                newWeights.Add(this.weights[i]);
             }
             else
             {
-                newSeq.Add(seq[i]);
+                newPoints.Add(this.pullablePoints[i]);
+                newWeights.Add(this.weights[i]);
             }
         }
-
-        return newSeq;
-    }*/
-
-    void NormalizePoints_Remove(ref List<Vector3> seq, ref List<float> wseq)
-    {
-        var newSeq = new List<Vector3>();
-        var newWseq = new List<float>();
-        int n = seq.Count;
-        float accumDist = 0;
-        // i = 0
-        newSeq.Add(seq[0]);
-        newWseq.Add(wseq[0]);
-        // 1 <= i < n - 1
-        for (int i = 1; i < n - 1; i++)
-        {
-            accumDist += Vector3.Distance(seq[i - 1], seq[i]);
-            if (accumDist > this.distanceThreshold / 2)
-            {
-                newSeq.Add(seq[i]);
-                newWseq.Add(wseq[i]);
-                accumDist = 0;
-            }
-        }
-        // i = n - 1
-        newSeq.Add(seq[n - 1]);
-        newWseq.Add(wseq[n - 1]);
-
-        seq = newSeq;
-        wseq = newWseq;
+        this.pullablePoints = newPoints;
+        this.weights = newWeights;
     }
 
-    void NormalizePoints_Add(ref List<Vector3> seq, ref List<float> wseq)
+    private static float DistanceAverage(List<Vector3> points)
     {
-        var newSeq = new List<Vector3>();
-        var newWseq = new List<float>();
-        int n = seq.Count;
-        // i = 0
-        newSeq.Add(seq[0]);
-        newWseq.Add(wseq[0]);
-        // i <= i < n
-        for (int i = 1; i < n; i++)
+        float distanceSum = 0;
+        int n = points.Count;
+        for (int i = 0; i < n; i++)
         {
-            if (Vector3.Distance(seq[i - 1], seq[i]) > 2 * this.distanceThreshold)
+            if (i < n - 1)
             {
-                Vector3 addedPoint = (seq[i - 1] + seq[i]) / 2;
-                float addedWeight = (wseq[i - 1] + wseq[i]) / 2;
-                newSeq.Add(addedPoint);
-                newWseq.Add(addedWeight);
-                newSeq.Add(seq[i]);
-                newWseq.Add(wseq[i]);
+                distanceSum += Vector3.Distance(points[i], points[i + 1]);
             }
             else
             {
-                newSeq.Add(seq[i]);
-                newWseq.Add(wseq[i]);
+                distanceSum += Vector3.Distance(points[n - 1], points[0]);
             }
         }
-
-        seq = newSeq;
-        wseq = newWseq;
+        return distanceSum / n;
     }
+
+//    private float BumpFunction(float t)
+//    {
+//        if (t < 0.5f)
+//        {
+//            return 2 * t;
+//        }
+//        else
+//        {
+//            return 2 - 2 * t;
+//        }
+//    }
 }

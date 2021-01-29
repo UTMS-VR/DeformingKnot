@@ -48,14 +48,14 @@ public class Optimize
 
             for (int j = i + 1; j < count; j++)
             {
-                if (PullableCurve.CurveDistance(this.newCurves[i].points, true, this.newCurves[j]) <= segment * epsilon)
+                if (PullableCurve.CurveDistance(this.newCurves[i].points, this.newCurves[j].points, true, true) <= segment * epsilon)
                 intersection = true;
                 break;
             }
 
             foreach (Curve curve in collisionCurves)
             {
-                if (PullableCurve.CurveDistance(this.newCurves[i].points, true, curve) <= segment * epsilon)
+                if (PullableCurve.CurveDistance(this.newCurves[i].points, curve.points, true, curve.closed) <= segment * epsilon)
                 intersection = true;
                 break;
             }

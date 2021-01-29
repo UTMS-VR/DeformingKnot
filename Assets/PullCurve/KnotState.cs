@@ -20,9 +20,10 @@ class KnotData
     public readonly float radius;
     public readonly float distanceThreshold;
     public readonly List<Curve> collisionCurves;
-    public readonly LogicalButton selectButton;
-    public readonly LogicalButton cancelButton;
-    public readonly LogicalButton optimizeButton;
+    public readonly LogicalButton buttonA;
+    public readonly LogicalButton buttonB;
+    public readonly LogicalButton buttonC;
+    public readonly LogicalButton buttonD;
 
     public KnotData(
         List<Vector3> points,
@@ -32,10 +33,11 @@ class KnotData
         int meridian,
         float distanceThreshold,
         List<Curve> collisionCurves,
-        LogicalButton selectButton,
-        LogicalButton cancelButton,
-        LogicalButton optimizeButton
-    )
+        LogicalButton buttonA = null,
+        LogicalButton buttonB = null,
+        LogicalButton buttonC = null,
+        LogicalButton buttonD = null
+        )
     {
         this.points = points;
         this.chosenPoints = chosenPoints;
@@ -44,9 +46,10 @@ class KnotData
         this.radius = radius;
         this.distanceThreshold = distanceThreshold;
         this.collisionCurves = collisionCurves;
-        this.selectButton = selectButton;
-        this.cancelButton = cancelButton;
-        this.optimizeButton = optimizeButton;
+        this.buttonA = buttonA ?? LogicalOVRInput.RawButton.A;
+        this.buttonB = buttonB ?? LogicalOVRInput.RawButton.B;
+        this.buttonC = buttonC ?? LogicalOVRInput.RawButton.RIndexTrigger;
+        this.buttonD = buttonD ?? LogicalOVRInput.RawButton.RHandTrigger;
     }
 }
 
@@ -67,18 +70,17 @@ class KnotStateBase : IKnotState
     {
         Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
 
-        if (this.data.oculusTouch.GetButtonDown(this.data.selectButton))
+        if (this.data.oculusTouch.GetButtonDown(this.data.buttonA))
         {
             return new KnotStatePull(this.data);
         }
-        else if (this.data.oculusTouch.GetButtonDown(this.data.cancelButton))
+        else if (this.data.oculusTouch.GetButtonDown(this.data.buttonB))
         {
             return new KnotStateChoose1(this.data);
         }
-        else if (this.data.oculusTouch.GetButtonDown(this.data.optimizeButton)
-                || this.data.oculusTouch.GetButtonDown(LogicalOVRInput.RawButton.RHandTrigger))
+        else if (this.data.oculusTouch.GetButtonDown(this.data.buttonC))
         {
-            return new KnotStateOptimize(this.data);
+            return new KnotStateDraw(this.data);
         }
 
         return null;
@@ -100,12 +102,13 @@ class KnotStatePull : IKnotState
     {
         this.data = data;
         this.collisionCurves = this.data.collisionCurves;
-        this.pullableCurve = new PullableCurve(this.data.points,
-                                                this.data.chosenPoints,
-                                                this.data.oculusTouch,
-                                                meridian: this.data.meridian,
-                                                radius: this.data.radius,
-                                                distanceThreshold: this.data.distanceThreshold);
+        int count = this.data.points.Count;
+        List<Vector3> shiftedPoints = AdjustParameter.Shift(this.data.points, this.data.chosenPoints.first);
+        int pullableRange = (this.data.chosenPoints.second - this.data.chosenPoints.first + 1 + count) % count;
+        List<Vector3> pullablePoints = shiftedPoints.Take(pullableRange).ToList();
+        List<Vector3> fixedPoints = shiftedPoints.Skip(pullableRange).ToList();
+        this.pullableCurve = new PullableCurve(pullablePoints, fixedPoints, this.data.oculusTouch, closed: true,
+            meridian: this.data.meridian, radius: this.data.radius, distanceThreshold: this.data.distanceThreshold);
     }
 
     public IKnotState Update()
@@ -115,18 +118,16 @@ class KnotStatePull : IKnotState
         // collisionPoints = collisionPoints.Concat(this.collisionPoints).ToList();
         this.pullableCurve.Update(this.collisionCurves);
         Mesh knotMesh = this.pullableCurve.GetMesh();
-        // Mesh pointsMesh = MakeMesh.GetMeshAtPoints(this.pullableCurve.GetPoints(), this.data.radius * 3); 
         Graphics.DrawMesh(knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
-        // Graphics.DrawMesh(pointsMesh, Vector3.zero, Quaternion.identity, MakeMesh.PointMaterial, 0);
         // this.pointMesh = MakeMesh.GetMeshAtPoints(collisionPoints, this.radius * 2);
 
-        if (this.data.oculusTouch.GetButtonDown(this.data.selectButton))
+        if (this.data.oculusTouch.GetButtonDown(this.data.buttonA))
         {
             this.data.points = this.pullableCurve.GetPoints();
             this.data.chosenPoints = (0, this.pullableCurve.GetCount() - 1);
             return new KnotStateBase(this.data);
         }
-        else if (this.data.oculusTouch.GetButton(this.data.cancelButton))
+        else if (this.data.oculusTouch.GetButton(this.data.buttonB))
         {
             return new KnotStateBase(this.data);
         }
@@ -136,7 +137,7 @@ class KnotStatePull : IKnotState
 
     public List<Vector3> GetPoints()
     {
-        return this.pullableCurve.GetPoints();
+        return this.data.points;
     }
 
     private List<Vector3> GetCompliment(int start, int end)
@@ -171,16 +172,16 @@ class KnotStateChoose1 : IKnotState
     {
         int ind1 = KnotStateChoose1.FindClosestPoint(this.data.oculusTouch, this.data.points);
         var chosenPoints = new List<Vector3>() { this.data.points[ind1] };
-        Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 3);
+        Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 2);
 
         Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
         Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, MakeMesh.PointMaterial, 0);
 
-        if (this.data.oculusTouch.GetButtonDown(this.data.selectButton))
+        if (this.data.oculusTouch.GetButtonDown(this.data.buttonA))
         {
             return new KnotStateChoose2(this.data, ind1);
         }
-        else if (this.data.oculusTouch.GetButtonDown(this.data.cancelButton))
+        else if (this.data.oculusTouch.GetButtonDown(this.data.buttonB))
         {
             return new KnotStateBase(this.data);
         }
@@ -196,12 +197,12 @@ class KnotStateChoose1 : IKnotState
     public static int FindClosestPoint(OculusTouch oculusTouch, List<Vector3> points)
     {
         // KnotStateChoose2 からも呼び出せるように static メソッドにした
-        Vector3 oculusTouchPosition = oculusTouch.GetPositionR();
+        Vector3 controllerPosition = oculusTouch.GetPositionR();
         int closestIndex = 0;
-        float closestDistance = Vector3.Distance(points[closestIndex], oculusTouchPosition);
+        float closestDistance = Vector3.Distance(points[closestIndex], controllerPosition);
         for (int i = 1; i < points.Count; i++)
         {
-            float distance = Vector3.Distance(points[i], oculusTouchPosition);
+            float distance = Vector3.Distance(points[i], controllerPosition);
             if (distance < closestDistance)
             {
                 closestIndex = i;
@@ -232,19 +233,19 @@ class KnotStateChoose2 : IKnotState
                     this.data.points[this.ind1],
                     this.data.points[ind2]
                 };
-        Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 3);
+        Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 2);
 
         Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
         Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, MakeMesh.PointMaterial, 0);
 
-        if (this.data.oculusTouch.GetButtonDown(this.data.selectButton))
+        if (this.data.oculusTouch.GetButtonDown(this.data.buttonA))
         {
             this.data.chosenPoints = KnotStateChoose2.ChooseShorterPath(
                 (this.ind1, ind2), this.data.points.Count);
             // this.chosenPoints = this.currentPoints;  // ←そのままの順序で選ぶ場合
             return new KnotStateBase(this.data);
         }
-        else if (this.data.oculusTouch.GetButtonDown(this.data.cancelButton))
+        else if (this.data.oculusTouch.GetButtonDown(this.data.buttonB))
         {
             return new KnotStateBase(this.data);
         }
@@ -272,74 +273,47 @@ class KnotStateChoose2 : IKnotState
     }
 }
 
-class KnotStateOptimize : IKnotState
+class KnotStateDraw : IKnotState
 {
     private KnotData data;
-    private List<Vector3> newPoints;
-    private List<Vector3> momentum;
+    private Curve drawnCurve;
 
-    public KnotStateOptimize(KnotData data)
+    public KnotStateDraw(KnotData data)
     {
         this.data = data;
-        this.newPoints = data.points;
-        this.newPoints = AdjustParameter.Equalize(this.newPoints, this.data.distanceThreshold, true);
-        this.momentum = new List<Vector3>();
-
-        for (int i = 0; i < this.newPoints.Count; i++)
-        {
-            this.momentum.Add(Vector3.zero);
-        }
+        this.drawnCurve = new Curve(
+            points: this.data.points,
+            closed: true,
+            segment: this.data.distanceThreshold / 2,
+            radius: this.data.radius
+            );
     }
 
     public IKnotState Update()
     {
-        bool selfIntersection = false;
-        if (this.newPoints.Count >= 4
-            && PullableCurve.MinSegmentDist(this.newPoints, true) <= this.data.distanceThreshold * 0.2f)
+        if (this.data.oculusTouch.GetButtonDown(this.data.buttonC))
         {
-            selfIntersection = true;
+            // start drawing new curve
+            this.drawnCurve.points = new List<Vector3>();
+            this.drawnCurve.closed = false;
         }
-        foreach (Curve curve in this.data.collisionCurves)
+        if (!this.drawnCurve.closed)
         {
-            if (PullableCurve.CurveDistance(this.newPoints, true, curve) <= this.data.distanceThreshold * 0.2f)
-            selfIntersection = true;
+            this.drawnCurve.Draw();
         }
+        this.drawnCurve.Move();
 
-        if (this.data.oculusTouch.GetButton(this.data.optimizeButton) && !selfIntersection)
+        Mesh knotMesh = this.drawnCurve.mesh;
+        Vector3 position = this.drawnCurve.position;
+        Quaternion rotation = this.drawnCurve.rotation;
+        Graphics.DrawMesh(knotMesh, position, rotation, MakeMesh.SelectedCurveMaterial, 0);
+
+        if (this.data.oculusTouch.GetButtonDown(this.data.buttonA))
         {
-            this.Optimize();
-        }
-        else if (this.data.oculusTouch.GetButtonUp(this.data.optimizeButton))
-        {
-            this.momentum = new List<Vector3>();
-            for (int i = 0; i < this.newPoints.Count; i++)
-            {
-                this.momentum.Add(Vector3.zero);
-            }
-        }
-
-        if (this.data.oculusTouch.GetButton(LogicalOVRInput.RawButton.RHandTrigger) && !selfIntersection)
-        {
-            Moebius optimizer1 = new Moebius(this.newPoints, this.momentum);
-            optimizer1.Flow();
-
-            while (true)
-            {
-                Elasticity optimizer2 = new Elasticity(this.newPoints, this.momentum, this.data.distanceThreshold);
-                if (optimizer2.MaxError() < this.data.distanceThreshold * 0.1f) break;
-                optimizer2.Flow();
-            }
-        }
-
-        Mesh knotMesh = MakeMesh.GetMesh(this.newPoints, this.data.meridian, this.data.radius, true);
-        Graphics.DrawMesh(knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
-
-        if (this.data.oculusTouch.GetButtonDown(this.data.selectButton))
-        {
-            this.data.points = this.newPoints;
+            this.data.points = this.drawnCurve.points;
             return new KnotStateBase(this.data);
         }
-        else if (this.data.oculusTouch.GetButtonDown(this.data.cancelButton))
+        else if (this.data.oculusTouch.GetButtonDown(this.data.buttonB))
         {
             return new KnotStateBase(this.data);
         }
@@ -349,46 +323,6 @@ class KnotStateOptimize : IKnotState
 
     public List<Vector3> GetPoints()
     {
-        return this.newPoints;
-    }
-
-    private void Optimize()
-    {
-        /*DiscreteMoebius optimizer1 = new DiscreteMoebius(this.newPoints, this.momentum);
-
-        for (int i = 0; i < this.newPoints.Count; i++)
-        {
-            this.newPoints[i] -= this.momentum[i] + optimizer1.gradient[i];
-        }
-
-        List<Vector3> tempPoints = new List<Vector3>();
-
-        for (int i = 0; i < this.newPoints.Count; i++)
-        {
-            tempPoints.Add(this.newPoints[i]);
-        }
-
-        while (true)
-        {
-            Elasticity optimizer2 = new Elasticity(this.newPoints, this.momentum, this.data.distanceThreshold);
-            if (optimizer2.MaxError() < this.data.distanceThreshold * 0.1f) break;
-            optimizer2.Flow();
-        }
-
-        for (int i = 0; i < this.newPoints.Count; i++)
-        {
-            this.momentum[i] = (this.momentum[i] + optimizer1.gradient[i]) * 0.95f
-                                + (tempPoints[i] - this.newPoints[i]) * 0.3f;
-        }*/
-
-        Moebius optimizer1 = new Moebius(this.newPoints, this.momentum);
-        optimizer1.MomentumFlow();
-
-        while (true)
-        {
-            Elasticity optimizer2 = new Elasticity(this.newPoints, this.momentum, this.data.distanceThreshold);
-            if (optimizer2.MaxError() < this.data.distanceThreshold * 0.1f) break;
-            optimizer2.Flow();
-        }
+        return this.data.points;
     }
 }
