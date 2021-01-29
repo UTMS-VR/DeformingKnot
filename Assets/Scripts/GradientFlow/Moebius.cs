@@ -6,264 +6,154 @@ using DrawCurve;
 // 暗黙の仮定：隣接する2点の間隔は一定
 public class Moebius
 {
-    private List<Vector3> pos;
-    private List<Vector3> momentum;
-    private int len;
-    private float arc;
-    private float seg;
+    private List<List<Vector3>> pointsList;
+    private List<List<Vector3>> momentumList;
+    private List<int> countList;
+    private List<float> arcList;
+    private List<float> segmentList;
+    private int count;
     private float lr = 1e-05f; // longitude 64, segment 0.03f -> 1e-05f;
     private float alpha = 0.95f;
-    public List<Vector3> gradient;
+    private List<List<Vector3>> gradientList;
 
-    public Moebius(List<Vector3> positions, List<Vector3> momentum)
+    public Moebius(List<List<Vector3>> pointsList, List<List<Vector3>> momentumList)
     {
-        this.pos = positions;
-        this.momentum = momentum;
-        this.len = positions.Count;
-        this.arc = ArcLength();
-        this.seg = this.arc / this.len;
-        this.gradient = Gradient();
+        this.pointsList = pointsList;
+        this.momentumList = momentumList;
+        this.countList = new List<int>();
+        this.arcList = new List<float>();
+        this.segmentList = new List<float>();
+        this.count = this.pointsList.Count;
+        for (int i = 0; i < this.count; i++)
+        {
+            this.countList.Add(this.pointsList[i].Count);
+            this.arcList.Add(this.ArcLength(this.pointsList[i]));
+            this.segmentList.Add(this.arcList[i] / this.countList[i]);
+        }
+        this.gradientList = Gradient();
     }
 
     public void Flow()
     {
-        for (int i = 0; i < this.len; i++)
+        for (int i = 0; i < this.count; i++)
         {
-            this.pos[i] -= this.gradient[i];
+            for (int j = 0; j < this.countList[i]; j++)
+            {
+                this.pointsList[i][j] -= this.gradientList[i][j];
+            }
         }
     }
 
     // momentum SGD
     public void MomentumFlow()
     {
-        for (int i = 0; i < this.len; i++)
+        for (int i = 0; i < this.count; i++)
         {
-            this.momentum[i] = this.alpha * this.momentum[i] + this.gradient[i];
-            this.pos[i] -= this.momentum[i];
-        }
-    }
-
-    public List<Vector3> Gradient()
-    {
-        float energy = AuxiliaryEnergy();
-        List<Vector3> gradient = new List<Vector3>();
-
-        for (int i = 0; i < this.len; i++)
-        {
-            Vector3 first = new Vector3(0, 0, 0);
-
-            for (int j = 1; j < this.len; j++)
+            for (int j = 0; j < this.countList[i]; j++)
             {
-                first += CoulombDiff(i, Sum(i, j), 2);
+                this.momentumList[i][j] = this.alpha * this.momentumList[i][j] + this.gradientList[i][j];
+                this.pointsList[i][j] -= this.momentumList[i][j];
             }
+        }
+    }
 
-            first *= 2 * Mathf.Pow(this.seg, 2);
+    public List<List<Vector3>> Gradient()
+    {
+        List<List<Vector3>> gradientList = new List<List<Vector3>>();
 
-            Vector3 second = energy * 2 * this.seg * SegmentDiff(i);
-
-            gradient.Add(this.lr * (first + second));
+        for (int i1 = 0; i1 < this.count; i1++)
+        {
+            gradientList.Add(new List<Vector3>());
+            for (int j1 = 0; j1 < this.countList[i1]; j1++)
+            {
+                Vector3 gradient = new Vector3();
+                for (int j2 = 1; j2 < this.countList[i1]; j2++)
+                {
+                    int j3 = (j1 + j2) % this.countList[i1];
+                    Vector3 first = this.CoulombDiff(this.pointsList[i1][j1], this.pointsList[i1][j3])
+                                    * Mathf.Pow(this.segmentList[i1], 2);
+                    Vector3 second = this.Coulomb(this.pointsList[i1][j1], this.pointsList[i1][j3])
+                                     * 2 * this.segmentList[i1] * this.SegmentDiff(i1, j1);
+                    gradient += 2 * (first + second);
+                }
+                for (int i2 = 1; i2 < this.count; i2++)
+                {
+                    int i3 = (i1 + i2) % this.count;
+                    for (int j2 = 0; j2 < this.countList[i3]; j2++)
+                    {
+                        Vector3 first = this.CoulombDiff(this.pointsList[i1][j1], this.pointsList[i3][j2])
+                                        * this.segmentList[i1] * this.segmentList[i3];
+                        Vector3 second = this.Coulomb(this.pointsList[i1][j1], this.pointsList[i3][j2])
+                                         * this.SegmentDiff(i1, j1) * this.segmentList[i3];
+                        gradient += 2 * (first + second);
+                    }
+                }
+                gradientList[i1].Add(this.lr * gradient);
+            }
         }
 
-        return gradient;
+        return gradientList;
     }
 
-    public float Energy()
-    {
-        float energy = AuxiliaryEnergy() * Mathf.Pow(this.seg, 2);
-
-        return energy - Mathf.Pow(Mathf.PI, 2) * this.len / 3 + 4;
-    }
-
-    private float AuxiliaryEnergy()
+    private float Energy()
     {
         float energy = 0.0f;
 
-        for (int i = 0; i < this.len; i++)
+        for (int i1 = 0; i1 < this.count; i1++)
         {
-            for (int j = 1; j < this.len; j++)
+            for (int j1 = 0; j1 < this.countList[i1]; j1++)
             {
-                energy += Coulomb(i, Sum(i, j), 2);
-            }
-        }
+                for (int j2 = 1; j2 < this.countList[i1]; j2++)
+                {
+                    int j3 = (j1 + j2) % this.countList[i1];
+                    energy += this.Coulomb(this.pointsList[i1][j1], this.pointsList[i1][j3])
+                              * Mathf.Pow(this.segmentList[i1], 2);
+                }
 
-        return energy;
-    }
-    
-    public List<Vector3> PoweredGradient(int n)
-    {
-        float energy = PoweredAuxiliaryEnergy(n);
-        List<Vector3> gradient = new List<Vector3>();
-
-        for (int i = 0; i < this.len; i++)
-        {
-            Vector3 first = new Vector3(0, 0, 0);
-
-            for (int j = 1; j < this.len; j++)
-            {
-                first += CoulombDiff(i, Sum(i, j), n);
-            }
-
-            first *= 2 * Mathf.Pow(this.seg, n);
-
-            Vector3 second = energy * n * Mathf.Pow(this.seg, n - 1) * SegmentDiff(i);
-
-            gradient.Add(this.lr * (first + second));
-        }
-
-        return gradient;
-    }
-
-    public float PoweredEnergy(int n)
-    {
-        float energy = PoweredAuxiliaryEnergy(n) * Mathf.Pow(this.seg, n);
-
-        return energy;
-    }
-
-    private float PoweredAuxiliaryEnergy(int n)
-    {
-        float energy = 0.0f;
-
-        for (int i = 0; i < this.len; i++)
-        {
-            for (int j = 1; j < this.len; j++)
-            {
-                energy += Coulomb(i, Sum(i, j), n);
+                for (int i2 = 1; i2 < this.count; i2++)
+                {
+                    int i3 = (i1 + i2) % this.count;
+                    for (int j2 = 0; j2 < this.countList[i3]; j2++)
+                    {
+                        energy += this.Coulomb(this.pointsList[i1][j1], this.pointsList[i3][j2])
+                                  * this.segmentList[i1] * this.segmentList[i3];
+                    }
+                }
             }
         }
 
         return energy;
     }
 
-    public List<Vector3> ModifiedGradient()
+    private float Coulomb(Vector3 v, Vector3 w)
     {
-        float energy = AuxiliaryModifiedEnergy();
-        List<Vector3> gradient = new List<Vector3>();
-
-        for (int i = 0; i < this.len; i++)
-        {
-            Vector3 first = new Vector3();
-            first += CoulombDiff(i, Succ(i), 2);
-            first += CoulombDiff(i, Pred(i), 2);
-
-            for (int j = 2; j <= this.len - 2; j++)
-            {
-                first += ModifiedCoulombDiff(i, Sum(i, j));
-            }
-
-            first *= 2 * Mathf.Pow(this.seg, 2);
-
-            Vector3 second = energy * 2 * this.seg * SegmentDiff(i);
-
-            gradient.Add(this.lr * (first + second));
-        }
-
-        return gradient;
+        return 1 / Mathf.Pow(Vector3.Distance(v, w), 2);
     }
 
-    public float ModifiedEnergy()
+    private Vector3 CoulombDiff(Vector3 v, Vector3 w)
     {
-        return AuxiliaryModifiedEnergy() * Mathf.Pow(this.seg, 2);
+        return - 2 * (v - w) / Mathf.Pow(Vector3.Distance(v, w), 4);
     }
 
-    private float AuxiliaryModifiedEnergy()
-    {
-        float energy = 0.0f;
-
-        for (int i = 0; i < this.len; i++)
-        {
-            energy += Coulomb(i, Succ(i), 2);
-            energy += Coulomb(i, Pred(i), 2);
-
-            for (int j = 2; j <= this.len - 2; j++)
-            {
-                energy += ModifiedCoulomb(i, Sum(i, j));
-            }
-        }
-
-        return energy;
-    }
-
-    private float Coulomb(int i, int j, int n)
-    {
-        return 1 / Mathf.Pow(Distance(i, j), n);
-    }
-
-    private Vector3 CoulombDiff(int i, int j, int n)
-    {
-        return - n * (this.pos[i] - this.pos[j]) / Mathf.Pow(Distance(i, j), n + 2);
-    }
-
-    private float ModifiedCoulomb(int i, int j)
-    {
-        float denom = Distance(i, j) - this.seg / Mathf.Sqrt(2);
-        return 1 / Mathf.Pow(denom, 2);
-    }
-
-    private Vector3 ModifiedCoulombDiff(int i, int j)
-    {
-        float denom = Distance(i, j) - this.seg / Mathf.Sqrt(2);
-        return - 2 * (DistanceDiff(i, j) - SegmentDiff(i) / Mathf.Sqrt(2)) / Mathf.Pow(denom, 3);
-    }
-
-    private float ArcLength()
+    private float ArcLength(List<Vector3> points)
     {
         float arc = 0.0f;
+        int count = points.Count;
 
-        for (int i = 0; i < this.len; i++)
+        for (int i = 0; i < count; i++)
         {
-            arc += Vector3.Distance(this.pos[i], this.pos[Succ(i)]);
+            arc += Vector3.Distance(points[i], points[(i + 1) % count]);
         }
 
         return arc;
     }
 
-    private Vector3 SegmentDiff(int i)
+    private Vector3 SegmentDiff(int i, int j)
     {
-        return (DistanceDiff(i, Succ(i)) + DistanceDiff(i, Pred(i))) / this.len;
-    }
-
-    private float Distance(int i, int j)
-    {
-        return Vector3.Distance(this.pos[i], this.pos[j]);
-    }
-
-    private Vector3 DistanceDiff(int i, int j)
-    {
-        return (this.pos[i] - this.pos[j]).normalized;
-    }
-
-    private float ElasticEnergy()
-    {
-        float energy = 0.0f;
-
-        for (int i = 0; i < this.len; i++)
-        {
-            energy += Mathf.Pow(Vector3.Distance(this.pos[i], this.pos[Succ(i)]) - this.seg, 2);
-        }
-
-        return energy;
-    }
-
-    private Vector3 ElasticForce(int i)
-    {
-        Vector3 next = 2 * (Vector3.Distance(this.pos[i], this.pos[Succ(i)]) - this.seg) * (DistanceDiff(i, Succ(i)) - SegmentDiff(i));
-        Vector3 previous = 2 * (Vector3.Distance(this.pos[i], this.pos[Pred(i)]) - this.seg) * (DistanceDiff(i, Pred(i)) - SegmentDiff(i));
-        return next + previous;
-    }
-
-    private int Succ(int i)
-    {
-        return Sum(i, 1);
-    }
-
-    private int Pred(int i)
-    {
-        return Sum(i, this.len - 1);
-    }
-
-    private int Sum(int i, int j)
-    {
-        return (i + j) % this.len;
+        int jp = (j + 1) % this.countList[i];
+        int jn = (j + this.countList[i] - 1) % this.countList[i];
+        Vector3 tangentp = (this.pointsList[i][j] - this.pointsList[i][jp]).normalized;
+        Vector3 tangentn = (this.pointsList[i][j] - this.pointsList[i][jn]).normalized;
+        return (tangentp + tangentn) / this.countList[i];
     }
 }

@@ -172,7 +172,7 @@ class KnotStateChoose1 : IKnotState
     {
         int ind1 = KnotStateChoose1.FindClosestPoint(this.data.oculusTouch, this.data.points);
         var chosenPoints = new List<Vector3>() { this.data.points[ind1] };
-        Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 2);
+        Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 4);
 
         Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
         Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, MakeMesh.PointMaterial, 0);
@@ -233,7 +233,7 @@ class KnotStateChoose2 : IKnotState
                     this.data.points[this.ind1],
                     this.data.points[ind2]
                 };
-        Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 2);
+        Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 4);
 
         Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
         Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, MakeMesh.PointMaterial, 0);
