@@ -40,7 +40,7 @@ public class Optimize
         {
             float segment = this.newCurves[i].segment;
             if (this.newCurves[i].points.Count >= 4
-                && PullableCurve.MinSegmentDist(this.newCurves[i].points, true) <= segment * epsilon)
+                && this.newCurves[i].MinSegmentDist() <= segment * epsilon)
             {
                 intersection = true;
                 break;
@@ -48,16 +48,20 @@ public class Optimize
 
             for (int j = i + 1; j < count; j++)
             {
-                if (PullableCurve.CurveDistance(this.newCurves[i].points, this.newCurves[j].points, true, true) <= segment * epsilon)
-                intersection = true;
-                break;
+                if (this.newCurves[i].CurveDistance(this.newCurves[j]) <= segment * epsilon)
+                {
+                    intersection = true;
+                    break;
+                }
             }
 
             foreach (Curve curve in collisionCurves)
             {
-                if (PullableCurve.CurveDistance(this.newCurves[i].points, curve.points, true, curve.closed) <= segment * epsilon)
-                intersection = true;
-                break;
+                if (this.newCurves[i].CurveDistance(curve) <= segment * epsilon)
+                {
+                    intersection = true;
+                    break;
+                }
             }
         }
 

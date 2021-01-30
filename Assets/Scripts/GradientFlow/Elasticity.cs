@@ -17,6 +17,7 @@ public class Elasticity
     {
         this.pos = positions;
         this.len = positions.Count;
+        this.momentum = momentum;
         this.seg = segment;
         this.gradient = Gradient();
     }
