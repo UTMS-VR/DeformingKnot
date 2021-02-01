@@ -105,18 +105,18 @@ public class BasicDeformation : State
         this.contextMenu.AddItem(new MenuItem("右人差し指 : 描画", () => {}));
         this.contextMenu.AddItem(new MenuItem("右中指 : 平行移動, 回転", () => {}));
         this.contextMenu.AddItem(new MenuItem("A : 選択", () => {}));
-        this.contextMenu.AddItem(new MenuItem("B : 切断", () => {}));
+        this.contextMenu.AddItem(new MenuItem("B : 選択中の曲線を切断(曲線は1つ選択)", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
-        this.contextMenu.AddItem(new MenuItem("結合", () => {
+        this.contextMenu.AddItem(new MenuItem("選択中の曲線を結合(曲線は1つか2つ選択)", () => {
             this.Combine();
         }));
-        this.contextMenu.AddItem(new MenuItem("削除", () => {
+        this.contextMenu.AddItem(new MenuItem("選択中の曲線を削除", () => {
             this.Remove();
         }));
         this.contextMenu.AddItem(new MenuItem("元に戻す", () => {
             this.Undo();
         }));
-        this.contextMenu.AddItem(new MenuItem("連続変形", () => {
+        this.contextMenu.AddItem(new MenuItem("連続変形(全て閉曲線にしておく)", () => {
             this.ChangeState();
         }));
     }
@@ -314,7 +314,7 @@ public class SelectAutoOrManual : State
             this.newState = new AutomaticDeformation(base.oculusTouch, base.contextMenu, base.curves);
         }));
 
-        this.contextMenu.AddItem(new MenuItem("手動変形", () => {
+        this.contextMenu.AddItem(new MenuItem("手動変形(曲線は1つ選択)", () => {
             List<Curve> selection = base.curves.Where(curve => curve.selected).ToList();
             if (selection.Count == 1)
             {
@@ -374,7 +374,7 @@ public class AutomaticDeformation : State
 
     protected override void SetupMenu()
     {
-        this.contextMenu.AddItem(new MenuItem("A : 自動変形(丁寧)", () => {}));
+        this.contextMenu.AddItem(new MenuItem("A : 自動変形(遅い)", () => {}));
         this.contextMenu.AddItem(new MenuItem("B : 自動変形(速い)", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
@@ -426,6 +426,28 @@ public class ManualDeformation : State
     {
         this.deformingCurve.Update();
         MenuItem renamedItem = this.contextMenu.FindItem((item) => this.contextMenu.items.IndexOf(item) == base.NumberOfDefaultItems);
-        this.contextMenu.ChangeItemMessage(renamedItem, this.deformingCurve.state.ToString());
+        this.contextMenu.ChangeItemMessage(renamedItem, this.Message(this.deformingCurve.state));
+    }
+
+    private string Message(IKnotState knotState)
+    {
+        if (knotState.ToString() == "KnotStateBase")
+        {
+            return "可動域を確定";
+        }
+        else if (knotState.ToString() == "KnotStatePull")
+        {
+            return "変形";
+        }
+        else if (knotState.ToString() == "KnotStateChoose1")
+        {
+            return "可動域の始点を選択";
+        }
+        else if (knotState.ToString() == "KnotStateChoose2")
+        {
+            return "可動域の終点を選択";
+        }
+
+        return "";
     }
 }
