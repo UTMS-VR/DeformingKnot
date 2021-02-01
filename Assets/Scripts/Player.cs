@@ -78,7 +78,7 @@ public class BasicDeformation : State
         : base(oculusTouch, contextMenu, curves)
     {
         base.NumberOfUnselectableItems = 9;
-        this.preCurves = new List<Curve>();
+        this.preCurves = base.curves;
         this.drawingCurve = new Curve(new List<Vector3>(), false);
         this.movingCurves = new List<int>();
 
@@ -152,7 +152,7 @@ public class BasicDeformation : State
             || base.oculusTouch.GetButtonDown(this.move)
             || base.oculusTouch.GetButtonDown(this.select)
             || base.oculusTouch.GetButtonDown(this.cut)
-            || base.oculusTouch.GetButtonDown(this.comfirm))
+            || (base.oculusTouch.GetButtonDown(this.comfirm) && (this.contextMenu.SelectedIndex() != 11)))
         {
             this.preCurves = new List<Curve>();
 
