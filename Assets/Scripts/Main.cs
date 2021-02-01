@@ -44,8 +44,8 @@ public class Main : MonoBehaviour
     void Update()
     {
         this.oculusTouch.UpdateFirst();
-        this.contextMenu.Update();
         this.state.Update();
+        this.contextMenu.Update();
         if (this.state.newState != null) this.state = this.state.newState;
         this.state.Display();
         this.oculusTouch.UpdateFirst();

@@ -6,7 +6,7 @@ using DrawCurve;
 
 public class Knot
 {
-    private IKnotState state;
+    public IKnotState state;
 
 
     public Knot(

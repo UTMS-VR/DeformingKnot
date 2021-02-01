@@ -5,13 +5,13 @@ using System.Linq;
 using InputManager;
 using DrawCurve;
 
-interface IKnotState
+public interface IKnotState
 {
     IKnotState Update();
     List<Vector3> GetPoints();
 }
 
-class KnotData
+public class KnotData
 {
     public List<Vector3> points;
     public (int first, int second) chosenPoints;
@@ -55,7 +55,7 @@ class KnotData
 
 
 
-class KnotStateBase : IKnotState
+public class KnotStateBase : IKnotState
 {
     private KnotData data;
     private Mesh knotMesh;
@@ -92,7 +92,7 @@ class KnotStateBase : IKnotState
     }
 }
 
-class KnotStatePull : IKnotState
+public class KnotStatePull : IKnotState
 {
     private KnotData data;
     private List<Curve> collisionCurves;
@@ -157,7 +157,7 @@ class KnotStatePull : IKnotState
     }
 }
 
-class KnotStateChoose1 : IKnotState
+public class KnotStateChoose1 : IKnotState
 {
     private KnotData data;
     private Mesh knotMesh;
@@ -213,7 +213,7 @@ class KnotStateChoose1 : IKnotState
     }
 }
 
-class KnotStateChoose2 : IKnotState
+public class KnotStateChoose2 : IKnotState
 {
     private KnotData data;
     private Mesh knotMesh;
@@ -273,7 +273,7 @@ class KnotStateChoose2 : IKnotState
     }
 }
 
-class KnotStateDraw : IKnotState
+public class KnotStateDraw : IKnotState
 {
     private KnotData data;
     private Curve drawnCurve;
