@@ -6,10 +6,12 @@ using UnityEngine.UI;
 using DrawCurve;
 using InputManager;
 using FileManager;
+using ContextMenu;
 
 public class Main : MonoBehaviour
 {
     private OculusTouch oculusTouch;
+    private ContextMenu.ContextMenu contextMenu;
     private State state;
 
     void Start()
@@ -17,19 +19,34 @@ public class Main : MonoBehaviour
         this.oculusTouch = new OculusTouch
         (
             buttonMap: LiteralKeysPlus,
-            rightStickKey: PredefinedMaps.WASD,
+            leftStickKey: PredefinedMaps.Arrows,
             rightHandKey: PredefinedMaps.OKLSemiIComma,
             handScale: 0.03f,
             handSpeed: 0.01f
         );
-        this.state = new BasicDeformation(oculusTouch, new List<Curve>());
+
+        this.contextMenu = new ContextMenu.ContextMenu(
+            this.oculusTouch,
+            upButton: LogicalOVRInput.RawButton.LStickUp,
+            downButton: LogicalOVRInput.RawButton.LStickDown,
+            confirmButton: LogicalOVRInput.RawButton.X,
+            toggleMenuButton: LogicalOVRInput.RawButton.LIndexTrigger,
+            lockLevel: null
+        );
+        this.contextMenu.AddItem(new MenuItem("左人差し指 : メニューウィンドウの開閉", () => {}));
+        this.contextMenu.AddItem(new MenuItem("左スティック : カーソル操作", () => {}));
+        this.contextMenu.AddItem(new MenuItem("X : 決定", () => {}));
+        this.contextMenu.Open();
+
+        this.state = new BasicDeformation(this.oculusTouch, this.contextMenu, new List<Curve>());
     }
 
     void Update()
     {
         this.oculusTouch.UpdateFirst();
-        State newState = this.state.Update();
-        if (newState != null) this.state = newState;
+        this.contextMenu.Update();
+        this.state.Update();
+        if (this.state.newState != null) this.state = this.state.newState;
         this.state.Display();
         this.oculusTouch.UpdateFirst();
     }

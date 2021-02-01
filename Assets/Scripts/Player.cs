@@ -4,19 +4,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using DrawCurve;
 using InputManager;
+using ContextMenu;
 
 public abstract class State
 {
     protected OculusTouch oculusTouch;
+    protected ContextMenu.ContextMenu contextMenu;
     protected List<Curve> curves;
 
-    public State(OculusTouch oculusTouch, List<Curve> curves)
+    public State newState;
+
+    public State(OculusTouch oculusTouch, ContextMenu.ContextMenu contextMenu, List<Curve> curves)
     {
         this.oculusTouch = oculusTouch;
+        this.contextMenu = contextMenu;
+        this.SetupMenu();
         this.curves = curves;
+        this.newState = null;
     }
 
-    public abstract State Update();
+    protected abstract void SetupMenu();
+    protected void ResetMenu()
+    {
+        List<MenuItem> removedItems = this.contextMenu.FindAllItems((item) => this.contextMenu.items.IndexOf(item) >= 3);
+        foreach (MenuItem item in removedItems)
+        {
+            this.contextMenu.RemoveItem(item);
+        }
+    }
+
+    public abstract void Update();
 
     public void Display()
     {
@@ -44,6 +61,7 @@ public class BasicDeformation : State
     private LogicalButton undo;
 
     public BasicDeformation(OculusTouch oculusTouch,
+                            ContextMenu.ContextMenu contextMenu,
                             List<Curve> curves,
                             LogicalButton changeState = null,
                             LogicalButton draw = null,
@@ -53,7 +71,7 @@ public class BasicDeformation : State
                             LogicalButton combine = null,
                             LogicalButton remove = null,
                             LogicalButton undo = null)
-        : base(oculusTouch, curves)
+        : base(oculusTouch, contextMenu, curves)
     {
         this.preCurves = new List<Curve>();
         this.drawingCurve = new Curve(new List<Vector3>(), false);
@@ -86,7 +104,27 @@ public class BasicDeformation : State
         Curve.SetUp(base.oculusTouch, this.draw, this.move);
     }
 
-    public override State Update()
+    protected override void SetupMenu()
+    {
+        this.contextMenu.AddItem(new MenuItem("右人差し指 : 描画", () => {}));
+        this.contextMenu.AddItem(new MenuItem("右中指 : 平行移動, 回転", () => {}));
+        this.contextMenu.AddItem(new MenuItem("A : 選択", () => {}));
+        this.contextMenu.AddItem(new MenuItem("B : 切断", () => {}));
+        this.contextMenu.AddItem(new MenuItem("結合", () => {
+            this.Combine();
+        }));
+        this.contextMenu.AddItem(new MenuItem("削除", () => {
+            this.Remove();
+        }));
+        this.contextMenu.AddItem(new MenuItem("元に戻す", () => {
+            this.Undo();
+        }));
+        this.contextMenu.AddItem(new MenuItem("連続変形", () => {
+            this.ChangeState();
+        }));
+    }
+
+    public override void Update()
     {
         if (this.ValidButtonInput())
         {
@@ -95,36 +133,36 @@ public class BasicDeformation : State
             this.Move();
             this.Select();
             this.Cut();
-            this.Combine();
-            this.Remove();
-            this.Undo();
+            // this.Combine();
+            //this.Remove();
+            //this.Undo();
             
-            if (base.oculusTouch.GetButtonDown(this.changeState))
+            /*if (base.oculusTouch.GetButtonDown(this.changeState))
             {
                 bool closed = true;
                 foreach (Curve curve in base.curves)
                 {
                     if (!curve.closed) closed = false;
                 }
-                if (closed) return new SelectAutoOrManual(base.oculusTouch, base.curves);
-            }
+                if (closed) return new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.curves);
+            }*/
         }
 
-        return null;
+        //return null;
     }
 
     private bool ValidButtonInput()
     {
         int valid = 0;
 
-        if (base.oculusTouch.GetButtonDown(this.changeState)) valid++;
+        //if (base.oculusTouch.GetButtonDown(this.changeState)) valid++;
         if (base.oculusTouch.GetButton(this.draw) || this.oculusTouch.GetButtonUp(this.draw)) valid++;
         if (base.oculusTouch.GetButton(this.move) || this.oculusTouch.GetButtonUp(this.move)) valid++;
         if (base.oculusTouch.GetButtonDown(this.select)) valid++;
         if (base.oculusTouch.GetButtonDown(this.cut)) valid++;
-        if (base.oculusTouch.GetButtonDown(this.combine)) valid++;
-        if (base.oculusTouch.GetButtonDown(this.remove)) valid++;
-        if (base.oculusTouch.GetButtonDown(this.undo)) valid++;
+        //if (base.oculusTouch.GetButtonDown(this.combine)) valid++;
+        //if (base.oculusTouch.GetButtonDown(this.remove)) valid++;
+        //if (base.oculusTouch.GetButtonDown(this.undo)) valid++;
 
         return (valid == 1) ? true : false;
     }
@@ -150,6 +188,7 @@ public class BasicDeformation : State
 
     private void Draw()
     {
+        Debug.Log("draw");
         this.drawingCurve.Draw();
 
         if (base.oculusTouch.GetButtonUp(this.draw))
@@ -228,10 +267,10 @@ public class BasicDeformation : State
         }
     }
 
-    private void Combine()
+    public void Combine()
     {
-        if (base.oculusTouch.GetButtonDown(this.combine))
-        {
+        //if (base.oculusTouch.GetButtonDown(this.combine))
+        //{
             List<Curve> selection = base.curves.Where(curve => curve.selected).ToList();
 
             if (selection.Count == 1)
@@ -249,22 +288,36 @@ public class BasicDeformation : State
                     base.curves.Add(newCurves[0]);
                 }
             }
-        }
+        //}
     }
 
     private void Remove()
     {
-        if (base.oculusTouch.GetButtonDown(this.remove))
-        {
+        //if (base.oculusTouch.GetButtonDown(this.remove))
+        //{
             base.curves = base.curves.Where(curve => !curve.selected).ToList();
-        }
+        //}
     }
 
     private void Undo()
     {
-        if (base.oculusTouch.GetButtonDown(this.undo))
-        {
+        //if (base.oculusTouch.GetButtonDown(this.undo))
+        //{
             base.curves = this.preCurves;
+        //}
+    }
+
+    private void ChangeState()
+    {
+        bool closed = true;
+        foreach (Curve curve in base.curves)
+        {
+            if (!curve.closed) closed = false;
+        }
+        if (closed)
+        {
+            base.ResetMenu();
+            this.newState = new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.curves);
         }
     }
 }
@@ -277,12 +330,13 @@ public class SelectAutoOrManual : State
     private LogicalButton pull;
 
     public SelectAutoOrManual(OculusTouch oculusTouch,
+                              ContextMenu.ContextMenu contextMenu,
                               List<Curve> curves,
                               LogicalButton changeState = null,
                               LogicalButton select = null,
                               LogicalButton energy = null,
                               LogicalButton pull = null)
-        : base(oculusTouch, curves)
+        : base(oculusTouch, contextMenu, curves)
     {
         if (changeState != null) this.changeState = changeState;
         else this.changeState = LogicalOVRInput.RawButton.LIndexTrigger;
@@ -297,7 +351,12 @@ public class SelectAutoOrManual : State
         else this.pull = LogicalOVRInput.RawButton.Y;
     }
 
-    public override State Update()
+    protected override void SetupMenu()
+    {
+        
+    }
+
+    public override void Update()
     {
         this.Select();
 
@@ -305,19 +364,19 @@ public class SelectAutoOrManual : State
 
         if (base.oculusTouch.GetButtonDown(this.changeState))
         {
-            return new BasicDeformation(base.oculusTouch, base.curves);
+            // return new BasicDeformation(base.oculusTouch, base.contextMenu, base.curves);
         }
         if (base.oculusTouch.GetButtonDown(this.energy))
         {
-            return new AutomaticDeformation(base.oculusTouch, base.curves);
+            // return new AutomaticDeformation(base.oculusTouch, base.contextMenu, base.curves);
         }
         else if (base.oculusTouch.GetButtonDown(this.pull) && selection.Count == 1)
         {
             base.curves.Remove(selection[0]);
-            return new ManualDeformation(base.oculusTouch, base.curves, selection[0]);
+            // return new ManualDeformation(base.oculusTouch, base.contextMenu, base.curves, selection[0]);
         }
 
-        return null;
+        // return null;
     }
 
     private void Select()
@@ -340,11 +399,12 @@ public class AutomaticDeformation : State
     private LogicalButton button2;
     
     public AutomaticDeformation(OculusTouch oculusTouch,
+                                ContextMenu.ContextMenu contextMenu,
                                 List<Curve> curves,
                                 LogicalButton changeState = null,
                                 LogicalButton button1 = null,
                                 LogicalButton button2 = null)
-        : base(oculusTouch, curves.Where(curve => !curve.selected).ToList())
+        : base(oculusTouch, contextMenu, curves.Where(curve => !curve.selected).ToList())
     {
         if (changeState != null) this.changeState = changeState;
         else this.changeState = LogicalOVRInput.RawButton.LIndexTrigger;
@@ -359,17 +419,23 @@ public class AutomaticDeformation : State
         this.optimizer = new Optimize(oculusTouch, newCurves, this.button1, this.button2);
     }
 
-    public override State Update()
+    protected override void SetupMenu()
     {
+
+    }
+
+    public override void Update()
+    {
+        Debug.Log("Update");
         this.optimizer.Update(base.curves);
 
         if (base.oculusTouch.GetButtonDown(this.changeState))
         {
             base.curves = base.curves.Concat(this.optimizer.GetCurves()).ToList();
-            return new SelectAutoOrManual(base.oculusTouch, base.curves);
+            // return new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.curves);
         }
 
-        return null;
+        // return null;
     }
 }
 
@@ -379,10 +445,11 @@ public class ManualDeformation : State
     private LogicalButton changeState;
     
     public ManualDeformation(OculusTouch oculusTouch,
+                             ContextMenu.ContextMenu contextMenu,
                              List<Curve> curves,
                              Curve curve,
                              LogicalButton changeState = null)
-        : base(oculusTouch, curves)
+        : base(oculusTouch, contextMenu, curves)
     {
         this.deformingCurve = new Knot(curve.points,
                                        oculusTouch,
@@ -395,16 +462,21 @@ public class ManualDeformation : State
         else this.changeState = LogicalOVRInput.RawButton.LIndexTrigger;
     }
 
-    public override State Update()
+    protected override void SetupMenu()
+    {
+        
+    }
+
+    public override void Update()
     {
         this.deformingCurve.Update();
 
         if (base.oculusTouch.GetButtonDown(this.changeState))
         {
             base.curves.Add(new Curve(this.deformingCurve.GetPoints(), true, selected: true));
-            return new SelectAutoOrManual(base.oculusTouch, base.curves);
+            // return new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.curves);
         }
 
-        return null;
+        // return null;
     }
 }
