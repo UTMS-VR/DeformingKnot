@@ -113,6 +113,20 @@ namespace ContextMenu {
       }
     }
 
+    public void IncreaseSelectedIndex()
+    {
+      if (this.selectedIndex < this.innerItems.Count - 1)
+      {
+        this.selectedIndex ++;
+        UpdateSelectionObject();
+      }
+    }
+
+    public int SelectedIndex()
+    {
+      return this.selectedIndex;
+    }
+
     private void ExecuteAction() {
       if (this.displayed) {
         var pushed = this.controller.GetButtonDown(this.confirmButton, this.locq);

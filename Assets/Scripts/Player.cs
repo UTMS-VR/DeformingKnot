@@ -10,6 +10,8 @@ public abstract class State
 {
     protected OculusTouch oculusTouch;
     protected ContextMenu.ContextMenu contextMenu;
+    protected int NumberOfDefaultItems = 4;
+    protected int NumberOfUnselectableItems;
     protected List<Curve> curves;
     public State newState;
 
@@ -25,10 +27,18 @@ public abstract class State
     protected abstract void SetupMenu();
     protected void ResetMenu()
     {
-        List<MenuItem> removedItems = this.contextMenu.FindAllItems((item) => this.contextMenu.items.IndexOf(item) >= 3);
+        List<MenuItem> removedItems = this.contextMenu.FindAllItems((item) => this.contextMenu.items.IndexOf(item) >= this.NumberOfDefaultItems);
         foreach (MenuItem item in removedItems)
         {
             this.contextMenu.RemoveItem(item);
+        }
+    }
+
+    public void RestrictCursorPosition()
+    {
+        while (this.contextMenu.SelectedIndex() < this.NumberOfUnselectableItems)
+        {
+            this.contextMenu.IncreaseSelectedIndex();
         }
     }
 
@@ -54,6 +64,7 @@ public class BasicDeformation : State
     private LogicalButton move;
     private LogicalButton select;
     private LogicalButton cut;
+    private LogicalButton comfirm;
 
     public BasicDeformation(OculusTouch oculusTouch,
                             ContextMenu.ContextMenu contextMenu,
@@ -62,9 +73,11 @@ public class BasicDeformation : State
                             LogicalButton draw = null,
                             LogicalButton move = null,
                             LogicalButton select = null,
-                            LogicalButton cut = null)
+                            LogicalButton cut = null,
+                            LogicalButton comfirm = null)
         : base(oculusTouch, contextMenu, curves)
     {
+        base.NumberOfUnselectableItems = 9;
         this.preCurves = new List<Curve>();
         this.drawingCurve = new Curve(new List<Vector3>(), false);
         this.movingCurves = new List<int>();
@@ -81,6 +94,9 @@ public class BasicDeformation : State
         if (cut != null) this.cut = cut;
         else this.cut = LogicalOVRInput.RawButton.B;
 
+        if (comfirm != null) this.comfirm = comfirm;
+        else this.comfirm = LogicalOVRInput.RawButton.X;
+
         Curve.SetUp(base.oculusTouch, this.draw, this.move);
     }
 
@@ -90,6 +106,7 @@ public class BasicDeformation : State
         this.contextMenu.AddItem(new MenuItem("右中指 : 平行移動, 回転", () => {}));
         this.contextMenu.AddItem(new MenuItem("A : 選択", () => {}));
         this.contextMenu.AddItem(new MenuItem("B : 切断", () => {}));
+        this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("結合", () => {
             this.Combine();
         }));
@@ -124,8 +141,7 @@ public class BasicDeformation : State
         if (base.oculusTouch.GetButton(this.move) || this.oculusTouch.GetButtonUp(this.move)) valid++;
         if (base.oculusTouch.GetButtonDown(this.select)) valid++;
         if (base.oculusTouch.GetButtonDown(this.cut)) valid++;
-        // base.contextMenu.comfirmBottonを取得したい
-        if (base.oculusTouch.GetButtonDown(LogicalOVRInput.RawButton.X)) valid++; 
+        if (base.oculusTouch.GetButtonDown(this.comfirm)) valid++; 
 
         return (valid == 1) ? true : false;
     }
@@ -136,8 +152,7 @@ public class BasicDeformation : State
             || base.oculusTouch.GetButtonDown(this.move)
             || base.oculusTouch.GetButtonDown(this.select)
             || base.oculusTouch.GetButtonDown(this.cut)
-            // base.contextMenu.comfirmBottonを取得したい
-            || base.oculusTouch.GetButtonDown(LogicalOVRInput.RawButton.X))
+            || base.oculusTouch.GetButtonDown(this.comfirm))
         {
             this.preCurves = new List<Curve>();
 
@@ -284,6 +299,7 @@ public class SelectAutoOrManual : State
                               LogicalButton select = null)
         : base(oculusTouch, contextMenu, curves)
     {
+        base.NumberOfUnselectableItems = 6;
         if (select != null) this.select = select;
         else this.select = LogicalOVRInput.RawButton.A;
     }
@@ -291,6 +307,7 @@ public class SelectAutoOrManual : State
     protected override void SetupMenu()
     {
         this.contextMenu.AddItem(new MenuItem("A : 選択", () => {}));
+        this.contextMenu.AddItem(new MenuItem("", () => {}));
 
         this.contextMenu.AddItem(new MenuItem("自動変形", () => {
             base.ResetMenu();
@@ -343,6 +360,8 @@ public class AutomaticDeformation : State
                                 LogicalButton button2 = null)
         : base(oculusTouch, contextMenu, curves.Where(curve => !curve.selected).ToList())
     {
+        base.NumberOfUnselectableItems = 7;
+
         if (button1 != null) this.button1 = button1;
         else this.button1 = LogicalOVRInput.RawButton.A;
 
@@ -357,6 +376,7 @@ public class AutomaticDeformation : State
     {
         this.contextMenu.AddItem(new MenuItem("A : 自動変形(丁寧)", () => {}));
         this.contextMenu.AddItem(new MenuItem("B : 自動変形(速い)", () => {}));
+        this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
             base.curves = base.curves.Concat(this.optimizer.GetCurves()).ToList();
             base.ResetMenu();
@@ -380,6 +400,7 @@ public class ManualDeformation : State
                              Curve curve)
         : base(oculusTouch, contextMenu, curves)
     {
+        base.NumberOfUnselectableItems = 8;
         this.deformingCurve = new Knot(curve.points,
                                        oculusTouch,
                                        meridian: curve.meridian,
@@ -393,6 +414,7 @@ public class ManualDeformation : State
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("A : 決定", () => {}));
         this.contextMenu.AddItem(new MenuItem("B : キャンセル", () => {}));
+        this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
             base.curves.Add(new Curve(this.deformingCurve.GetPoints(), true, selected: true));
             base.ResetMenu();
@@ -403,7 +425,7 @@ public class ManualDeformation : State
     public override void Update()
     {
         this.deformingCurve.Update();
-        MenuItem renamedItem = this.contextMenu.FindItem((item) => this.contextMenu.items.IndexOf(item) == 3);
+        MenuItem renamedItem = this.contextMenu.FindItem((item) => this.contextMenu.items.IndexOf(item) == base.NumberOfDefaultItems);
         this.contextMenu.ChangeItemMessage(renamedItem, this.deformingCurve.state.ToString());
     }
 }
