@@ -280,7 +280,7 @@ namespace DrawCurve
 
             for (int i = 0; i <= endi; i++)
             {
-                int endj = (i == 0 && !this.closed) ? n - 2 : n - 1;
+                int endj = (i == 0 || !this.closed) ? n - 2 : n - 1;
                 for (int j = i + 2; j <= endj; j++)
                 {
                     float dist = SegmentDist.SSDist(seq[i], seq[i + 1], seq[j], seq[(j + 1) % n]);

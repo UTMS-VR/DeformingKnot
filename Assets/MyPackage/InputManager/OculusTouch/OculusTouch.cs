@@ -41,8 +41,11 @@ namespace InputManager
             KeyTo3D rightHandKey = null,
             KeyTo3D leftHandKey = null,
             float handScale = 0.1f,
-            float handSpeed = 0.3f
-            ) : base(OculusTouch.defaultButtonMap, OculusTouch.defaultStickMap, OculusTouch.defaultPositionDeviceMap)
+            float handSpeed = 0.3f,
+            uint? repeatDelay = null,
+            uint? repeatInterval = null
+            ) : base(OculusTouch.defaultButtonMap, OculusTouch.defaultStickMap, OculusTouch.defaultPositionDeviceMap, 
+                repeatDelay: repeatDelay, repeatInterval: repeatInterval)
         {
             var buttonMapData = new ButtonMapData { };
             var stickMapData = new StickMapData { };

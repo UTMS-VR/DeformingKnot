@@ -27,6 +27,8 @@ namespace InputManager
         private KeyCode above;
         private KeyCode below;
 
+        private bool getRotationNotSupportedWraningShown = false;
+
         //public PhysicalKeyPositionDevice(
         //    KeyCode up, KeyCode down,
         //    KeyCode right, KeyCode left,
@@ -105,7 +107,11 @@ namespace InputManager
 
         public Quaternion? GetRotation()
         {
-            Debug.Log("GetRotation is not supported on non-VRheadset environment");
+            if (!this.getRotationNotSupportedWraningShown)
+            {
+                Debug.Log("GetRotation is not supported on non-VRheadset environment");
+                this.getRotationNotSupportedWraningShown = true;
+            }
             return null;
         }
     }

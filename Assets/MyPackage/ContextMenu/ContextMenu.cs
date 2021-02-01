@@ -24,9 +24,12 @@ namespace ContextMenu {
     private readonly LogicalButton confirmButton;
     private readonly LogicalButton toggleMenuButton;
 
-    private List<MenuItem> innerItems = new List<MenuItem>();
+    private readonly List<MenuItem> innerItems = new List<MenuItem>();
     private int selectedIndex = 0;
-    private bool displayed = true;
+    private bool displayed = false;
+
+    private readonly uint? lockLevel;
+    private Lock locq = null;
 
     public ReadOnlyCollection<MenuItem> items {
       get {
@@ -39,13 +42,15 @@ namespace ContextMenu {
       LogicalButton upButton,
       LogicalButton downButton,
       LogicalButton confirmButton,
-      LogicalButton toggleMenuButton
+      LogicalButton toggleMenuButton,
+      uint? lockLevel = 10
     ) {
       this.controller = controller;
       this.upButton = upButton;
       this.downButton = downButton;
       this.confirmButton = confirmButton;
       this.toggleMenuButton = toggleMenuButton;
+      this.lockLevel = lockLevel;
       FindCanvasObject();
       LoadPrefabs();
       CreatePanel();
@@ -80,18 +85,21 @@ namespace ContextMenu {
     }
 
     private void ToggleDisplayed() {
-      var pushed = this.controller.GetButtonDown(this.toggleMenuButton);
+      var pushed = this.controller.GetButtonDown(this.toggleMenuButton, this.locq);
       if (pushed) {
-        displayed = !displayed;
-        UpdatePanelObject();
+        if (this.displayed) {
+          Close();
+        } else {
+          Open();
+        }
         Debug.Log("Menu panel toggled.");
       }
     }
 
     private void ChangeSelectedIndex() {
       if (this.displayed) {
-        var downPushed = this.controller.GetButtonDown(this.downButton);
-        var upPushed = this.controller.GetButtonDown(this.upButton);
+        var downPushed = this.controller.GetButtonDown(this.downButton, this.locq, repeat: true);
+        var upPushed = this.controller.GetButtonDown(this.upButton, this.locq, repeat: true);
         if (downPushed && this.selectedIndex < this.innerItems.Count - 1) {
           this.selectedIndex ++;
           UpdateSelectionObject();
@@ -107,7 +115,7 @@ namespace ContextMenu {
 
     private void ExecuteAction() {
       if (this.displayed) {
-        var pushed = this.controller.GetButtonDown(this.confirmButton);
+        var pushed = this.controller.GetButtonDown(this.confirmButton, this.locq);
         if (pushed) {
           this.selectionObject.GetComponent<SelectionManager>().Select();
           var item = this.innerItems[this.selectedIndex];
@@ -170,16 +178,23 @@ namespace ContextMenu {
 
     public void Open() {
       this.displayed = true;
+      if (this.lockLevel is uint level) {
+        this.locq = this.controller.GetLock(level);
+      }
       UpdatePanelObject();
     }
 
     public void Close() {
       this.displayed = false;
+      if (this.lockLevel is uint level) {
+        this.controller.Unlock(this.locq);
+        this.locq = null;
+      }
       UpdatePanelObject();
     }
 
     private void UpdatePanelObject() {
-      this.panelObject.SetActive(displayed);
+      this.panelObject.SetActive(this.displayed);
     }
 
     private void UpdateSelectionObject() {
