@@ -13,6 +13,8 @@ public abstract class State
     protected int NumberOfDefaultItems = 4;
     protected int NumberOfUnselectableItems;
     protected List<Curve> curves;
+    protected float segment = 0.03f;
+    protected float epsilon;
     public State newState;
 
     public State(OculusTouch oculusTouch, ContextMenu.ContextMenu contextMenu, List<Curve> curves)
@@ -21,6 +23,7 @@ public abstract class State
         this.contextMenu = contextMenu;
         this.SetupMenu();
         this.curves = curves;
+        this.epsilon = this.segment * 0.2f;
         this.newState = null;
     }
 
@@ -105,9 +108,9 @@ public class BasicDeformation : State
         this.contextMenu.AddItem(new MenuItem("右人差し指 : 描画", () => {}));
         this.contextMenu.AddItem(new MenuItem("右中指 : 平行移動, 回転", () => {}));
         this.contextMenu.AddItem(new MenuItem("A : 選択", () => {}));
-        this.contextMenu.AddItem(new MenuItem("B : 選択中の曲線を切断(曲線は1つ選択)", () => {}));
+        this.contextMenu.AddItem(new MenuItem("B : 選択中の曲線を切断 (曲線は1つ選択)", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
-        this.contextMenu.AddItem(new MenuItem("選択中の曲線を結合(曲線は1つか2つ選択)", () => {
+        this.contextMenu.AddItem(new MenuItem("選択中の曲線を結合 (曲線は1つか2つ選択)", () => {
             this.Combine();
         }));
         this.contextMenu.AddItem(new MenuItem("選択中の曲線を削除", () => {
@@ -116,7 +119,7 @@ public class BasicDeformation : State
         this.contextMenu.AddItem(new MenuItem("元に戻す", () => {
             this.Undo();
         }));
-        this.contextMenu.AddItem(new MenuItem("連続変形(全て閉曲線にしておく)", () => {
+        this.contextMenu.AddItem(new MenuItem("連続変形 (全て閉曲線にしておく)", () => {
             this.ChangeState();
         }));
     }
@@ -174,7 +177,7 @@ public class BasicDeformation : State
                 base.curves.Add(this.drawingCurve);
             }
 
-            this.drawingCurve = new Curve(new List<Vector3>(), false);
+            this.drawingCurve = new Curve(new List<Vector3>(), false, segment: base.segment);
         }
         
         if (this.drawingCurve.points.Count >= 2)
@@ -281,7 +284,22 @@ public class BasicDeformation : State
         {
             if (!curve.closed) closed = false;
         }
-        if (closed)
+
+        bool intersection = false;
+        for (int i = 0; i < base.curves.Count; i++)
+        {
+            for (int j = i + 1; j < base.curves.Count; j++)
+            {
+                if (base.curves[i].CurveDistance(base.curves[j]) < base.epsilon)
+                {
+                    intersection = true;
+                    break;
+                }
+            }
+            if (intersection) break;
+        }
+
+        if (closed && !intersection)
         {
             base.ResetMenu();
             this.newState = new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.curves);
@@ -314,7 +332,7 @@ public class SelectAutoOrManual : State
             this.newState = new AutomaticDeformation(base.oculusTouch, base.contextMenu, base.curves);
         }));
 
-        this.contextMenu.AddItem(new MenuItem("手動変形(曲線は1つ選択)", () => {
+        this.contextMenu.AddItem(new MenuItem("手動変形 (曲線は1つ選択)", () => {
             List<Curve> selection = base.curves.Where(curve => curve.selected).ToList();
             if (selection.Count == 1)
             {
@@ -374,8 +392,8 @@ public class AutomaticDeformation : State
 
     protected override void SetupMenu()
     {
-        this.contextMenu.AddItem(new MenuItem("A : 自動変形(遅い)", () => {}));
-        this.contextMenu.AddItem(new MenuItem("B : 自動変形(速い)", () => {}));
+        this.contextMenu.AddItem(new MenuItem("A : 自動変形 (遅い)", () => {}));
+        this.contextMenu.AddItem(new MenuItem("B : 自動変形 (速い)", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
             base.curves = base.curves.Concat(this.optimizer.GetCurves()).ToList();
@@ -416,7 +434,7 @@ public class ManualDeformation : State
         this.contextMenu.AddItem(new MenuItem("B : キャンセル", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
-            base.curves.Add(new Curve(this.deformingCurve.GetPoints(), true, selected: true));
+            base.curves.Add(new Curve(this.deformingCurve.GetPoints(), true, selected: true, segment: base.segment));
             base.ResetMenu();
             this.newState = new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.curves);
         }));

@@ -54,6 +54,7 @@ public class Optimize
                     break;
                 }
             }
+            if (intersection) break;
 
             foreach (Curve curve in collisionCurves)
             {
@@ -63,6 +64,7 @@ public class Optimize
                     break;
                 }
             }
+            if (intersection) break;
         }
 
         if (!intersection)
