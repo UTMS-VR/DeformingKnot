@@ -423,7 +423,7 @@ public class ManualDeformation : State
                                        oculusTouch,
                                        meridian: curve.meridian,
                                        radius: curve.radius,
-                                       distanceThreshold: curve.segment,
+                                       segment: curve.segment,
                                        collisionCurves: curves);
     }
 

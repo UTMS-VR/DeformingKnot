@@ -14,7 +14,7 @@ public class Knot
         OculusTouch oculusTouch,
         int meridian = 20,
         float radius = 0.1f,
-        float distanceThreshold = -1,
+        float segment = -1,
         List<Curve> collisionCurves = null,
         LogicalButton buttonA = null,
         LogicalButton buttonB = null,
@@ -28,7 +28,7 @@ public class Knot
         buttonD = buttonD ?? LogicalOVRInput.RawButton.RHandTrigger;
         int count = points.Count;
         (int first, int second) chosenPoints = (count / 3, 2 * count / 3);
-        KnotData data = new KnotData(points, chosenPoints, oculusTouch, radius, meridian, distanceThreshold, collisionCurves,
+        KnotData data = new KnotData(points, chosenPoints, oculusTouch, radius, meridian, segment, collisionCurves,
             buttonA, buttonB, buttonC, buttonD);
         this.state = new KnotStateBase(data);
 

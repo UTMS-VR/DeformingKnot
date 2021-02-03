@@ -18,7 +18,7 @@ public class KnotData
     public readonly OculusTouch oculusTouch;
     public readonly int meridian;
     public readonly float radius;
-    public readonly float distanceThreshold;
+    public readonly float segment;
     public readonly List<Curve> collisionCurves;
     public readonly LogicalButton buttonA;
     public readonly LogicalButton buttonB;
@@ -31,7 +31,7 @@ public class KnotData
         OculusTouch oculusTouch,
         float radius,
         int meridian,
-        float distanceThreshold,
+        float segment,
         List<Curve> collisionCurves,
         LogicalButton buttonA = null,
         LogicalButton buttonB = null,
@@ -44,7 +44,7 @@ public class KnotData
         this.oculusTouch = oculusTouch;
         this.meridian = meridian;
         this.radius = radius;
-        this.distanceThreshold = distanceThreshold;
+        this.segment = segment;
         this.collisionCurves = collisionCurves;
         this.buttonA = buttonA ?? LogicalOVRInput.RawButton.A;
         this.buttonB = buttonB ?? LogicalOVRInput.RawButton.B;
@@ -107,8 +107,8 @@ public class KnotStatePull : IKnotState
         int pullableRange = (this.data.chosenPoints.second - this.data.chosenPoints.first + 1 + count) % count;
         List<Vector3> pullablePoints = shiftedPoints.Take(pullableRange).ToList();
         List<Vector3> fixedPoints = shiftedPoints.Skip(pullableRange).ToList();
-        this.pullableCurve = new PullableCurve(pullablePoints, fixedPoints, this.data.oculusTouch, closed: true,
-            meridian: this.data.meridian, radius: this.data.radius, distanceThreshold: this.data.distanceThreshold);
+        this.pullableCurve = new PullableCurve(pullablePoints, new List<Vector3>(), fixedPoints, this.data.oculusTouch, closed: true,
+            meridian: this.data.meridian, radius: this.data.radius, segment: this.data.segment);
     }
 
     public IKnotState Update()
@@ -116,7 +116,7 @@ public class KnotStatePull : IKnotState
         // List<Vector3> collisionPoints = this.collisionPoints;
         // List<Vector3> collisionPoints = this.GetCompliment(this.chosenPoints.first, this.chosenPoints.second);
         // collisionPoints = collisionPoints.Concat(this.collisionPoints).ToList();
-        this.pullableCurve.Update(this.collisionCurves);
+        this.pullableCurve.Update();
         Mesh knotMesh = this.pullableCurve.GetMesh();
         Graphics.DrawMesh(knotMesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
         // this.pointMesh = MakeMesh.GetMeshAtPoints(collisionPoints, this.radius * 2);
@@ -284,7 +284,7 @@ public class KnotStateDraw : IKnotState
         this.drawnCurve = new Curve(
             points: this.data.points,
             closed: true,
-            segment: this.data.distanceThreshold / 2,
+            segment: this.data.segment,
             radius: this.data.radius
             );
     }
