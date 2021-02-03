@@ -27,7 +27,7 @@ public class Optimize
 
         for (int i = 0; i < this.newCurves.Count; i++)
         {
-            // this.newCurves[i].points = AdjustParameter.Equalize(this.newCurves[i].points, this.newCurves[i].segment, true);
+            this.newCurves[i].points = AdjustParameter.Equalize(this.newCurves[i].points, this.newCurves[i].segment, true);
             this.newCurves[i].MomentumInitialize();
         }
 
@@ -39,27 +39,31 @@ public class Optimize
 
     public void Update()
     {
-        if (!this.intersectionManager.HaveInterSections())
+        if (this.oculusTouch.GetButton(this.button1) || this.oculusTouch.GetButton(this.button2))
         {
-            List<List<Vector3>> pointsList = this.newCurves.Select(curve => curve.points).ToList();
-            List<List<Vector3>> momentumList = this.newCurves.Select(curve => curve.momentum).ToList();
-            Moebius moebius = new Moebius(pointsList, momentumList);
-            if (this.oculusTouch.GetButton(this.button1))
+            this.intersectionManager.Update();
+            if (!this.intersectionManager.HaveInterSections())
             {
-                moebius.Flow();
-            }
-            else if (this.oculusTouch.GetButton(this.button2))
-            {
-                moebius.MomentumFlow();
-            }
-
-            foreach (Curve curve in this.newCurves)
-            {
-                while (true)
+                List<List<Vector3>> pointsList = this.newCurves.Select(curve => curve.points).ToList();
+                List<List<Vector3>> momentumList = this.newCurves.Select(curve => curve.momentum).ToList();
+                Moebius moebius = new Moebius(pointsList, momentumList);
+                if (this.oculusTouch.GetButton(this.button1))
                 {
-                    Elasticity elasticity = new Elasticity(curve.points, curve.momentum, curve.segment);
-                    if (elasticity.MaxError() < curve.segment * 0.1f) break;
-                    elasticity.Flow();
+                    moebius.Flow();
+                }
+                else if (this.oculusTouch.GetButton(this.button2))
+                {
+                    moebius.MomentumFlow();
+                }
+
+                foreach (Curve curve in this.newCurves)
+                {
+                    while (true)
+                    {
+                        Elasticity elasticity = new Elasticity(curve.points, curve.momentum, curve.segment);
+                        if (elasticity.MaxError() < curve.segment * 0.1f) break;
+                        elasticity.Flow();
+                    }
                 }
             }
         }

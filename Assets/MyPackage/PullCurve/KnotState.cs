@@ -108,7 +108,7 @@ public class KnotStatePull : IKnotState
         List<Vector3> pullablePoints = shiftedPoints.Take(pullableRange).ToList();
         List<Vector3> fixedPoints = shiftedPoints.Skip(pullableRange).ToList();
         this.pullableCurve = new PullableCurve(pullablePoints, new List<Vector3>(), fixedPoints, this.data.oculusTouch, closed: true,
-            meridian: this.data.meridian, radius: this.data.radius, segment: this.data.segment);
+            meridian: this.data.meridian, radius: this.data.radius, segment: this.data.segment, collisionCurves: this.data.collisionCurves);
     }
 
     public IKnotState Update()

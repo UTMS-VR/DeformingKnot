@@ -67,17 +67,4 @@ public class Main : MonoBehaviour
         ( LogicalOVRInput.RawButton.LIndexTrigger, new PhysicalKey(KeyCode.Q) ),
         ( LogicalOVRInput.RawButton.LHandTrigger, new PhysicalKey(KeyCode.W) )
     });
-
-    public static ButtonMap PositionalKeysPlus
-    = new ButtonMap(new List<(LogicalButton logicalButton, IPhysicalButton physicalButton)>
-    {
-        (LogicalOVRInput.RawButton.A, new PhysicalKey(KeyCode.Period)),
-        (LogicalOVRInput.RawButton.B, new PhysicalKey(KeyCode.Slash)),
-        (LogicalOVRInput.RawButton.X, new PhysicalKey(KeyCode.X)),
-        (LogicalOVRInput.RawButton.Y, new PhysicalKey(KeyCode.Z)),
-        (LogicalOVRInput.RawButton.RIndexTrigger, new PhysicalKey(KeyCode.P)),
-        (LogicalOVRInput.RawButton.RHandTrigger, new PhysicalKey(KeyCode.O)),
-        (LogicalOVRInput.RawButton.LIndexTrigger, new PhysicalKey(KeyCode.Q)),
-        (LogicalOVRInput.RawButton.LHandTrigger, new PhysicalKey(KeyCode.W))
-    });
 }
