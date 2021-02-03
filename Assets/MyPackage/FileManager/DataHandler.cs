@@ -20,6 +20,21 @@ namespace FileManager
         }
     }
 
+    [Serializable]
+    public class CurveCore
+    {
+        [SerializeField]
+        public List<Vector3> points;
+        [SerializeField]
+        public bool closed;
+
+        public CurveCore(List<Vector3> points, bool closed)
+        {
+            this.points = points;
+            this.closed = closed;
+        }
+    }
+
     public class DataHandler
     {
         string inputDirOnPC;
@@ -78,11 +93,25 @@ namespace FileManager
             this.Save(filename, json);
         }
 
+        public void SaveCurves(string filename, List<(List<Vector3> points, bool closed)> curves)
+        {
+            List<CurveCore> serializedCurves = curves.Select(curve => new CurveCore(curve.points, curve.closed)).ToList();
+            string json = JsonUtility.ToJson(new SerializedList<CurveCore>(serializedCurves));
+            this.Save(filename, json);
+        }
+
         public List<Vector3> LoadCurve(string filename, float maxLength = 1.0f, Vector3? barycenter = null)
         {
             string json = this.Load(filename);
             List<Vector3> curve = JsonUtility.FromJson<SerializedList<Vector3>>(json).ToList();
             return DataHandler.Normalize(curve, maxLength, barycenter);
+        }
+
+        public List<(List<Vector3> points, bool closed)> LoadCurves(string filename)
+        {
+            string json = this.Load(filename);
+            List<CurveCore> serializedCurves = JsonUtility.FromJson<SerializedList<CurveCore>>(json).ToList();
+            return serializedCurves.Select(curve => (curve.points, curve.closed)).ToList();
         }
 
         public string LoadStringFromUrl(string url, string filename)
@@ -152,6 +181,14 @@ namespace FileManager
                 vector => (vector.magnitude == 0.0f) ? vector : vector * maxLength / maxLengthInCurve
                 ).ToList();
             return DataHandler.MoveBarycenter(normalizedCurve, barycenter);
+        }
+
+        public List<string> GetFilenames()
+        {
+            string inputDir = this.onHMD() ? this.inputDirOnHMD : this.inputDirOnPC;
+            Directory.CreateDirectory(inputDir);
+            List<string> filenames = Directory.GetFiles(inputDir, "*.json", SearchOption.TopDirectoryOnly).ToList();
+            return filenames.Select(name => name.Substring(inputDir.Length + 1)).ToList();
         }
     }
 }

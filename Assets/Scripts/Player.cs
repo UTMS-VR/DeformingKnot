@@ -1,15 +1,18 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DrawCurve;
 using InputManager;
 using ContextMenu;
+using FileManager;
 
 public abstract class State
 {
     protected OculusTouch oculusTouch;
     protected ContextMenu.ContextMenu contextMenu;
+    protected DataHandler dataHandler;
     protected int NumberOfDefaultItems = 4;
     protected int NumberOfUnselectableItems;
     protected List<Curve> curves;
@@ -17,10 +20,11 @@ public abstract class State
     protected float epsilon;
     public State newState;
 
-    public State(OculusTouch oculusTouch, ContextMenu.ContextMenu contextMenu, List<Curve> curves)
+    public State(OculusTouch oculusTouch, ContextMenu.ContextMenu contextMenu, DataHandler dataHandler, List<Curve> curves)
     {
         this.oculusTouch = oculusTouch;
         this.contextMenu = contextMenu;
+        this.dataHandler = dataHandler;
         this.SetupMenu();
         this.curves = curves;
         this.epsilon = this.segment * 0.2f;
@@ -71,6 +75,7 @@ public class BasicDeformation : State
 
     public BasicDeformation(OculusTouch oculusTouch,
                             ContextMenu.ContextMenu contextMenu,
+                            DataHandler dataHandler,
                             List<Curve> curves,
                             LogicalButton changeState = null,
                             LogicalButton draw = null,
@@ -78,7 +83,7 @@ public class BasicDeformation : State
                             LogicalButton select = null,
                             LogicalButton cut = null,
                             LogicalButton comfirm = null)
-        : base(oculusTouch, contextMenu, curves)
+        : base(oculusTouch, contextMenu, dataHandler, curves)
     {
         base.NumberOfUnselectableItems = 9;
         this.preCurves = base.curves;
@@ -116,11 +121,17 @@ public class BasicDeformation : State
         this.contextMenu.AddItem(new MenuItem("選択中の曲線を削除", () => {
             this.Remove();
         }));
+        this.contextMenu.AddItem(new MenuItem("連続変形 (全て閉曲線にしておく)", () => {
+            this.ChangeState();
+        }));
         this.contextMenu.AddItem(new MenuItem("元に戻す", () => {
             this.Undo();
         }));
-        this.contextMenu.AddItem(new MenuItem("連続変形 (全て閉曲線にしておく)", () => {
-            this.ChangeState();
+        this.contextMenu.AddItem(new MenuItem("保存", () => {
+            this.Save();
+        }));
+        this.contextMenu.AddItem(new MenuItem("開く", () => {
+            this.Open();
         }));
     }
 
@@ -155,7 +166,7 @@ public class BasicDeformation : State
             || base.oculusTouch.GetButtonDown(this.move)
             || base.oculusTouch.GetButtonDown(this.select)
             || base.oculusTouch.GetButtonDown(this.cut)
-            || (base.oculusTouch.GetButtonDown(this.comfirm) && (this.contextMenu.SelectedIndex() != 11)))
+            || (base.oculusTouch.GetButtonDown(this.comfirm) && (this.contextMenu.SelectedIndex() != 12)))
         {
             this.preCurves = new List<Curve>();
 
@@ -302,9 +313,64 @@ public class BasicDeformation : State
         if (closed && !intersection)
         {
             base.ResetMenu();
-            this.newState = new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.curves);
+            this.newState = new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
         }
     }
+
+    private void Save()
+    {
+        string timeString = this.GetCurrentTimeString();
+        string filename = $"curve_{timeString}.json";
+        List<(List<Vector3>, bool)> curvesCore = base.curves.Select(curve => (curve.points, curve.closed)).ToList();
+        base.dataHandler.SaveCurves(filename, curvesCore);
+        base.ResetMenu();
+        this.newState = new OpenFile(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
+    }
+
+    private void Open()
+    {
+        base.ResetMenu();
+        this.newState = new OpenFile(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
+    }
+
+    string GetCurrentTimeString()
+    {
+        DateTime currentDateTime = DateTime.Now;
+        return currentDateTime.ToString("yyyy-MM-dd-HH-mm-ss");
+    }
+}
+
+public class OpenFile : State
+{
+    public OpenFile(OculusTouch oculusTouch,
+                    ContextMenu.ContextMenu contextMenu,
+                    DataHandler dataHandler,
+                    List<Curve> curves)
+        : base(oculusTouch, contextMenu, dataHandler, curves)
+    {
+        base.NumberOfUnselectableItems = 4;
+    }
+
+    protected override void SetupMenu()
+    {
+        List<string> filenames = base.dataHandler.GetFilenames();
+        foreach (string filename in filenames)
+        {
+            this.contextMenu.AddItem(new MenuItem(filename, () => {
+                List<(List<Vector3> points, bool closed)> curvesCore = base.dataHandler.LoadCurves(filename);
+                List<Curve> loadedCurves = curvesCore.Select(core => new Curve(core.points, core.closed, segment: base.segment)).ToList();
+                base.ResetMenu();
+                this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, loadedCurves);
+            }));
+        }
+
+        this.contextMenu.AddItem(new MenuItem("戻る", () => {
+            base.ResetMenu();
+            this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
+        }));
+    }
+    
+    public override void Update() {}
 }
 
 public class SelectAutoOrManual : State
@@ -313,9 +379,10 @@ public class SelectAutoOrManual : State
 
     public SelectAutoOrManual(OculusTouch oculusTouch,
                               ContextMenu.ContextMenu contextMenu,
+                              DataHandler dataHandler,
                               List<Curve> curves,
                               LogicalButton select = null)
-        : base(oculusTouch, contextMenu, curves)
+        : base(oculusTouch, contextMenu, dataHandler, curves)
     {
         base.NumberOfUnselectableItems = 6;
         if (select != null) this.select = select;
@@ -329,7 +396,7 @@ public class SelectAutoOrManual : State
 
         this.contextMenu.AddItem(new MenuItem("自動変形", () => {
             base.ResetMenu();
-            this.newState = new AutomaticDeformation(base.oculusTouch, base.contextMenu, base.curves);
+            this.newState = new AutomaticDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
         }));
 
         this.contextMenu.AddItem(new MenuItem("手動変形 (曲線は1つ選択)", () => {
@@ -338,13 +405,13 @@ public class SelectAutoOrManual : State
             {
                 base.ResetMenu();
                 base.curves.Remove(selection[0]);
-                this.newState = new ManualDeformation(base.oculusTouch, base.contextMenu, base.curves, selection[0]);
+                this.newState = new ManualDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves, selection[0]);
             }
         }));
 
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
             base.ResetMenu();
-            this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.curves);
+            this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
         }));
     }
 
@@ -373,10 +440,11 @@ public class AutomaticDeformation : State
     
     public AutomaticDeformation(OculusTouch oculusTouch,
                                 ContextMenu.ContextMenu contextMenu,
+                                DataHandler dataHandler,
                                 List<Curve> curves,
                                 LogicalButton button1 = null,
                                 LogicalButton button2 = null)
-        : base(oculusTouch, contextMenu, curves.Where(curve => !curve.selected).ToList())
+        : base(oculusTouch, contextMenu, dataHandler, curves.Where(curve => !curve.selected).ToList())
     {
         base.NumberOfUnselectableItems = 7;
 
@@ -398,7 +466,7 @@ public class AutomaticDeformation : State
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
             base.curves = base.curves.Concat(this.optimizer.GetCurves()).ToList();
             base.ResetMenu();
-            this.newState = new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.curves);
+            this.newState = new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
         }));
     }
 
@@ -414,9 +482,10 @@ public class ManualDeformation : State
     
     public ManualDeformation(OculusTouch oculusTouch,
                              ContextMenu.ContextMenu contextMenu,
+                             DataHandler dataHandler,
                              List<Curve> curves,
                              Curve curve)
-        : base(oculusTouch, contextMenu, curves)
+        : base(oculusTouch, contextMenu, dataHandler, curves)
     {
         base.NumberOfUnselectableItems = 8;
         this.deformingCurve = new Knot(curve.points,
@@ -436,7 +505,7 @@ public class ManualDeformation : State
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
             base.curves.Add(new Curve(this.deformingCurve.GetPoints(), true, selected: true, segment: base.segment));
             base.ResetMenu();
-            this.newState = new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.curves);
+            this.newState = new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
         }));
     }
 

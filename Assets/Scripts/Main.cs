@@ -13,6 +13,7 @@ public class Main : MonoBehaviour
     private OculusTouch oculusTouch;
     private ContextMenu.ContextMenu contextMenu;
     private LogicalButton comfirmBotton;
+    private DataHandler dataHandler;
     private State state;
 
     void Start()
@@ -41,7 +42,16 @@ public class Main : MonoBehaviour
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.Open();
 
-        this.state = new BasicDeformation(this.oculusTouch, this.contextMenu, new List<Curve>(), comfirm: comfirmBotton);
+        this.dataHandler = new DataHandler(
+            inputDirOnPC: "CurveData",
+            outputDirOnPC: "CurveData",
+            cacheDirOnPC: "CurveData",
+            inputDirOnHMD: "/mnt/sdcard/CurveData",
+            outputDirOnHMD: "/mnt/sdcard/CurveData",
+            cacheDirOnHMD: "/mnt/sdcard/CurveData"
+        );
+
+        this.state = new BasicDeformation(this.oculusTouch, this.contextMenu, this.dataHandler, new List<Curve>(), comfirm: comfirmBotton);
     }
 
     void Update()
