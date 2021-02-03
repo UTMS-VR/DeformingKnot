@@ -123,8 +123,9 @@ public class KnotStatePull : IKnotState
 
         if (this.data.oculusTouch.GetButtonDown(this.data.buttonA))
         {
-            this.data.points = this.pullableCurve.GetPoints();
-            this.data.chosenPoints = (0, this.pullableCurve.GetCount() - 1);
+            var confirmedPoints = this.pullableCurve.GetConfirmedPoints();
+            this.data.points = confirmedPoints.points;
+            this.data.chosenPoints = (0, confirmedPoints.count - 1);
             return new KnotStateBase(this.data);
         }
         else if (this.data.oculusTouch.GetButton(this.data.buttonB))

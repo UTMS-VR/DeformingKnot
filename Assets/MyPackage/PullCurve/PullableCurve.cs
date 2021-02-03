@@ -74,13 +74,14 @@ public class PullableCurve
         int count = this.pullablePoints.Count;
         int preCount = this.preFixedPoints.Count;
         int postCount = this.postFixedPoints.Count;
+        List<Vector3> points = this.GetPoints();
         this.selfHandler = (CurveDistanceHandler)new EfficientCurveDistanceHandler(
             length: preCount + count + postCount,
             initial: preCount,
             terminal: preCount + count - 1,
             closed: this.closed,
             epsilon: this.epsilon,
-            dist: (i, j) => this.SelfHandlerDist(i, j)
+            dist: (i, j) => PullableCurve.CurveSegmentDistance(points, points, i, j)
         );
 
         if (collisionCurves != null)
@@ -119,16 +120,18 @@ public class PullableCurve
         return new PullableCurve(points, new List<Vector3>(), new List<Vector3>(), oculusTouch);
     }
 
-    public List<Vector3> GetPoints()
+    public List<Vector3> GetPoints(List<Vector3> points = null)
     {
-        List<Vector3> points = this.preFixedPoints.Concat(this.pullablePoints).ToList();
-        points = points.Concat(this.postFixedPoints).ToList();
-        return AdjustParameter.Equalize(points, this.segment, this.closed);
+        if (points == null) points = this.pullablePoints;
+        List<Vector3> prePoints = this.preFixedPoints.Concat(points).ToList();
+        return prePoints.Concat(this.postFixedPoints).ToList();
     }
 
-    public int GetCount()
+    public (List<Vector3> points, int count) GetConfirmedPoints()
     {
-        return this.pullablePoints.Count;
+        this.pullablePoints = AdjustParameter.Equalize(this.pullablePoints, this.segment, false);
+        return (this.GetPoints(), this.pullablePoints.Count);
+
     }
 
     private static float BumpFunction(float t)
@@ -155,7 +158,8 @@ public class PullableCurve
         //Mesh meshAtPoints = MakeMesh.GetMeshAtPoints(this.points, this.radius * 2.0f);
         //Graphics.DrawMesh(mesh, Vector3.zero, Quaternion.identity, MakeMesh.CurveMaterial, 0);
         //Graphics.DrawMesh(meshAtPoints, Vector3.zero, Quaternion.identity, MakeMesh.PointMaterial, 0);
-        this.selfHandler.Update((i, j) => this.SelfHandlerDist(i, j));
+        List<Vector3> points = GetPoints();
+        this.selfHandler.Update((i, j) => PullableCurve.CurveSegmentDistance(points, points, i, j));
         if (this.collisionCurves != null)
         {
             foreach (var (curve, handler) in this.collisionCurves)
@@ -181,7 +185,8 @@ public class PullableCurve
             newPullablePoints.Add(this.pullablePoints[i] + vrControllerMove * this.weights[i]);
         }
 
-        if (this.selfHandler.Distance((i, j) => this.SelfHandlerDist(i, j)) < this.epsilon) return;
+        List<Vector3> points = this.GetPoints(newPullablePoints);
+        if (this.selfHandler.Distance((i, j) => PullableCurve.CurveSegmentDistance(points, points, i, j)) < this.epsilon) return;
         if (collisionCurves != null)
         {
             foreach (var (curve, handler) in this.collisionCurves)
@@ -202,26 +207,6 @@ public class PullableCurve
             points1[index1], points1[(index1 + 1) % count1],
             points2[index2], points2[(index2 + 1) % count2]
             );
-    }
-
-    private float SelfHandlerDist(int i, int j)
-    {
-        int count = this.pullablePoints.Count;
-        int preCount = this.preFixedPoints.Count;
-        int postCount = this.postFixedPoints.Count;
-
-        if (j < preCount)
-        {
-            return PullableCurve.CurveSegmentDistance(this.pullablePoints, this.preFixedPoints, i - preCount, j);
-        }
-        else if (j < preCount + count)
-        {
-            return PullableCurve.CurveSegmentDistance(this.pullablePoints, this.pullablePoints, i - preCount, j - preCount);
-        }
-        else
-        {
-            return PullableCurve.CurveSegmentDistance(this.pullablePoints, this.postFixedPoints, i - preCount, j - preCount - count);
-        }
     }
 
     private static float DistanceAverage(List<Vector3> points)

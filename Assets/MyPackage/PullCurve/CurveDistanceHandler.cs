@@ -22,7 +22,7 @@ namespace PullCurve
             return min;
         }
 
-        protected abstract IEnumerable<(int i, int j)> CollidablePairs();
+        protected abstract List<(int i, int j)> CollidablePairs();
 
         public abstract void Update(DistFunc dist);
     }
@@ -42,8 +42,9 @@ namespace PullCurve
             this.closed2 = closed2;
         }
 
-        protected override IEnumerable<(int i, int j)> CollidablePairs()
+        protected override List<(int i, int j)> CollidablePairs()
         {
+            List<(int i, int j)> pairs = new List<(int i, int j)>();
             int end1 = this.closed1 ? this.length1 - 1 : this.length1 - 2;
             int end2 = this.closed2 ? this.length2 - 1 : this.length2 - 2;
 
@@ -51,9 +52,11 @@ namespace PullCurve
             {
                 for (int j = 0; j <= end2; j++)
                 {
-                    yield return (i, j);
+                    pairs.Add((i, j));
                 }
             }
+
+            return pairs;
         }
 
         public override void Update(DistFunc dist) { }
@@ -65,7 +68,7 @@ namespace PullCurve
         private int length2;
         private bool closed1;
         private bool closed2;
-        private IEnumerable<(int i, int j)> collidablePairs;
+        private List<(int i, int j)> collidablePairs;
         private float epsilon;
         private int updateFrame = 10;
         private int frameCount = 0;
@@ -84,7 +87,7 @@ namespace PullCurve
             this.collidablePairs = this.FindCollidablePairs(dist);
         }
 
-        protected override IEnumerable<(int i, int j)> CollidablePairs()
+        protected override List<(int i, int j)> CollidablePairs()
         {
             return this.collidablePairs;
         }
@@ -98,8 +101,9 @@ namespace PullCurve
             }
         }
 
-        private IEnumerable<(int i, int j)> FindCollidablePairs(DistFunc dist)
+        private List<(int i, int j)> FindCollidablePairs(DistFunc dist)
         {
+            List<(int i, int j)> pairs = new List<(int i, int j)>();
             int end1 = this.closed1 ? this.length1 - 1 : this.length1 - 2;
             int end2 = this.closed2 ? this.length2 - 1 : this.length2 - 2;
 
@@ -107,9 +111,11 @@ namespace PullCurve
             {
                 for (int j = 0; j <= end2; j++)
                 {
-                    if (this.Collidable(i, j, dist)) yield return (i, j);
+                    if (this.Collidable(i, j, dist)) pairs.Add((i, j));
                 }
             }
+
+            return pairs;
         }
 
         private bool Collidable(int i, int j, DistFunc dist)
@@ -122,7 +128,7 @@ namespace PullCurve
     {
         private int length;
         private bool closed;
-        private IEnumerable<(int i, int j)> collidablePairs;
+        private List<(int i, int j)> collidablePairs;
         private float epsilon;
         private int updateFrame = 10;
         private int frameCount = 0;
@@ -140,7 +146,7 @@ namespace PullCurve
             this.collidablePairs = this.FindCollidablePairs(dist);
         }
 
-        protected override IEnumerable<(int i, int j)> CollidablePairs()
+        protected override List<(int i, int j)> CollidablePairs()
         {
             return this.collidablePairs;
         }
@@ -154,17 +160,20 @@ namespace PullCurve
             }
         }
 
-        private IEnumerable<(int i, int j)> FindCollidablePairs(DistFunc dist)
+        private List<(int i, int j)> FindCollidablePairs(DistFunc dist)
         {
+            List<(int i, int j)> pairs = new List<(int i, int j)>();
             int endi = this.closed ? this.length - 1 : this.length - 2;
             for (int i = 0; i <= endi; i++)
             {
                 int endj = (i != 0 && this.closed) ? this.length - 1 : this.length - 2;
                 for (int j = i + 2; j <= endj; j++)
                 {
-                    if (this.Collidable(i, j, dist)) yield return (i, j);
+                    if (this.Collidable(i, j, dist)) pairs.Add((i, j));
                 }
             }
+
+            return pairs;
         }
 
         private bool Collidable(int i, int j, DistFunc dist)
@@ -179,7 +188,7 @@ namespace PullCurve
         private int initial;
         private int terminal;
         private bool closed;
-        private IEnumerable<(int i, int j)> collidablePairs;
+        private List<(int i, int j)> collidablePairs;
         private float epsilon;
         private int updateFrame = 10;
         private int frameCount = 0;
@@ -201,7 +210,7 @@ namespace PullCurve
             this.collidablePairs = this.FindCollidablePairs(dist);
         }
 
-        protected override IEnumerable<(int i, int j)> CollidablePairs()
+        protected override List<(int i, int j)> CollidablePairs()
         {
             return this.collidablePairs;
         }
@@ -215,28 +224,31 @@ namespace PullCurve
             }
         }
 
-        private IEnumerable<(int i, int j)> FindCollidablePairs(DistFunc dist)
+        private List<(int i, int j)> FindCollidablePairs(DistFunc dist)
         {
+            List<(int i, int j)> pairs = new List<(int i, int j)>();
             for (int i = initial; i < terminal; i++)
             {
                 int end1 = (i == initial) ? initial - 2 : initial - 1;
                 for (int j = 0; j <= end1; j++)
                 {
-                    if (this.Collidable(i, j, dist)) yield return (i, j);
+                    if (this.Collidable(i, j, dist)) pairs.Add((i, j));
                 }
 
                 for (int j = i + 2; j < terminal; j++)
                 {
-                    if (this.Collidable(i, j, dist)) yield return (i, j);
+                    if (this.Collidable(i, j, dist)) pairs.Add((i, j));
                 }
 
                 int end2 = (i == terminal - 1) ? terminal + 1 : terminal;
-                int end3 = this.closed ? this.length - 1 : this.length - 2;
+                int end3 = (i != 0 && this.closed) ? this.length - 1 : this.length - 2;
                 for (int j = end2; j <= end3; j++)
                 {
-                    if (this.Collidable(i, j, dist)) yield return (i, j);
+                    if (this.Collidable(i, j, dist)) pairs.Add((i, j));
                 }
             }
+
+            return pairs;
         }
 
         private bool Collidable(int i, int j, DistFunc dist)
