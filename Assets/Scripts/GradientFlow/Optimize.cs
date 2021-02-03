@@ -9,65 +9,37 @@ public class Optimize
 {
     private OculusTouch oculusTouch;
     private List<Curve> newCurves;
+    private List<Curve> collisionCurves;
+    private IntersectionManager intersectionManager;
     private LogicalButton button1;
     private LogicalButton button2;
 
     public Optimize(OculusTouch oculusTouch,
                     List<Curve> newCurves,
+                    List<Curve> collisionCurves,
+                    float epsilon,
                     LogicalButton button1,
                     LogicalButton button2)
     {
         this.newCurves = newCurves;
+        this.collisionCurves = collisionCurves;
         this.oculusTouch = oculusTouch;
 
         for (int i = 0; i < this.newCurves.Count; i++)
         {
-            this.newCurves[i].points = AdjustParameter.Equalize(this.newCurves[i].points, this.newCurves[i].segment, true);
+            // this.newCurves[i].points = AdjustParameter.Equalize(this.newCurves[i].points, this.newCurves[i].segment, true);
             this.newCurves[i].MomentumInitialize();
         }
+
+        this.intersectionManager = new IntersectionManager(this.newCurves, this.collisionCurves, epsilon);
 
         this.button1 = button1;
         this.button2 = button2;
     }
 
-    public void Update(List<Curve> collisionCurves)
+    public void Update()
     {
-        float epsilon = 0.2f;
-        int count = this.newCurves.Count;
-
-        bool intersection = false;
-        for (int i = 0; i < count; i++)
-        {
-            float segment = this.newCurves[i].segment;
-            if (this.newCurves[i].points.Count >= 4
-                && this.newCurves[i].MinSegmentDist() <= segment * epsilon)
-            {
-                intersection = true;
-                break;
-            }
-
-            for (int j = i + 1; j < count; j++)
-            {
-                if (this.newCurves[i].CurveDistance(this.newCurves[j]) <= segment * epsilon)
-                {
-                    intersection = true;
-                    break;
-                }
-            }
-            if (intersection) break;
-
-            foreach (Curve curve in collisionCurves)
-            {
-                if (this.newCurves[i].CurveDistance(curve) <= segment * epsilon)
-                {
-                    intersection = true;
-                    break;
-                }
-            }
-            if (intersection) break;
-        }
-
-        if (!intersection)
+        if (!this.intersectionManager.HaveInterSections())
         {
             List<List<Vector3>> pointsList = this.newCurves.Select(curve => curve.points).ToList();
             List<List<Vector3>> momentumList = this.newCurves.Select(curve => curve.momentum).ToList();

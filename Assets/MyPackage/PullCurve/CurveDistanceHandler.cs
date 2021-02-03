@@ -124,7 +124,7 @@ namespace PullCurve
         }
     }
 
-    public class OneCurveDistanceHandler : CurveDistanceHandler
+    public class SelfCurveDistanceHandler : CurveDistanceHandler
     {
         private int length;
         private bool closed;
@@ -133,7 +133,7 @@ namespace PullCurve
         private int updateFrame = 10;
         private int frameCount = 0;
 
-        public OneCurveDistanceHandler(
+        public SelfCurveDistanceHandler(
             int length,
             bool closed,
             float epsilon,

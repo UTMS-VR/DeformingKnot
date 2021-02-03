@@ -387,7 +387,7 @@ public class AutomaticDeformation : State
         else this.button2 = LogicalOVRInput.RawButton.B;
 
         List<Curve> newCurves = curves.Where(curve => curve.selected).ToList();
-        this.optimizer = new Optimize(oculusTouch, newCurves, this.button1, this.button2);
+        this.optimizer = new Optimize(oculusTouch, newCurves, base.curves, base.epsilon, this.button1, this.button2);
     }
 
     protected override void SetupMenu()
@@ -404,7 +404,7 @@ public class AutomaticDeformation : State
 
     public override void Update()
     {
-        this.optimizer.Update(base.curves);
+        this.optimizer.Update();
     }
 }
 
