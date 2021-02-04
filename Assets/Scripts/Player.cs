@@ -112,8 +112,8 @@ public class BasicDeformation : State
     {
         this.contextMenu.AddItem(new MenuItem("右人差し指 : 描画", () => {}));
         this.contextMenu.AddItem(new MenuItem("右中指 : 平行移動, 回転", () => {}));
-        this.contextMenu.AddItem(new MenuItem("A : 選択", () => {}));
-        this.contextMenu.AddItem(new MenuItem("B : 選択中の曲線を切断 (曲線は1つ選択)", () => {}));
+        this.contextMenu.AddItem(new MenuItem("Aボタン : 選択", () => {}));
+        this.contextMenu.AddItem(new MenuItem("Bボタン : 選択中の曲線を切断 (曲線は1つ選択)", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("選択中の曲線を結合 (曲線は1つか2つ選択)", () => {
             this.Combine();
@@ -391,7 +391,7 @@ public class SelectAutoOrManual : State
 
     protected override void SetupMenu()
     {
-        this.contextMenu.AddItem(new MenuItem("A : 選択", () => {}));
+        this.contextMenu.AddItem(new MenuItem("Aボタン : 選択", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
 
         this.contextMenu.AddItem(new MenuItem("自動変形", () => {
@@ -460,8 +460,8 @@ public class AutomaticDeformation : State
 
     protected override void SetupMenu()
     {
-        this.contextMenu.AddItem(new MenuItem("A : 自動変形 (遅い)", () => {}));
-        this.contextMenu.AddItem(new MenuItem("B : 自動変形 (速い)", () => {}));
+        this.contextMenu.AddItem(new MenuItem("Aボタン : 自動変形 (遅い)", () => {}));
+        this.contextMenu.AddItem(new MenuItem("Bボタン : 自動変形 (速い)", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
             base.curves = base.curves.Concat(this.optimizer.GetCurves()).ToList();
@@ -499,8 +499,8 @@ public class ManualDeformation : State
     protected override void SetupMenu()
     {
         this.contextMenu.AddItem(new MenuItem("", () => {}));
-        this.contextMenu.AddItem(new MenuItem("A : 決定", () => {}));
-        this.contextMenu.AddItem(new MenuItem("B : キャンセル", () => {}));
+        this.contextMenu.AddItem(new MenuItem("Aボタン : 決定", () => {}));
+        this.contextMenu.AddItem(new MenuItem("Bボタン : キャンセル", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
             base.curves.Add(new Curve(this.deformingCurve.GetPoints(), true, selected: true, segment: base.segment));
@@ -524,7 +524,7 @@ public class ManualDeformation : State
         }
         else if (knotState.ToString() == "KnotStatePull")
         {
-            return "変形";
+            return "右手に合わせて変形";
         }
         else if (knotState.ToString() == "KnotStateChoose1")
         {

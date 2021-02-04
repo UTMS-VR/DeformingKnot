@@ -12,7 +12,7 @@ public class Moebius
     private List<float> arcList;
     private List<float> segmentList;
     private int count;
-    private float lr = 1e-05f; // longitude 64, segment 0.03f -> 1e-05f;
+    private float lr = 1e-04f; // longitude 64, segment 0.03f -> 1e-05f;
     private float alpha = 0.95f;
     private List<List<Vector3>> gradientList;
 
@@ -40,6 +40,7 @@ public class Moebius
             for (int j = 0; j < this.countList[i]; j++)
             {
                 this.pointsList[i][j] -= this.gradientList[i][j];
+                // if (this.gradientList[i][j].magnitude > 0.001f) Debug.Log(this.gradientList[i][j].magnitude);
             }
         }
     }
@@ -53,6 +54,7 @@ public class Moebius
             {
                 this.momentumList[i][j] = this.alpha * this.momentumList[i][j] + this.gradientList[i][j];
                 this.pointsList[i][j] -= this.momentumList[i][j];
+                // if (this.momentumList[i][j].magnitude > 0.001f) Debug.Log(this.momentumList[i][j].magnitude);
             }
         }
     }

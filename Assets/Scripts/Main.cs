@@ -37,8 +37,8 @@ public class Main : MonoBehaviour
             lockLevel: null
         );
         this.contextMenu.AddItem(new MenuItem("左人差し指 : メニューウィンドウの開閉", () => {}));
-        this.contextMenu.AddItem(new MenuItem("左スティック : カーソル操作", () => {}));
-        this.contextMenu.AddItem(new MenuItem("X : 決定", () => {}));
+        this.contextMenu.AddItem(new MenuItem("左スティック : カーソルの移動", () => {}));
+        this.contextMenu.AddItem(new MenuItem("Xボタン : メニューでの決定ボタン", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.Open();
 

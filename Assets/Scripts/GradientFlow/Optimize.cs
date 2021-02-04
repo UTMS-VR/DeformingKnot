@@ -30,7 +30,6 @@ public class Optimize
             this.newCurves[i].points = AdjustParameter.Equalize(this.newCurves[i].points, this.newCurves[i].segment, true);
             this.newCurves[i].MomentumInitialize();
         }
-
         this.intersectionManager = new IntersectionManager(this.newCurves, this.collisionCurves, epsilon);
 
         this.button1 = button1;
@@ -61,7 +60,7 @@ public class Optimize
                     while (true)
                     {
                         Elasticity elasticity = new Elasticity(curve.points, curve.momentum, curve.segment);
-                        if (elasticity.MaxError() < curve.segment * 0.1f) break;
+                        if (elasticity.MaxError() < curve.segment * 0.3f) break;
                         elasticity.Flow();
                     }
                 }

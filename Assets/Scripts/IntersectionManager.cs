@@ -17,6 +17,7 @@ public class IntersectionManager
     {
         this.deformableCurves = deformableCurves;
         this.fixedCurves = fixedCurves;
+        this.epsilon = epsilon;
 
         int count = this.deformableCurves.Count;
         this.selfHandlers = new List<CurveDistanceHandler>();
@@ -70,8 +71,6 @@ public class IntersectionManager
                 ));
             }
         }
-
-        this.epsilon = epsilon;
     }
 
     public void Update()
