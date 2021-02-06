@@ -43,9 +43,9 @@ public abstract class State
 
     public void RestrictCursorPosition()
     {
-        while (this.contextMenu.SelectedIndex() < this.NumberOfUnselectableItems)
+        while (this.contextMenu.cursorIndex < this.NumberOfUnselectableItems)
         {
-            this.contextMenu.IncreaseSelectedIndex();
+            this.contextMenu.MoveCursorDown();
         }
     }
 
@@ -166,7 +166,7 @@ public class BasicDeformation : State
             || base.oculusTouch.GetButtonDown(this.move)
             || base.oculusTouch.GetButtonDown(this.select)
             || base.oculusTouch.GetButtonDown(this.cut)
-            || (base.oculusTouch.GetButtonDown(this.comfirm) && (this.contextMenu.SelectedIndex() != 12)))
+            || (base.oculusTouch.GetButtonDown(this.comfirm) && (this.contextMenu.cursorIndex != 12)))
         {
             this.preCurves = new List<Curve>();
 
@@ -493,14 +493,16 @@ public class ManualDeformation : State
                                        meridian: curve.meridian,
                                        radius: curve.radius,
                                        segment: curve.segment,
-                                       collisionCurves: curves);
+                                       collisionCurves: curves,
+                                       buttonC: LogicalOVRInput.RawButton.DisabledButton,
+                                       buttonD: LogicalOVRInput.RawButton.DisabledButton);
     }
 
     protected override void SetupMenu()
     {
         this.contextMenu.AddItem(new MenuItem("", () => {}));
-        this.contextMenu.AddItem(new MenuItem("Aボタン : 決定", () => {}));
-        this.contextMenu.AddItem(new MenuItem("Bボタン : キャンセル", () => {}));
+        this.contextMenu.AddItem(new MenuItem("", () => {}));
+        this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
             base.curves.Add(new Curve(this.deformingCurve.GetPoints(), true, selected: true, segment: base.segment));
@@ -513,26 +515,30 @@ public class ManualDeformation : State
     {
         this.deformingCurve.Update();
         MenuItem renamedItem = this.contextMenu.FindItem((item) => this.contextMenu.items.IndexOf(item) == base.NumberOfDefaultItems);
-        this.contextMenu.ChangeItemMessage(renamedItem, this.Message(this.deformingCurve.state));
+        this.contextMenu.ChangeItemMessage(renamedItem, this.Message(this.deformingCurve.state).Item1);
+        renamedItem = this.contextMenu.FindItem((item) => this.contextMenu.items.IndexOf(item) == base.NumberOfDefaultItems + 1);
+        this.contextMenu.ChangeItemMessage(renamedItem, this.Message(this.deformingCurve.state).Item2);
+        renamedItem = this.contextMenu.FindItem((item) => this.contextMenu.items.IndexOf(item) == base.NumberOfDefaultItems + 2);
+        this.contextMenu.ChangeItemMessage(renamedItem, this.Message(this.deformingCurve.state).Item3);
     }
 
-    private string Message(IKnotState knotState)
+    private (string, string, string) Message(IKnotState knotState)
     {
         if (knotState.ToString() == "KnotStateBase")
         {
-            return "可動域を確定";
+            return ("可動域を確定しますか？", "Aボタン : 確定する", "Bボタン : 選択し直す");
         }
         else if (knotState.ToString() == "KnotStatePull")
         {
-            return "右手に合わせて変形";
+            return ("右手の動きに合わせて変形します", "Aボタン : 確定", "Bボタン : キャンセル");
         }
         else if (knotState.ToString() == "KnotStateChoose1")
         {
-            return "可動域の始点を選択";
+            return ("可動域の始点を選択して下さい", "Aボタン : 決定", "Bボタン : キャンセル");
         }
         else
         {
-            return "可動域の終点を選択";
+            return ("可動域の終点を選択して下さい", "Aボタン : 決定", "Bボタン : キャンセル");
         }
     }
 }

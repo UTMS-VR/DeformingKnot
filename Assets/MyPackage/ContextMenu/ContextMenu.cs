@@ -24,13 +24,43 @@ namespace ContextMenu {
     private readonly LogicalButton confirmButton;
     private readonly LogicalButton toggleMenuButton;
 
-    private readonly List<MenuItem> innerItems = new List<MenuItem>();
-    private int selectedIndex = 0;
-    private bool displayed = false;
-
     private readonly uint? lockLevel;
     private Lock locq = null;
 
+    private bool innerDisplayed = false;  // 直接使用は非推奨
+    public bool displayed {
+      get {
+        return this.innerDisplayed;
+      }
+      set {
+        this.innerDisplayed = value;
+        if (value) {
+          if (this.lockLevel is uint level) {
+            this.locq = this.controller.GetLock(level);
+          }
+        } else {
+          if (this.lockLevel is uint level) {
+            this.controller.Unlock(this.locq);
+            this.locq = null;
+          }
+        }
+        UpdatePanelObject();
+      }
+    }
+
+    private int innerCursorIndex = 0;  // 直接使用は非推奨
+    public int cursorIndex {
+      get {
+        return this.innerCursorIndex;
+      }
+      set {
+        var count = this.innerItems.Count;
+        this.innerCursorIndex = (value % count + count) % count;
+        UpdateSelectionObject();
+      }
+    }
+
+    private readonly List<MenuItem> innerItems = new List<MenuItem>();
     public ReadOnlyCollection<MenuItem> items {
       get {
         return this.innerItems.AsReadOnly();
@@ -92,7 +122,6 @@ namespace ContextMenu {
         } else {
           Open();
         }
-        Debug.Log("Menu panel toggled.");
       }
     }
 
@@ -100,31 +129,13 @@ namespace ContextMenu {
       if (this.displayed) {
         var downPushed = this.controller.GetButtonDown(this.downButton, this.locq, repeat: true);
         var upPushed = this.controller.GetButtonDown(this.upButton, this.locq, repeat: true);
-        if (downPushed && this.selectedIndex < this.innerItems.Count - 1) {
-          this.selectedIndex ++;
-          UpdateSelectionObject();
-          Debug.Log("Selected item changed: " + this.selectedIndex);
+        if (downPushed) {
+          MoveCursorDown();
         }
-        if (upPushed && this.selectedIndex > 0) {
-          this.selectedIndex --;
-          UpdateSelectionObject();
-          Debug.Log("Selected item changed: " + this.selectedIndex);
+        if (upPushed) {
+          MoveCursorUp();
         }
       }
-    }
-
-    public void IncreaseSelectedIndex()
-    {
-      if (this.selectedIndex < this.innerItems.Count - 1)
-      {
-        this.selectedIndex ++;
-        UpdateSelectionObject();
-      }
-    }
-
-    public int SelectedIndex()
-    {
-      return this.selectedIndex;
     }
 
     private void ExecuteAction() {
@@ -132,7 +143,7 @@ namespace ContextMenu {
         var pushed = this.controller.GetButtonDown(this.confirmButton, this.locq);
         if (pushed) {
           this.selectionObject.GetComponent<SelectionManager>().Select();
-          var item = this.innerItems[this.selectedIndex];
+          var item = this.innerItems[this.cursorIndex];
           if (item.action != null) {
             item.action();
           }
@@ -165,9 +176,8 @@ namespace ContextMenu {
       var index = this.innerItems.IndexOf(oldItem);
       if (index >= 0) {
         this.innerItems.RemoveAt(index);
-        if (index <= this.selectedIndex) {
-          this.selectedIndex --;
-          UpdateSelectionObject();
+        if (index <= this.cursorIndex) {
+          this.cursorIndex --;
         }
         UpdateItemObjects();
       }
@@ -190,35 +200,37 @@ namespace ContextMenu {
       }
     }
 
+    public void MoveCursorDown() {
+      this.cursorIndex ++;
+    }
+
+    public void MoveCursorUp() {
+      this.cursorIndex --;
+    }
+
     public void Open() {
       this.displayed = true;
-      if (this.lockLevel is uint level) {
-        this.locq = this.controller.GetLock(level);
-      }
-      UpdatePanelObject();
     }
 
     public void Close() {
       this.displayed = false;
-      if (this.lockLevel is uint level) {
-        this.controller.Unlock(this.locq);
-        this.locq = null;
-      }
-      UpdatePanelObject();
     }
 
+    // メニューのパネルに関する状態変化 (表示/非表示の変更など) があった場合に必ず実行してください。
     private void UpdatePanelObject() {
       this.panelObject.SetActive(this.displayed);
     }
 
+    // カーソルに関する状態変化 (カーソル位置など) があった場合に必ず実行してください。
     private void UpdateSelectionObject() {
       var height = GetItemHeight();
       var selectionTransform = this.selectionObject.GetComponent<RectTransform>();
       var selectionPosition = selectionTransform.anchoredPosition;
-      selectionPosition.y = -selectedIndex * height - 10;
+      selectionPosition.y = -cursorIndex * height - 10;
       selectionTransform.anchoredPosition = selectionPosition;
     }
 
+    // メニュー項目 (項目の追加やテキストの変更など) があった場合に必ず実行してください。
     private void UpdateItemObjects() {
       var height = GetItemHeight();
       var totalHeight = height * this.innerItems.Count + 20;
