@@ -530,11 +530,9 @@ public class ManualDeformation : State
         {
             return "可動域の始点を選択";
         }
-        else if (knotState.ToString() == "KnotStateChoose2")
+        else
         {
             return "可動域の終点を選択";
         }
-
-        return "";
     }
 }
