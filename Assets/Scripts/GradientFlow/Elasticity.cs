@@ -72,7 +72,7 @@ public class Elasticity
 
         for (int i = 0; i < this.len; i++)
         {
-            float error = Vector3.Distance(this.pos[i], this.pos[Succ(i)]) - this.seg;
+            float error = Mathf.Abs(Vector3.Distance(this.pos[i], this.pos[Succ(i)]) - this.seg);
 
             if (max < error)
             {
