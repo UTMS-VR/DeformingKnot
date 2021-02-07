@@ -281,7 +281,7 @@ namespace PullCurve
             Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, this.data.curveMaterial, 0);
             Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, this.data.pointMaterial, 0);
 
-            if (this.data.oculusTouch.GetButtonDown(this.data.buttonA))
+            if (this.data.oculusTouch.GetButtonDown(this.data.buttonA) && this.ind1 != ind2)
             {
                 this.data.chosenPoints = KnotStateChoose2.ChooseShorterPath(
                     (this.ind1, ind2), this.data.points.Count);
