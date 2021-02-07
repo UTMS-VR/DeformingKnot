@@ -7,6 +7,7 @@ using DrawCurve;
 using InputManager;
 using ContextMenu;
 using FileManager;
+using PullCurve;
 
 public abstract class State
 {
@@ -492,10 +493,11 @@ public class ManualDeformation : State
                                        oculusTouch,
                                        meridian: curve.meridian,
                                        radius: curve.radius,
-                                       segment: curve.segment,
+                                       distanceThreshold: curve.segment,
                                        collisionCurves: curves,
                                        buttonC: LogicalOVRInput.RawButton.DisabledButton,
-                                       buttonD: LogicalOVRInput.RawButton.DisabledButton);
+                                       buttonD: LogicalOVRInput.RawButton.DisabledButton,
+                                       curveMaterial: MakeMesh.SelectedCurveMaterial);
     }
 
     protected override void SetupMenu()
@@ -515,24 +517,24 @@ public class ManualDeformation : State
     {
         this.deformingCurve.Update();
         MenuItem renamedItem = this.contextMenu.FindItem((item) => this.contextMenu.items.IndexOf(item) == base.NumberOfDefaultItems);
-        this.contextMenu.ChangeItemMessage(renamedItem, this.Message(this.deformingCurve.state).Item1);
+        this.contextMenu.ChangeItemMessage(renamedItem, this.Message(this.deformingCurve.GetKnotState()).Item1);
         renamedItem = this.contextMenu.FindItem((item) => this.contextMenu.items.IndexOf(item) == base.NumberOfDefaultItems + 1);
-        this.contextMenu.ChangeItemMessage(renamedItem, this.Message(this.deformingCurve.state).Item2);
+        this.contextMenu.ChangeItemMessage(renamedItem, this.Message(this.deformingCurve.GetKnotState()).Item2);
         renamedItem = this.contextMenu.FindItem((item) => this.contextMenu.items.IndexOf(item) == base.NumberOfDefaultItems + 2);
-        this.contextMenu.ChangeItemMessage(renamedItem, this.Message(this.deformingCurve.state).Item3);
+        this.contextMenu.ChangeItemMessage(renamedItem, this.Message(this.deformingCurve.GetKnotState()).Item3);
     }
 
     private (string, string, string) Message(IKnotState knotState)
     {
-        if (knotState.ToString() == "KnotStateBase")
+        if (knotState is KnotStateBase)
         {
             return ("可動域を確定しますか？", "Aボタン : 確定する", "Bボタン : 選択し直す");
         }
-        else if (knotState.ToString() == "KnotStatePull")
+        else if (knotState is KnotStatePull)
         {
             return ("右手の動きに合わせて変形します", "Aボタン : 確定", "Bボタン : キャンセル");
         }
-        else if (knotState.ToString() == "KnotStateChoose1")
+        else if (knotState is KnotStateChoose1)
         {
             return ("可動域の始点を選択して下さい", "Aボタン : 決定", "Bボタン : キャンセル");
         }
