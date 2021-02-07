@@ -410,6 +410,15 @@ public class SelectAutoOrManual : State
             }
         }));
 
+        this.contextMenu.AddItem(new MenuItem("平滑化", () => {
+            List<Curve> selection = base.curves.Where(curve => curve.selected).ToList();
+            foreach (Curve curve in selection)
+            {
+                curve.points = this.Smoothing(curve.points);
+                curve.MeshUpdate();
+            }
+        }));
+
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
             base.ResetMenu();
             this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
@@ -430,6 +439,29 @@ public class SelectAutoOrManual : State
                 base.curves[i].Select();
             }
         }
+    }
+
+    private List<Vector3> Smoothing(List<Vector3> points)
+    {
+        int count = points.Count;
+        List<Vector3> newPoints = new List<Vector3>();
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 nowPoint = points[i];
+            Vector3 postPoint = points[(i + 1) % count];
+            Vector3 prePoint = points[(i - 1 + count) % count];
+            float cos = Vector3.Dot((postPoint - nowPoint).normalized, (prePoint - nowPoint).normalized);
+            if (cos > -0.9f)
+            {
+                newPoints.Add((nowPoint + postPoint + prePoint) / 3);
+            }
+            else
+            {
+                newPoints.Add(nowPoint);
+            }
+        }
+
+        return newPoints;
     }
 }
 
