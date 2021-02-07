@@ -74,25 +74,25 @@ namespace PullCurve
         }
 
         public Mesh GetPullableMesh(int first, int second)
-         {
-             var (pullablePoints, _) = this.GetPullableAndFixedPoints(first, second);
-             return MakeMesh.GetMesh(pullablePoints, this.meridian, this.radius, false);
-         }
+        {
+            var (pullablePoints, _) = this.GetPullableAndFixedPoints(first, second);
+            return MakeMesh.GetMesh(pullablePoints, this.meridian, this.radius, false);
+        }
 
          public Mesh GetFixedMesh(int first, int second)
-         {
-             var (pullablePoints, fixedPoints) = this.GetPullableAndFixedPoints(first, second);
-             List<Vector3> fixedPointsAppended = 
-                 fixedPoints.Prepend(pullablePoints.Last()).Append(pullablePoints.First()).ToList();
-             return MakeMesh.GetMesh(fixedPointsAppended, this.meridian, this.radius, false);
-         }
+        {
+            var (pullablePoints, fixedPoints) = this.GetPullableAndFixedPoints(first, second);
+            List<Vector3> fixedPointsAppended = 
+                fixedPoints.Prepend(pullablePoints.Last()).Append(pullablePoints.First()).ToList();
+            return MakeMesh.GetMesh(fixedPointsAppended, this.meridian, this.radius, false);
+        }
 
-         public Mesh GetBoundaryMesh(int first, int second)
-         {
-             var (pullablePoints, _) = this.GetPullableAndFixedPoints(first, second);
-             var boundaryPoints = new List<Vector3>() { pullablePoints.Last(), pullablePoints.First() };
-             return MakeMesh.GetMeshAtPoints(boundaryPoints, this.radius * 3);
-         }
+        public Mesh GetBoundaryMesh(int first, int second)
+        {
+            var (pullablePoints, _) = this.GetPullableAndFixedPoints(first, second);
+            var boundaryPoints = new List<Vector3>() { pullablePoints.Last(), pullablePoints.First() };
+            return MakeMesh.GetMeshAtPoints(boundaryPoints, this.radius * 3);
+        }
     }
 
 
