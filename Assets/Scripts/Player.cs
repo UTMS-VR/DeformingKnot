@@ -16,6 +16,7 @@ public abstract class State
     protected DataHandler dataHandler;
     protected int NumberOfDefaultItems = 4;
     protected int NumberOfUnselectableItems;
+    protected int NumberOfAllItems;
     protected List<Curve> curves;
     protected float segment = 0.03f;
     protected float epsilon;
@@ -44,9 +45,13 @@ public abstract class State
 
     public void RestrictCursorPosition()
     {
-        while (this.contextMenu.cursorIndex < this.NumberOfUnselectableItems)
+        if (this.contextMenu.cursorIndex == 0)
         {
-            this.contextMenu.MoveCursorDown();
+            this.contextMenu.cursorIndex = this.NumberOfUnselectableItems;
+        }
+        else if (this.contextMenu.cursorIndex < this.NumberOfUnselectableItems)
+        {
+            this.contextMenu.cursorIndex = this.NumberOfAllItems - 1;
         }
     }
 
@@ -87,6 +92,7 @@ public class BasicDeformation : State
         : base(oculusTouch, contextMenu, dataHandler, curves)
     {
         base.NumberOfUnselectableItems = 9;
+        base.NumberOfAllItems = 15;
         this.preCurves = base.curves;
         this.drawingCurve = new Curve(new List<Vector3>(), false);
         this.movingCurves = new List<int>();
@@ -369,6 +375,9 @@ public class OpenFile : State
             base.ResetMenu();
             this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
         }));
+
+
+        base.NumberOfAllItems = 5 + filenames.Count;
     }
     
     public override void Update() {}
@@ -386,6 +395,7 @@ public class SelectAutoOrManual : State
         : base(oculusTouch, contextMenu, dataHandler, curves)
     {
         base.NumberOfUnselectableItems = 6;
+        base.NumberOfAllItems = 10;
         if (select != null) this.select = select;
         else this.select = LogicalOVRInput.RawButton.A;
     }
@@ -480,6 +490,7 @@ public class AutomaticDeformation : State
         : base(oculusTouch, contextMenu, dataHandler, curves.Where(curve => !curve.selected).ToList())
     {
         base.NumberOfUnselectableItems = 7;
+        base.NumberOfAllItems = 8;
 
         if (button1 != null) this.button1 = button1;
         else this.button1 = LogicalOVRInput.RawButton.A;
@@ -521,6 +532,7 @@ public class ManualDeformation : State
         : base(oculusTouch, contextMenu, dataHandler, curves)
     {
         base.NumberOfUnselectableItems = 8;
+        base.NumberOfAllItems = 9;
         this.deformingCurve = new Knot(curve.points,
                                        oculusTouch,
                                        meridian: curve.meridian,
