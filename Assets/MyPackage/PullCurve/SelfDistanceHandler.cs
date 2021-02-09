@@ -7,7 +7,7 @@ namespace PullCurve
 {
     using DistFunc = Func<int, int, float>;
 
-    abstract class CurveDistanceHandler
+    abstract class SelfDistanceHandler
     {
         public float Distance(DistFunc dist)
         {
@@ -27,29 +27,26 @@ namespace PullCurve
         public abstract void Update(DistFunc dist);
     }
 
-    class TrivialCurveDistanceHandler : CurveDistanceHandler
+    class TrivialSelfDistanceHandler : SelfDistanceHandler
     {
-        int length1;
-        int length2;
-        bool closed1;
-        bool closed2;
+        int length;
+        bool closed;
 
-        public TrivialCurveDistanceHandler(int length1, int length2, bool closed1, bool closed2)
+        public TrivialSelfDistanceHandler(int length, bool closed)
         {
-            this.length1 = length1;
-            this.length2 = length2;
-            this.closed1 = closed1;
-            this.closed2 = closed2;
+            this.length = length;
+            this.closed = closed;
         }
 
         protected override IEnumerable<(int i, int j)> CollidablePairs()
         {
-            int end1 = this.closed1 ? this.length1 - 1 : this.length1 - 2;
-            int end2 = this.closed2 ? this.length2 - 1 : this.length2 - 2;
+            int n = this.length;
+            int endi = closed ? n - 3 : n - 4;
 
-            for (int i = 0; i <= end1; i++)
+            for (int i = 0; i <= endi; i++)
             {
-                for (int j = 0; j <= end2; j++)
+                int endj = (i == 0 || !closed) ? n - 2 : n - 1;
+                for (int j = i + 2; j <= endj; j++)
                 {
                     yield return (i, j);
                 }
@@ -59,27 +56,22 @@ namespace PullCurve
         public override void Update(DistFunc dist) { }
     }
 
-    class SimpleCurveDistanceHandler : CurveDistanceHandler
+    class SimpleSelfDistanceHandler : SelfDistanceHandler
     {
-        private int length1;
-        private int length2;
-        private bool closed1;
-        private bool closed2;
+        int length;
+        bool closed;
         private List<(int i, int j)> collidablePairs;
         private float epsilon;
         private int updateFrame = 10;
         private int frameCount = 0;
 
-        public SimpleCurveDistanceHandler(
-            int length1, int length2,
-            bool closed1, bool closed2,
+        public SimpleSelfDistanceHandler(
+            int length, bool closed,
             float epsilon, DistFunc dist
             )
         {
-            this.length1 = length1;
-            this.length2 = length2;
-            this.closed1 = closed1;
-            this.closed2 = closed2;
+            this.length = length;
+            this.closed = closed;
             this.epsilon = epsilon;
             this.collidablePairs = this.FindCollidablePairs(dist);
         }
@@ -101,12 +93,13 @@ namespace PullCurve
         private List<(int i, int j)> FindCollidablePairs(DistFunc dist)
         {
             var collidablePairs = new List<(int i, int j)>();
-            int end1 = this.closed1 ? this.length1 - 1 : this.length1 - 2;
-            int end2 = this.closed2 ? this.length2 - 1 : this.length2 - 2;
+            int n = this.length;
+            int endi = closed ? n - 3 : n - 4;
 
-            for (int i = 0; i <= end1; i++)
+            for (int i = 0; i <= endi; i++)
             {
-                for (int j = 0; j <= end2; j++)
+                int endj = (i == 0 || !closed) ? n - 2 : n - 1;
+                for (int j = i + 2; j <= endj; j++)
                 {
                     float d = dist(i, j);
                     if (d < this.epsilon * (this.updateFrame + 1))

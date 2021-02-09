@@ -13,8 +13,8 @@ namespace PullCurve
         private List<Vector3> pullablePoints;
         private List<Vector3> preFixedPoints;
         private List<Vector3> postFixedPoints;
-        private CurveDistanceHandler selfHandler;
         private List<(Curve curve, CurveDistanceHandler handler)> collisionCurves;
+        private SelfDistanceHandler selfDistanceHandler;
         private float distanceThreshold;
         private float epsilon;
         private List<float> weights;
@@ -75,15 +75,6 @@ namespace PullCurve
             int count = this.pullablePoints.Count;
             int preCount = this.preFixedPoints.Count;
             int postCount = this.postFixedPoints.Count;
-            List<Vector3> points = this.GetPoints();
-            this.selfHandler = (CurveDistanceHandler)new EfficientCurveDistanceHandler(
-                length: preCount + count + postCount,
-                initial: preCount,
-                terminal: preCount + count - 1,
-                closed: this.closed,
-                epsilon: this.epsilon,
-                dist: (i, j) => PullableCurve.CurveSegmentDistance(points, points, i, j)
-            );
 
             if (collisionCurves != null)
             {
@@ -96,7 +87,7 @@ namespace PullCurve
                         //    closed1: this.closed,
                         //    closed2: curve.closed
                         //    )
-                        (CurveDistanceHandler)new TwoCurvesDistanceHandler(
+                        (CurveDistanceHandler)new SimpleCurveDistanceHandler(
                             length1: this.pullablePoints.Count, // 注意: pullablePoints に対してだけ衝突判定を考える
                             length2: curve.points.Count,
                             closed1: false,
@@ -107,6 +98,16 @@ namespace PullCurve
                     )
                 ).ToList();
             }
+            List<Vector3> points = this.GetPoints();
+            //this.selfDistanceHandler = new TrivialSelfDistanceHandler(
+            //    length: points.Count,
+            //    closed: this.closed
+            //    );
+            this.selfDistanceHandler = new SimpleSelfDistanceHandler(
+            length: points.Count,
+            closed: this.closed,
+            epsilon: this.epsilon,
+            dist: (i, j) => PullableCurve.CurveSegmentDistance(points, points, i, j));
         }
 
         public static PullableCurve Line(Vector3 start, Vector3 end, int numPoints, OculusTouch oculusTouch)
@@ -123,16 +124,19 @@ namespace PullCurve
 
         public List<Vector3> GetPoints(List<Vector3> points = null)
         {
+            // equalize しない (ことを想定して内部で利用している)
             if (points == null) points = this.pullablePoints;
             List<Vector3> prePoints = this.preFixedPoints.Concat(points).ToList();
             return prePoints.Concat(this.postFixedPoints).ToList();
         }
 
-        public (List<Vector3> points, int count) GetConfirmedPoints()
+        public (List<Vector3> points, int pullableCount) GetEqualizedPoints()
         {
-            this.pullablePoints = AdjustParameter.Equalize(this.pullablePoints, this.distanceThreshold, false);
-            return (this.GetPoints(), this.pullablePoints.Count);
-
+            List<Vector3> equalizedPullablePoints = AdjustParameter.Equalize(
+                this.pullablePoints, this.distanceThreshold, false);
+            int pullableCount = equalizedPullablePoints.Count;
+            List<Vector3> equalizedPoints = GetPoints(equalizedPullablePoints);
+            return (equalizedPoints, pullableCount);
         }
 
         private static float BumpFunction(float t)
@@ -155,8 +159,6 @@ namespace PullCurve
         public void Update()
         {
             this.UpdatePoints();
-            List<Vector3> points = GetPoints();
-            this.selfHandler.Update((i, j) => PullableCurve.CurveSegmentDistance(points, points, i, j));
             if (this.collisionCurves != null)
             {
                 foreach (var (curve, handler) in this.collisionCurves)
@@ -164,6 +166,8 @@ namespace PullCurve
                     handler.Update((i, j) => PullableCurve.CurveSegmentDistance(this.pullablePoints, curve.points, i, j));
                 }
             }
+            List<Vector3> points = GetPoints();
+            this.selfDistanceHandler.Update((i, j) => PullableCurve.CurveSegmentDistance(points, points, i, j));
         }
 
         void UpdatePoints()
@@ -182,8 +186,10 @@ namespace PullCurve
                 newPullablePoints.Add(this.pullablePoints[i] + vrControllerMove * this.weights[i]);
             }
 
-            List<Vector3> points = this.GetPoints(newPullablePoints);
-            if (this.selfHandler.Distance((i, j) => PullableCurve.CurveSegmentDistance(points, points, i, j)) < this.epsilon) return;
+            List<Vector3> newPoints = this.GetPoints(newPullablePoints);
+            if (newPoints.Count >= 4 && this.selfDistanceHandler.Distance((i, j) => PullableCurve.CurveSegmentDistance(
+                newPoints, newPoints, i, j)) <= this.epsilon) return;
+             // if (newPoints.Count >= 4 && PullableCurve.MinSegmentDist(newPoints, true) <= this.epsilon) return;
             if (collisionCurves != null)
             {
                 foreach (var (curve, handler) in this.collisionCurves)
