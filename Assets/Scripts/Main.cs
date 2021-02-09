@@ -36,9 +36,9 @@ public class Main : MonoBehaviour
             toggleMenuButton: LogicalOVRInput.RawButton.LIndexTrigger,
             lockLevel: null
         );
-        this.contextMenu.AddItem(new MenuItem("左人差し指 : メニューウィンドウの開閉", () => {}));
-        this.contextMenu.AddItem(new MenuItem("左スティック : カーソルの移動", () => {}));
-        this.contextMenu.AddItem(new MenuItem("Xボタン : メニューでの決定ボタン", () => {}));
+        this.contextMenu.AddItem(new MenuItem("left index finger : open and close the menu window", () => {}));
+        this.contextMenu.AddItem(new MenuItem("left stick : move cursor", () => {}));
+        this.contextMenu.AddItem(new MenuItem("X button : select button in menu", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.Open();
 
