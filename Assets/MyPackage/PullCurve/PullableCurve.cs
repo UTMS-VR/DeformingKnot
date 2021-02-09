@@ -187,7 +187,7 @@ namespace PullCurve
             }
 
             List<Vector3> newPoints = this.GetPoints(newPullablePoints);
-            if (newPoints.Count >= 4 && this.selfDistanceHandler.Distance((i, j) => PullableCurve.CurveSegmentDistance(
+            if (this.selfDistanceHandler.Distance((i, j) => PullableCurve.CurveSegmentDistance(
                 newPoints, newPoints, i, j)) <= this.epsilon) return;
              // if (newPoints.Count >= 4 && PullableCurve.MinSegmentDist(newPoints, true) <= this.epsilon) return;
             if (collisionCurves != null)

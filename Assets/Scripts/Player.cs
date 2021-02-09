@@ -16,7 +16,6 @@ public abstract class State
     protected DataHandler dataHandler;
     protected int NumberOfDefaultItems = 4;
     protected int NumberOfUnselectableItems;
-    protected int NumberOfAllItems;
     protected List<Curve> curves;
     protected float segment = 0.03f;
     protected float epsilon;
@@ -52,7 +51,7 @@ public abstract class State
         }
         else if (this.contextMenu.cursorIndex < this.NumberOfUnselectableItems)
         {
-            this.contextMenu.cursorIndex = this.NumberOfAllItems - 1;
+            this.contextMenu.cursorIndex = - 1;
         }
     }
 
@@ -93,7 +92,6 @@ public class BasicDeformation : State
         : base(oculusTouch, contextMenu, dataHandler, curves)
     {
         base.NumberOfUnselectableItems = 9;
-        base.NumberOfAllItems = 15;
         this.preCurves = base.curves;
         this.drawingCurve = new Curve(new List<Vector3>(), false);
         this.movingCurves = new List<int>();
@@ -360,14 +358,19 @@ public class OpenFile : State
 
     protected override void SetupMenu()
     {
+        this.contextMenu.AddItem(new MenuItem("Gallery", () => {
+            base.ResetMenu();
+            this.newState = new Gallery(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
+        }));
+
         List<string> files = base.dataHandler.GetFiles();
         foreach (string file in files)
         {
             this.contextMenu.AddItem(new MenuItem(file, () => {
                 List<(List<Vector3> points, bool closed)> curvesCore = base.dataHandler.LoadCurves(file);
-                List<Curve> loadedCurves = curvesCore.Select(core => new Curve(core.points, core.closed, segment: base.segment)).ToList();
+                List<Curve> loadedCurves = curvesCore.Select(core => new Curve(core.points, core.closed, selected: true, segment: base.segment)).ToList();
                 base.ResetMenu();
-                this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, loadedCurves);
+                this.newState = new SelectResetOrAdd(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves, loadedCurves);
             }));
         }
 
@@ -375,9 +378,84 @@ public class OpenFile : State
             base.ResetMenu();
             this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
         }));
+    }
+    
+    public override void Update() {}
+}
 
+public class Gallery : State
+{
+    public Gallery(OculusTouch oculusTouch,
+                   ContextMenu.ContextMenu contextMenu,
+                   DataHandler dataHandler,
+                   List<Curve> curves)
+        : base(oculusTouch, contextMenu, dataHandler, curves)
+    {
+        base.NumberOfUnselectableItems = 4;
+    }
 
-        base.NumberOfAllItems = 5 + files.Count;
+    protected override void SetupMenu()
+    {
+        foreach (string file in this.KnotFiles())
+        {
+            List<Vector3> points = this.dataHandler.LoadCurveFromGitHub("Gallery/" + file, maxLength: 0.2f, barycenter: new Vector3(0, 0, 0.5f));
+            this.contextMenu.AddItem(new MenuItem(file, () => {
+                Curve curve = new Curve(points, true, selected: true, segment: base.segment);
+                base.ResetMenu();
+                this.newState = new SelectResetOrAdd(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves, new List<Curve>{ curve });
+            }));
+        }
+
+        this.contextMenu.AddItem(new MenuItem("戻る", () => {
+            base.ResetMenu();
+            this.newState = new OpenFile(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
+        }));
+    }
+    
+    public override void Update() {}
+
+    private List<string> KnotFiles()
+    {
+        return new List<string>{
+            "knot_0_1.json",
+            "knot_3_1.json",
+            "knot_4_1.json",
+            "knot_5_1.json",
+            "knot_5_2.json",
+            "knot_6_1.json",
+            "knot_6_2.json",
+            "knot_6_3.json",
+            "ochiai_unknot.json"
+        };
+    }
+}
+
+public class SelectResetOrAdd : State
+{
+    private List<Curve> newCurves;
+    public SelectResetOrAdd(OculusTouch oculusTouch,
+                            ContextMenu.ContextMenu contextMenu,
+                            DataHandler dataHandler,
+                            List<Curve> curves,
+                            List<Curve> newCurves)
+        : base(oculusTouch, contextMenu, dataHandler, curves)
+    {
+        base.NumberOfUnselectableItems = 4;
+        this.newCurves = newCurves;
+    }
+
+    protected override void SetupMenu()
+    {
+        this.contextMenu.AddItem(new MenuItem("曲線をリセットしてファイルを開く", () => {
+            base.ResetMenu();
+            this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, this.newCurves);
+        }));
+
+        this.contextMenu.AddItem(new MenuItem("ファイルを開いて曲線を追加", () => {
+            base.ResetMenu();
+            this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.dataHandler,
+                base.curves.Concat(this.newCurves).ToList());
+        }));
     }
     
     public override void Update() {}
@@ -395,7 +473,6 @@ public class SelectAutoOrManual : State
         : base(oculusTouch, contextMenu, dataHandler, curves)
     {
         base.NumberOfUnselectableItems = 6;
-        base.NumberOfAllItems = 10;
         if (select != null) this.select = select;
         else this.select = LogicalOVRInput.RawButton.A;
     }
@@ -516,7 +593,6 @@ public class AutomaticDeformation : State
         : base(oculusTouch, contextMenu, dataHandler, curves.Where(curve => !curve.selected).ToList())
     {
         base.NumberOfUnselectableItems = 7;
-        base.NumberOfAllItems = 8;
 
         if (button1 != null) this.button1 = button1;
         else this.button1 = LogicalOVRInput.RawButton.A;
@@ -558,7 +634,6 @@ public class ManualDeformation : State
         : base(oculusTouch, contextMenu, dataHandler, curves)
     {
         base.NumberOfUnselectableItems = 8;
-        base.NumberOfAllItems = 9;
         this.deformingCurve = new Knot(curve.points,
                                        oculusTouch,
                                        meridian: curve.meridian,
