@@ -10,9 +10,10 @@ public class Optimize
     private OculusTouch oculusTouch;
     private List<Curve> newCurves;
     private List<Curve> collisionCurves;
-    private IntersectionManager intersectionManager;
+    // private IntersectionManager intersectionManager;
     private LogicalButton button1;
     private LogicalButton button2;
+    private float epsilon;
 
     public Optimize(OculusTouch oculusTouch,
                     List<Curve> newCurves,
@@ -30,18 +31,19 @@ public class Optimize
             this.newCurves[i].points = AdjustParameter.Equalize(this.newCurves[i].points, this.newCurves[i].segment, true);
             this.newCurves[i].MomentumInitialize();
         }
-        this.intersectionManager = new IntersectionManager(this.newCurves, this.collisionCurves, epsilon);
+        // this.intersectionManager = new IntersectionManager(this.newCurves, this.collisionCurves, epsilon);
 
         this.button1 = button1;
         this.button2 = button2;
+        this.epsilon = epsilon;
     }
 
     public void Update()
     {
         if (this.oculusTouch.GetButton(this.button1) || this.oculusTouch.GetButton(this.button2))
         {
-            this.intersectionManager.Update();
-            if (!this.intersectionManager.HaveInterSections())
+            //this.intersectionManager.Update();
+            if (!this.HaveInterSections()) //this.intersectionManager.HaveInterSections())
             {
                 List<List<Vector3>> pointsList = this.newCurves.Select(curve => curve.points).ToList();
                 List<List<Vector3>> momentumList = this.newCurves.Select(curve => curve.momentum).ToList();
@@ -60,7 +62,7 @@ public class Optimize
                     while (true)
                     {
                         Elasticity elasticity = new Elasticity(curve.points, curve.momentum, curve.segment);
-                        if (elasticity.MaxError() < curve.segment * 0.3f) break;
+                        if (elasticity.MaxError() < curve.segment * 0.2f) break;
                         elasticity.Flow();
                     }
                 }
@@ -80,6 +82,27 @@ public class Optimize
             curve.MeshUpdate();
             Graphics.DrawMesh(curve.mesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
         }
+    }
+
+    private bool HaveInterSections()
+    {
+        int selectedCurvesCount = newCurves.Count;
+        int unselectedCurvesCount = collisionCurves.Count;
+
+        for (int i = 0; i < selectedCurvesCount; i++)
+        {
+            if (newCurves[i].MinSegmentDist() < this.epsilon) return true;
+            for (int j = i + 1; j < selectedCurvesCount; j++)
+            {
+                if (newCurves[i].CurveDistance(newCurves[j]) < this.epsilon) return true;
+            }
+            for (int k = 0; k < unselectedCurvesCount; k++)
+            {
+                if (newCurves[i].CurveDistance(collisionCurves[k]) < this.epsilon) return true;
+            }
+        }
+
+        return false;
     }
 
     public List<Curve> GetCurves()

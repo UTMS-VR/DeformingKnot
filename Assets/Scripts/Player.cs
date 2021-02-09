@@ -41,6 +41,7 @@ public abstract class State
         {
             this.contextMenu.RemoveItem(item);
         }
+        this.contextMenu.cursorIndex = 0;
     }
 
     public void RestrictCursorPosition()
@@ -303,25 +304,24 @@ public class BasicDeformation : State
             if (!curve.closed) closed = false;
         }
 
-        bool intersection = false;
-        for (int i = 0; i < base.curves.Count; i++)
-        {
-            for (int j = i + 1; j < base.curves.Count; j++)
-            {
-                if (base.curves[i].CurveDistance(base.curves[j]) < base.epsilon)
-                {
-                    intersection = true;
-                    break;
-                }
-            }
-            if (intersection) break;
-        }
-
-        if (closed && !intersection)
+        if (closed && !this.HaveInterSections())
         {
             base.ResetMenu();
             this.newState = new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
         }
+    }
+
+    private bool HaveInterSections()
+    {
+        for (int i = 0; i < base.curves.Count; i++)
+        {
+            for (int j = i + 1; j < base.curves.Count; j++)
+            {
+                if (base.curves[i].CurveDistance(base.curves[j]) < base.epsilon) return true;
+            }
+        }
+
+        return false;
     }
 
     private void Save()
@@ -421,11 +421,14 @@ public class SelectAutoOrManual : State
         }));
 
         this.contextMenu.AddItem(new MenuItem("平滑化", () => {
-            List<Curve> selection = base.curves.Where(curve => curve.selected).ToList();
-            foreach (Curve curve in selection)
+            if (!this.HaveInterSections())
             {
-                curve.points = this.Smoothing(curve.points);
-                curve.MeshUpdate();
+                List<Curve> selection = base.curves.Where(curve => curve.selected).ToList();
+                foreach (Curve curve in selection)
+                {
+                    curve.points = this.Smoothing(curve.points);
+                    curve.MeshUpdate();
+                }
             }
         }));
 
@@ -461,7 +464,7 @@ public class SelectAutoOrManual : State
             Vector3 postPoint = points[(i + 1) % count];
             Vector3 prePoint = points[(i - 1 + count) % count];
             float cos = Vector3.Dot((postPoint - nowPoint).normalized, (prePoint - nowPoint).normalized);
-            if (cos > -0.9f)
+            if (cos > -0.8f)
             {
                 newPoints.Add((nowPoint + postPoint + prePoint) / 3);
             }
@@ -472,6 +475,29 @@ public class SelectAutoOrManual : State
         }
 
         return newPoints;
+    }
+
+    private bool HaveInterSections()
+    {
+        List<Curve> selectedCurves = base.curves.Where(curve => curve.selected).ToList();
+        List<Curve> unselectedCurves = base.curves.Where(curve => !curve.selected).ToList();
+        int selectedCurvesCount = selectedCurves.Count;
+        int unselectedCurvesCount = unselectedCurves.Count;
+
+        for (int i = 0; i < selectedCurvesCount; i++)
+        {
+            if (selectedCurves[i].MinSegmentDist() < base.epsilon) return true;
+            for (int j = i + 1; j < selectedCurvesCount; j++)
+            {
+                if (selectedCurves[i].CurveDistance(selectedCurves[j]) < base.epsilon) return true;
+            }
+            for (int k = 0; k < unselectedCurvesCount; k++)
+            {
+                if (selectedCurves[i].CurveDistance(unselectedCurves[k]) < base.epsilon) return true;
+            }
+        }
+
+        return false;
     }
 }
 

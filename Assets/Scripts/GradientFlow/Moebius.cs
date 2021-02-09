@@ -31,6 +31,27 @@ public class Moebius
             this.segmentList.Add(this.arcList[i] / this.countList[i]);
         }
         this.gradientList = Gradient();
+
+        var (g, a) = this.Max();
+        Debug.Log((g, a));
+        Mesh mesh = MakeMesh.GetMeshAtPoints(new List<Vector3>{ this.pointsList[0][a] }, 0.01f);
+        Graphics.DrawMesh(mesh, Vector3.zero, Quaternion.identity, MakeMesh.PointMaterial, 0);
+    }
+
+    private (float, int) Max()
+    {
+        float g = 0;
+        int a = -1;
+        for (int i = 0; i < this.countList[0]; i++)
+        {
+            float h = this.gradientList[0][i].magnitude;
+            if (g < h)
+            {
+                g = h;
+                a = i;
+            }
+        }
+        return (g, a);
     }
 
     public void Flow()
