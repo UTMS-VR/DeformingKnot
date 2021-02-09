@@ -9,7 +9,7 @@ namespace DrawCurve
     public class Curve
     {
         public List<Vector3> points;
-        //public List<Vector3> momentum;
+        public List<Vector3> momentum;
         public Mesh mesh;
         public Mesh meshAtPoints;
         public bool closed;
@@ -27,7 +27,7 @@ namespace DrawCurve
         public Curve(List<Vector3> points, bool closed, bool selected = false, float segment = 0.03f, int meridian = 10, float radius = 0.005f)
         {
             this.points = points;
-            //this.momentum = new List<Vector3>();
+            this.momentum = new List<Vector3>();
             this.closed = closed;
             this.selected = selected;
             this.segment = segment;
@@ -58,43 +58,18 @@ namespace DrawCurve
             this.meshAtPoints = MakeMesh.GetMeshAtEndPoint(this.points, this.radius * 2.0f);
         }
 
-        /*public void MomentumInitialize()
+        public void MomentumInitialize()
         {
             this.momentum = new List<Vector3>();
             for (int i = 0; i < Length(); i++)
             {
                 this.momentum.Add(Vector3.zero);
             }
-        }*/
+        }
 
         private int Length()
         {
             return this.points.Count;
-        }
-
-        public float ArcLength()
-        {
-            float arclength = 0.0f;
-
-            for (int i = 1; i < Length(); i++)
-            {
-                arclength += Vector3.Distance(points[i - 1], points[i]);
-            }
-
-            if (this.closed)
-            {
-                arclength += Vector3.Distance(points[Length() - 1], points[0]);
-            }
-
-            return arclength;
-        }
-
-        public void ScaleTranslation()
-        {
-            for (int i = 0; i < Length(); i++)
-            {
-                this.points[i] *= this.segment * Length() / ArcLength();
-            }
         }
 
         public void Draw()
@@ -174,44 +149,6 @@ namespace DrawCurve
                 MeshUpdate();
             }
         }
-
-        /*public void Optimize()
-        {
-            DiscreteMoebius optimizer = new DiscreteMoebius(this.points, this.momentum);
-            
-            for (int i = 0; i < this.Length(); i++)
-            {
-                this.points[i] -= this.momentum[i] + optimizer.gradient[i];
-            }
-            List<Vector3> tempPoints = new List<Vector3>();
-            for (int i = 0; i < this.Length(); i++)
-            {
-                tempPoints.Add(this.points[i]);
-            }
-            while (true)
-            {
-                Elasticity optimizer2 = new Elasticity(this.points, this.momentum, this.segment);
-                if (optimizer2.MaxError() < this.segment * 0.1f) break;
-                optimizer2.Flow();
-            }
-            for (int i = 0; i < this.Length(); i++)
-            {
-                this.momentum[i] = (this.momentum[i] + optimizer.gradient[i]) * 0.95f
-                                    + (tempPoints[i] - this.points[i]) * 0.3f;
-            }
-            DiscreteMoebius optimizer = new DiscreteMoebius(this);
-            //Electricity optimizer = new Electricity(this);
-            optimizer.MomentumFlow();
-            //this.ScaleTranslation();
-            while (true)
-            {
-                Elasticity optimizer2 = new Elasticity(this);
-                if (optimizer2.MaxError() < this.segment * 0.1f) break;
-                optimizer2.MomentumFlow();
-            }
-            this.MeshUpdate();
-            this.MeshAtPointsUpdate();
-        }*/
 
         public List<Curve> Cut()
         {
@@ -337,16 +274,36 @@ namespace DrawCurve
         public float MinSegmentDist()
         {
             List<Vector3> seq = this.points;
-            int n = Length();
-            float min = SegmentDist.SSDist(seq[0], seq[1], seq[2], seq[3]);
+            int n = this.Length();
+            float min = float.PositiveInfinity;
             int endi = this.closed ? n - 3 : n - 4;
 
             for (int i = 0; i <= endi; i++)
             {
-                int endj = (i == 0 && !this.closed) ? n - 2 : n - 1;
+                int endj = (i == 0 || !this.closed) ? n - 2 : n - 1;
                 for (int j = i + 2; j <= endj; j++)
                 {
                     float dist = SegmentDist.SSDist(seq[i], seq[i + 1], seq[j], seq[(j + 1) % n]);
+                    if (dist < min) min = dist;
+                }
+            }
+
+            return min;
+        }
+
+        public float CurveDistance(Curve curve)
+        {
+            float min = float.PositiveInfinity;
+            int n1 = this.Length();
+            int n2 = curve.Length();
+            int end1 = this.closed ? n1 - 1 : n1 - 2;
+            int end2 = curve.closed ? n2 - 1 : n2 - 2;
+
+            for (int i = 0; i <= end1; i++)
+            {
+                for (int j = 0; j <= end2; j++)
+                {
+                    float dist = SegmentDist.SSDist(this.points[i], this.points[(i + 1) % n1], curve.points[j], curve.points[(j + 1) % n2]);
                     if (dist < min) min = dist;
                 }
             }
@@ -358,7 +315,7 @@ namespace DrawCurve
         {
             List<Vector3> points = ListVector3Copy(this.points);
             Curve curve = new Curve(points, this.closed, segment: this.segment);
-            //curve.momentum = ListVector3Copy(this.momentum);
+            curve.momentum = ListVector3Copy(this.momentum);
             curve.mesh = this.mesh;
             curve.meshAtPoints = this.meshAtPoints;
             curve.closed = this.closed;
@@ -392,21 +349,6 @@ namespace DrawCurve
             }
 
             return m;
-        }
-
-        public float MinCos()
-        {
-            float max = 1.0f;
-
-            for (int i = 0; i < Length(); i++)
-            {
-                Vector3 next = this.points[(i + 1) % Length()] - this.points[i];
-                Vector3 previous = this.points[i] - this.points[(i + Length() - 1) % Length()];
-                float cos = Vector3.Dot(next.normalized, previous.normalized);
-                if (cos < max) max = cos;
-            }
-
-            return max;
         }
     }
 }

@@ -9,7 +9,7 @@ public class Elasticity
     private List<Vector3> momentum;
     private int len;
     private float seg; 
-    private float lr = 1e-02f;
+    private float lr = 1e-01f;
     private float alpha = 0.95f;
     private List<Vector3> gradient;
 
@@ -17,6 +17,7 @@ public class Elasticity
     {
         this.pos = positions;
         this.len = positions.Count;
+        this.momentum = momentum;
         this.seg = segment;
         this.gradient = Gradient();
     }
@@ -71,7 +72,7 @@ public class Elasticity
 
         for (int i = 0; i < this.len; i++)
         {
-            float error = Vector3.Distance(this.pos[i], this.pos[Succ(i)]) - this.seg;
+            float error = Mathf.Abs(Vector3.Distance(this.pos[i], this.pos[Succ(i)]) - this.seg);
 
             if (max < error)
             {

@@ -23,6 +23,7 @@ namespace InputManager
             public static LogicalButton LStickDown = LogicalButton.Create();
             public static LogicalButton LStickRight = LogicalButton.Create();
             public static LogicalButton LStickLeft = LogicalButton.Create();
+            public static LogicalButton DisabledButton = LogicalButton.Create(); // OculusTouch で割り当てはしない
         }
 
         public class RawAxis2D
