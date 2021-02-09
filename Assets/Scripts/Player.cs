@@ -360,11 +360,11 @@ public class OpenFile : State
 
     protected override void SetupMenu()
     {
-        List<string> filenames = base.dataHandler.GetFilenames();
-        foreach (string filename in filenames)
+        List<string> files = base.dataHandler.GetFiles();
+        foreach (string file in files)
         {
-            this.contextMenu.AddItem(new MenuItem(filename, () => {
-                List<(List<Vector3> points, bool closed)> curvesCore = base.dataHandler.LoadCurves(filename);
+            this.contextMenu.AddItem(new MenuItem(file, () => {
+                List<(List<Vector3> points, bool closed)> curvesCore = base.dataHandler.LoadCurves(file);
                 List<Curve> loadedCurves = curvesCore.Select(core => new Curve(core.points, core.closed, segment: base.segment)).ToList();
                 base.ResetMenu();
                 this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, loadedCurves);
@@ -377,7 +377,7 @@ public class OpenFile : State
         }));
 
 
-        base.NumberOfAllItems = 5 + filenames.Count;
+        base.NumberOfAllItems = 5 + files.Count;
     }
     
     public override void Update() {}

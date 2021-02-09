@@ -183,7 +183,7 @@ namespace FileManager
             return DataHandler.MoveBarycenter(normalizedCurve, barycenter);
         }
 
-        public List<string> GetFilenames()
+        public List<string> GetFiles()
         {
             string inputDir = this.onHMD() ? this.inputDirOnHMD : this.inputDirOnPC;
             Directory.CreateDirectory(inputDir);

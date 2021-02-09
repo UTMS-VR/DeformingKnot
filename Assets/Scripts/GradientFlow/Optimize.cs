@@ -45,9 +45,7 @@ public class Optimize
             //this.intersectionManager.Update();
             if (!this.HaveInterSections()) //this.intersectionManager.HaveInterSections())
             {
-                List<List<Vector3>> pointsList = this.newCurves.Select(curve => curve.points).ToList();
-                List<List<Vector3>> momentumList = this.newCurves.Select(curve => curve.momentum).ToList();
-                Moebius moebius = new Moebius(pointsList, momentumList);
+                Moebius moebius = new Moebius(newCurves);
                 if (this.oculusTouch.GetButton(this.button1))
                 {
                     moebius.Flow();

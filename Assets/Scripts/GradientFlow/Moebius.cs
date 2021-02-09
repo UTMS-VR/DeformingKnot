@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DrawCurve;
@@ -9,26 +10,22 @@ public class Moebius
     private List<List<Vector3>> pointsList;
     private List<List<Vector3>> momentumList;
     private List<int> countList;
-    private List<float> arcList;
     private List<float> segmentList;
     private int count;
     private float lr = 1e-04f; // longitude 64, segment 0.03f -> 1e-05f;
     private float alpha = 0.95f;
     private List<List<Vector3>> gradientList;
 
-    public Moebius(List<List<Vector3>> pointsList, List<List<Vector3>> momentumList)
+    public Moebius(List<Curve> curveList)
     {
-        this.pointsList = pointsList;
-        this.momentumList = momentumList;
+        this.count = curveList.Count;
+        this.pointsList = curveList.Select(curve => curve.points).ToList();
+        this.momentumList = curveList.Select(curve => curve.momentum).ToList();
+        this.segmentList = curveList.Select(curve => curve.segment).ToList();
         this.countList = new List<int>();
-        this.arcList = new List<float>();
-        this.segmentList = new List<float>();
-        this.count = this.pointsList.Count;
         for (int i = 0; i < this.count; i++)
         {
             this.countList.Add(this.pointsList[i].Count);
-            this.arcList.Add(this.ArcLength(this.pointsList[i]));
-            this.segmentList.Add(this.arcList[i] / this.countList[i]);
         }
         this.gradientList = Gradient();
     }
