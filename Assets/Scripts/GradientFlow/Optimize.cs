@@ -14,6 +14,7 @@ public class Optimize
     private LogicalButton button1;
     private LogicalButton button2;
     private float epsilon;
+    private Flow curveFlow;
 
     public Optimize(OculusTouch oculusTouch,
                     List<Curve> newCurves,
@@ -33,6 +34,10 @@ public class Optimize
         }
         // this.intersectionManager = new IntersectionManager(this.newCurves, this.collisionCurves, epsilon);
 
+        // TODO: select flow schemes from UI
+        curveFlow = new Moebius(ref this.newCurves);
+        //curveFlow = new MeanCurvature(ref this.newCurves, 0.05f);
+
         this.button1 = button1;
         this.button2 = button2;
         this.epsilon = epsilon;
@@ -45,14 +50,13 @@ public class Optimize
             //this.intersectionManager.Update();
             if (!this.HaveInterSections()) //this.intersectionManager.HaveInterSections())
             {
-                Moebius moebius = new Moebius(newCurves);
                 if (this.oculusTouch.GetButton(this.button1))
                 {
-                    moebius.Flow();
+                    curveFlow.update(0.0f);
                 }
                 else if (this.oculusTouch.GetButton(this.button2))
                 {
-                    moebius.MomentumFlow();
+                    curveFlow.update(0.95f);
                 }
 
                 foreach (Curve curve in this.newCurves)
