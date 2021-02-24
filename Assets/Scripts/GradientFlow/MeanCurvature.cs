@@ -11,24 +11,17 @@ public class MeanCurvature : Flow
     {
     }
 
-    protected override List<List<Vector3>> Gradient()
+    protected override void setGradient()
     {
-        List<List<Vector3>> gradientList = new List<List<Vector3>>();
-
-        for (int i1 = 0; i1 < this.curveList.Count; i1++)
+        for (int i = 0; i < this.curveList.Count; i++)
         {
-            gradientList.Add(new List<Vector3>());
-            for (int j = 0; j < this.curveList[i1].points.Count; j++)
+            for (int j = 0; j < this.countList[i]; j++)
             {
-                Vector3 gradient = new Vector3(0f,0f,0f);
-                int jn = (j + 1) % this.curveList[i1].points.Count;
-                int jp = (j + this.curveList[i1].points.Count - 1) % this.curveList[i1].points.Count;
-                gradient += 0.5f*(this.curveList[i1].points[jn]+this.curveList[i1].points[jp]);                
-                gradient -=this.curveList[i1].points[j];
-                gradientList[i1].Add(gradient);
+                int jn = (j + 1) % this.countList[i];
+                int jp = (j + this.countList[i] - 1) % this.countList[i];
+                Vector3 gradient = this.curveList[i].points[j]-0.5f*(this.curveList[i].points[jn]+this.curveList[i].points[jp]);
+                gradientList[i][j] = gradient;
             }
         }
-
-        return gradientList;
     }
 }

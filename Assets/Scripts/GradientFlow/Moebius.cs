@@ -11,19 +11,16 @@ public class Moebius : Flow
     {
     }
 
-    protected override List<List<Vector3>> Gradient()
+    protected override void setGradient()
     {
-        List<List<Vector3>> gradientList = new List<List<Vector3>>();
-
         for (int i1 = 0; i1 < this.curveList.Count; i1++)
         {
-            gradientList.Add(new List<Vector3>());
-            for (int j1 = 0; j1 < this.curveList[i1].points.Count; j1++)
+            for (int j1 = 0; j1 < this.countList[i1]; j1++)
             {
-                Vector3 gradient = new Vector3(0f,0f,0f);
-                for (int j2 = 1; j2 < this.curveList[i1].points.Count; j2++)
+                Vector3 gradient = Vector3.zero;
+                for (int j2 = 1; j2 < this.countList[i1]; j2++)
                 {
-                    int j3 = (j1 + j2) % this.curveList[i1].points.Count;
+                    int j3 = (j1 + j2) % this.countList[i1];
                     Vector3 first = this.CoulombDiff(this.curveList[i1].points[j1], this.curveList[i1].points[j3])
                                     * Mathf.Pow(this.curveList[i1].segment, 2);
                     Vector3 second = this.Coulomb(this.curveList[i1].points[j1], this.curveList[i1].points[j3])
@@ -33,7 +30,7 @@ public class Moebius : Flow
                 for (int i2 = 1; i2 < this.curveList.Count; i2++)
                 {
                     int i3 = (i1 + i2) % this.curveList.Count;
-                    for (int j2 = 0; j2 < this.curveList[i3].points.Count; j2++)
+                    for (int j2 = 0; j2 < this.countList[i3]; j2++)
                     {
                         Vector3 first = this.CoulombDiff(this.curveList[i1].points[j1], this.curveList[i3].points[j2])
                                         * this.curveList[i1].segment * this.curveList[i3].segment;
@@ -42,11 +39,9 @@ public class Moebius : Flow
                         gradient += 2 * (first + second);
                     }
                 }
-                gradientList[i1].Add(gradient);
+                this.gradientList[i1][j1] = gradient;
             }
         }
-
-        return gradientList;
     }
 
     // private float Energy()
@@ -104,10 +99,10 @@ public class Moebius : Flow
 
     private Vector3 SegmentDiff(int i, int j)
     {
-        int jp = (j + 1) % this.curveList[i].points.Count;
-        int jn = (j + this.curveList[i].points.Count - 1) % this.curveList[i].points.Count;
+        int jp = (j + 1) % this.countList[i];
+        int jn = (j + this.countList[i] - 1) % this.countList[i];
         Vector3 tangentp = (this.curveList[i].points[j] - this.curveList[i].points[jp]).normalized;
         Vector3 tangentn = (this.curveList[i].points[j] - this.curveList[i].points[jn]).normalized;
-        return (tangentp + tangentn) / this.curveList[i].points.Count;
+        return (tangentp + tangentn) / this.countList[i];
     }
 }

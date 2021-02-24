@@ -15,6 +15,8 @@ public class Optimize
     private LogicalButton button2;
     private float epsilon;
     private Flow curveFlow;
+    private Elasticity elasticity;
+    private float minSeg = 1e+20f;
 
     public Optimize(OculusTouch oculusTouch,
                     List<Curve> newCurves,
@@ -26,17 +28,22 @@ public class Optimize
         this.newCurves = newCurves;
         this.collisionCurves = collisionCurves;
         this.oculusTouch = oculusTouch;
+        Debug.Log("Opt");
 
         for (int i = 0; i < this.newCurves.Count; i++)
         {
             this.newCurves[i].points = AdjustParameter.Equalize(this.newCurves[i].points, this.newCurves[i].segment, true);
-            this.newCurves[i].MomentumInitialize();
+            this.newCurves[i].MeshUpdate();
+            this.newCurves[i].momentum = new Vector3[this.newCurves[i].points.Count];
+            this.newCurves[i].clearMomentum();
+            this.minSeg = Mathf.Min(this.minSeg,this.newCurves[i].segment);
         }
         // this.intersectionManager = new IntersectionManager(this.newCurves, this.collisionCurves, epsilon);
 
         // TODO: select flow schemes from UI
-        curveFlow = new Moebius(ref this.newCurves);
+        curveFlow = new Moebius(ref this.newCurves, 1e-04f);
         //curveFlow = new MeanCurvature(ref this.newCurves, 0.05f);
+        elasticity = new Elasticity(ref this.newCurves, 1e-01f);
 
         this.button1 = button1;
         this.button2 = button2;
@@ -59,14 +66,9 @@ public class Optimize
                     curveFlow.update(0.95f);
                 }
 
-                foreach (Curve curve in this.newCurves)
+                while (elasticity.MaxError() > this.minSeg * 0.2f)
                 {
-                    while (true)
-                    {
-                        Elasticity elasticity = new Elasticity(curve.points, curve.momentum, curve.segment);
-                        if (elasticity.MaxError() < curve.segment * 0.2f) break;
-                        elasticity.Flow();
-                    }
+                    elasticity.update(0.0f);
                 }
             }
         }
@@ -75,13 +77,14 @@ public class Optimize
         {
             foreach (Curve curve in this.newCurves)
             {
-                curve.MomentumInitialize();
+                curve.clearMomentum();
             }
         }
 
         foreach (Curve curve in this.newCurves)
         {
-            curve.MeshUpdate();
+            //curve.MeshUpdate();
+            curve.MeshUpdatePos();
             Graphics.DrawMesh(curve.mesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
         }
     }

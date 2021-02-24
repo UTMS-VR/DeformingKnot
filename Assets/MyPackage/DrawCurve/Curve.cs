@@ -9,7 +9,7 @@ namespace DrawCurve
     public class Curve
     {
         public List<Vector3> points;
-        public List<Vector3> momentum;
+        public Vector3[] momentum;
         public Mesh mesh;
         public Mesh meshAtPoints;
         public bool closed;
@@ -27,12 +27,13 @@ namespace DrawCurve
         public Curve(List<Vector3> points, bool closed, bool selected = false, float segment = 0.03f, int meridian = 10, float radius = 0.005f)
         {
             this.points = points;
-            this.momentum = new List<Vector3>();
             this.closed = closed;
             this.selected = selected;
             this.segment = segment;
             this.meridian = meridian;
             this.radius = radius;
+            this.momentum = new Vector3[this.points.Count];
+            this.clearMomentum();
             this.mesh = MakeMesh.GetMesh(this.points, this.meridian, this.radius, this.closed);
         }
 
@@ -47,6 +48,34 @@ namespace DrawCurve
         {
             this.mesh = MakeMesh.GetMesh(this.points, this.meridian, this.radius, this.closed);
         }
+        public void MeshUpdatePos()
+        {
+            List<Vector3> pointsCopy = new List<Vector3>(this.points);
+            if (this.closed)
+            {
+                pointsCopy.Add(pointsCopy[0]);
+                pointsCopy.Add(pointsCopy[1]);
+            }
+            List<Vector3> tangents = MakeMesh.Tangents(pointsCopy, this.closed);
+            List<Vector3> principalNormals = MakeMesh.PrincipalNormals(tangents);
+            Vector3[] vertices = this.mesh.vertices;
+            Vector3[] normals = this.mesh.normals;
+            int k=0;
+            for (int j = 0; j < pointsCopy.Count; j++)
+            {
+                Vector3 binormal = Vector3.Cross(tangents[j], principalNormals[j]);
+                for (int i = 0; i <= this.meridian; i++)
+                {
+                    float theta = i * 2 * Mathf.PI / this.meridian;
+                    Vector3 direction = Mathf.Cos(theta) * principalNormals[j] + Mathf.Sin(theta) * binormal;
+                    vertices[k] = pointsCopy[j] + this.radius * direction;
+                    normals[k] = direction;
+                    k++;
+                }
+            }
+            this.mesh.vertices = vertices;
+            this.mesh.normals = normals;
+        }
 
         public void MeshAtPointsUpdate()
         {
@@ -56,15 +85,6 @@ namespace DrawCurve
         public void MeshAtEndPointUpdate()
         {
             this.meshAtPoints = MakeMesh.GetMeshAtEndPoint(this.points, this.radius * 2.0f);
-        }
-
-        public void MomentumInitialize()
-        {
-            this.momentum = new List<Vector3>();
-            for (int i = 0; i < Length(); i++)
-            {
-                this.momentum.Add(Vector3.zero);
-            }
         }
 
         private int Length()
@@ -315,7 +335,6 @@ namespace DrawCurve
         {
             List<Vector3> points = ListVector3Copy(this.points);
             Curve curve = new Curve(points, this.closed, segment: this.segment);
-            curve.momentum = ListVector3Copy(this.momentum);
             curve.mesh = this.mesh;
             curve.meshAtPoints = this.meshAtPoints;
             curve.closed = this.closed;
@@ -350,5 +369,13 @@ namespace DrawCurve
 
             return m;
         }
+        public void clearMomentum()
+        {
+            for (int j = 0; j <this.points.Count; j++)
+            {
+                this.momentum[j] = Vector3.zero;
+            }
+        }
+
     }
 }
