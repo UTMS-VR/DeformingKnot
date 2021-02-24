@@ -217,7 +217,6 @@ public class BasicDeformation : State
                 }
             }
         }
-
         foreach (int i in this.movingCurves)
         {
             base.curves[i].Move();
