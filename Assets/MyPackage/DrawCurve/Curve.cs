@@ -9,7 +9,6 @@ namespace DrawCurve
     public class Curve
     {
         public List<Vector3> points;
-        public Vector3[] momentum;
         public Mesh mesh;
         public Mesh meshAtPoints;
         public bool closed;
@@ -32,8 +31,6 @@ namespace DrawCurve
             this.segment = segment;
             this.meridian = meridian;
             this.radius = radius;
-            this.momentum = new Vector3[this.points.Count];
-            this.clearMomentum();
             this.mesh = MakeMesh.GetMesh(this.points, this.meridian, this.radius, this.closed);
         }
 
@@ -368,13 +365,6 @@ namespace DrawCurve
             }
 
             return m;
-        }
-        public void clearMomentum()
-        {
-            for (int j = 0; j <this.points.Count; j++)
-            {
-                this.momentum[j] = Vector3.zero;
-            }
         }
 
     }

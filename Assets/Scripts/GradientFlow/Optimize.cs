@@ -22,6 +22,7 @@ public class Optimize
                     List<Curve> newCurves,
                     List<Curve> collisionCurves,
                     float epsilon,
+                    string flowClass,
                     LogicalButton button1,
                     LogicalButton button2)
     {
@@ -34,15 +35,15 @@ public class Optimize
         {
             this.newCurves[i].points = AdjustParameter.Equalize(this.newCurves[i].points, this.newCurves[i].segment, true);
             this.newCurves[i].MeshUpdate();
-            this.newCurves[i].momentum = new Vector3[this.newCurves[i].points.Count];
-            this.newCurves[i].clearMomentum();
             this.minSeg = Mathf.Min(this.minSeg,this.newCurves[i].segment);
         }
         // this.intersectionManager = new IntersectionManager(this.newCurves, this.collisionCurves, epsilon);
 
-        // TODO: select flow schemes from UI
-        curveFlow = new Moebius(ref this.newCurves, 1e-04f);
-        //curveFlow = new MeanCurvature(ref this.newCurves, 0.05f);
+        if(flowClass=="Moebius"){
+            curveFlow = new Moebius(ref this.newCurves, 1e-04f);
+        }else if(flowClass=="MeanCurvature"){
+            curveFlow = new MeanCurvature(ref this.newCurves, 0.05f);
+        }
         elasticity = new Elasticity(ref this.newCurves, 1e-01f);
 
         this.button1 = button1;
@@ -70,15 +71,13 @@ public class Optimize
                 {
                     elasticity.update(0.0f);
                 }
+                elasticity.clearMomentum();
             }
         }
 
         if (this.oculusTouch.GetButtonUp(this.button2))
         {
-            foreach (Curve curve in this.newCurves)
-            {
-                curve.clearMomentum();
-            }
+            curveFlow.clearMomentum();
         }
 
         foreach (Curve curve in this.newCurves)

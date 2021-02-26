@@ -12,6 +12,7 @@ public abstract class Flow
     protected abstract void setGradient();
     protected int[] countList;
     protected List<Vector3[]> gradientList = new List<Vector3[]>();
+    protected List<Vector3[]> momentum = new List<Vector3[]>();
 
     public Flow(ref List<Curve> curveList, float lr= 1e-04f)
     {
@@ -21,8 +22,10 @@ public abstract class Flow
         for(int i =0; i < this.curveList.Count; i++)
         {
             this.gradientList.Add(new Vector3[this.countList[i]]);
+            this.momentum.Add(new Vector3[this.countList[i]]);
         }
         this.clearGradient();
+        this.clearMomentum();
     }
 
     public void update(float alpha)
@@ -32,8 +35,8 @@ public abstract class Flow
         {
             for (int j = 0; j < this.countList[i]; j++)
             {
-                this.curveList[i].momentum[j] = alpha * curveList[i].momentum[j] + this.gradientList[i][j];
-                this.curveList[i].points[j] -= this.lr * this.curveList[i].momentum[j];
+                this.momentum[i][j] = alpha * this.momentum[i][j] + this.gradientList[i][j];
+                this.curveList[i].points[j] -= this.lr * this.momentum[i][j];
                 // if (this.gradientList[i][j].magnitude > 0.001f) Debug.Log(this.gradientList[i][j].magnitude);
             }
         }
@@ -49,5 +52,16 @@ public abstract class Flow
             }
         }
     }
+    public void clearMomentum()
+    {
+        for(int i =0; i < this.curveList.Count; i++)
+        {
+            for (int j = 0; j < this.countList[i]; j++)
+            {
+                this.momentum[i][j] = Vector3.zero;
+            }
+        }
+    }
+
 }
 
