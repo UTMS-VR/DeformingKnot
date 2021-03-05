@@ -84,26 +84,12 @@ namespace InputManager
 
         public Vector3? GetPosition()
         {
-            if (this.onHeadset)
-            {
-                return this.handAnchor.GetComponent<Transform>().position;
-            }
-            else
-            {
-                return null;
-            }
+            return this.handAnchor.GetComponent<Transform>().position;
         }
 
         public Quaternion? GetRotation()
         {
-            if (this.onHeadset)
-            {
-                return this.handAnchor.GetComponent<Transform>().rotation;
-            }
-            else
-            {
-                return null;
-            }
+            return this.handAnchor.GetComponent<Transform>().rotation;
         }
     }
 }

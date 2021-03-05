@@ -217,7 +217,6 @@ public class BasicDeformation : State
                 }
             }
         }
-
         foreach (int i in this.movingCurves)
         {
             base.curves[i].Move();
@@ -482,9 +481,13 @@ public class SelectAutoOrManual : State
         this.contextMenu.AddItem(new MenuItem("Aボタン : 選択", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
 
-        this.contextMenu.AddItem(new MenuItem("自動変形", () => {
+        this.contextMenu.AddItem(new MenuItem("自動変形(Knot Energy)", () => {
             base.ResetMenu();
-            this.newState = new AutomaticDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
+            this.newState = new AutomaticDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves, "Moebius");
+        }));
+        this.contextMenu.AddItem(new MenuItem("自動変形(Mean Curvature Flow)", () => {
+            base.ResetMenu();
+            this.newState = new AutomaticDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves, "MeanCurvature");
         }));
 
         this.contextMenu.AddItem(new MenuItem("手動変形 (曲線は1つ選択)", () => {
@@ -588,6 +591,7 @@ public class AutomaticDeformation : State
                                 ContextMenu.ContextMenu contextMenu,
                                 DataHandler dataHandler,
                                 List<Curve> curves,
+                                string flowClass = "",
                                 LogicalButton button1 = null,
                                 LogicalButton button2 = null)
         : base(oculusTouch, contextMenu, dataHandler, curves.Where(curve => !curve.selected).ToList())
@@ -601,7 +605,7 @@ public class AutomaticDeformation : State
         else this.button2 = LogicalOVRInput.RawButton.B;
 
         List<Curve> newCurves = curves.Where(curve => curve.selected).ToList();
-        this.optimizer = new Optimize(oculusTouch, newCurves, base.curves, base.epsilon, this.button1, this.button2);
+        this.optimizer = new Optimize(oculusTouch, newCurves, base.curves, base.epsilon, flowClass, this.button1, this.button2);
     }
 
     protected override void SetupMenu()
