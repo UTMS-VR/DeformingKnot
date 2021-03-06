@@ -8,7 +8,8 @@ namespace PullCurve
 {
     public class Knot
     {
-        public IKnotState state;
+        private IKnotState state;
+
 
         public Knot(
             List<Vector3> points,
@@ -65,4 +66,5 @@ namespace PullCurve
             return this.state;
         }
     }
+
 }

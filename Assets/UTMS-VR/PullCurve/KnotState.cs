@@ -7,13 +7,14 @@ using DrawCurve;
 
 namespace PullCurve
 {
+
     public interface IKnotState
     {
         IKnotState Update();
         List<Vector3> GetPoints();
     }
 
-    public class KnotData
+    class KnotData
     {
         public List<Vector3> points;
         public (int first, int second) chosenPoints;
@@ -45,7 +46,7 @@ namespace PullCurve
             Material curveMaterial = null,
             Material pullableCurveMaterial = null,
             Material pointMaterial = null
-        )
+            )
         {
             this.points = points;
             this.chosenPoints = chosenPoints;
@@ -59,7 +60,7 @@ namespace PullCurve
             this.buttonC = buttonC ?? LogicalOVRInput.RawButton.RIndexTrigger;
             this.buttonD = buttonD ?? LogicalOVRInput.RawButton.RHandTrigger;
             this.curveMaterial = curveMaterial ?? MakeMesh.CurveMaterial;
-            this.pullableCurveMaterial = pointMaterial ?? MakeMesh.PointMaterial;
+            this.pullableCurveMaterial = pullableCurveMaterial ?? MakeMesh.PointMaterial;
             this.pointMaterial = pointMaterial ?? MakeMesh.PointMaterial;
         }
 
@@ -75,13 +76,14 @@ namespace PullCurve
             return (pullablePoints, fixedPoints);
         }
 
+
         public Mesh GetPullableMesh((int first, int second)? chosenPoints = null)
         {
             var (pullablePoints, _) = this.GetPullableAndFixedPoints(chosenPoints);
             return MakeMesh.GetMesh(pullablePoints, this.meridian, this.radius, false);
         }
 
-         public Mesh GetFixedMesh((int first, int second)? chosenPoints = null)
+        public Mesh GetFixedMesh((int first, int second)? chosenPoints = null)
         {
             var (pullablePoints, fixedPoints) = this.GetPullableAndFixedPoints(chosenPoints);
             List<Vector3> fixedPointsAppended = 
@@ -93,13 +95,13 @@ namespace PullCurve
         {
             var (pullablePoints, _) = this.GetPullableAndFixedPoints(chosenPoints);
             var boundaryPoints = new List<Vector3>() { pullablePoints.Last(), pullablePoints.First() };
-            return MakeMesh.GetMeshAtPoints(boundaryPoints, this.radius * 3);
+            return MakeMesh.GetMeshAtPoints(boundaryPoints, this.radius * 2);
         }
     }
 
 
 
-    public class KnotStateBase : IKnotState
+    class KnotStateBase : IKnotState
     {
         private KnotData data;
         private Mesh pullableMesh;
@@ -142,7 +144,7 @@ namespace PullCurve
         }
     }
 
-    public class KnotStatePull : IKnotState
+    class KnotStatePull : IKnotState
     {
         private KnotData data;
         private PullableCurve pullableCurve;
@@ -152,7 +154,8 @@ namespace PullCurve
             this.data = data;
             var (pullablePoints, fixedPoints) = this.data.GetPullableAndFixedPoints();
             this.pullableCurve = new PullableCurve(pullablePoints, new List<Vector3>(), fixedPoints, this.data.oculusTouch, closed: true,
-                meridian: this.data.meridian, radius: this.data.radius, distanceThreshold: this.data.distanceThreshold, collisionCurves: this.data.collisionCurves);
+                meridian: this.data.meridian, radius: this.data.radius, distanceThreshold: this.data.distanceThreshold,
+                collisionCurves: this.data.collisionCurves);
         }
 
         public IKnotState Update()
@@ -202,7 +205,7 @@ namespace PullCurve
         }
     }
 
-    public class KnotStateChoose1 : IKnotState
+    class KnotStateChoose1 : IKnotState
     {
         private KnotData data;
         private Mesh knotMesh;
@@ -217,7 +220,7 @@ namespace PullCurve
         {
             int ind1 = KnotStateChoose1.FindClosestPoint(this.data.oculusTouch, this.data.points);
             var chosenPoints = new List<Vector3>() { this.data.points[ind1] };
-            Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 3);
+            Mesh pointMesh = MakeMesh.GetMeshAtPoints(chosenPoints, this.data.radius * 2);
 
             Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, this.data.curveMaterial, 0);
             Graphics.DrawMesh(pointMesh, Vector3.zero, Quaternion.identity, this.data.pointMaterial, 0);
@@ -258,7 +261,7 @@ namespace PullCurve
         }
     }
 
-    public class KnotStateChoose2 : IKnotState
+    class KnotStateChoose2 : IKnotState
     {
         private KnotData data;
         private Mesh knotMesh;
@@ -277,7 +280,7 @@ namespace PullCurve
             var chosenPoints = KnotStateChoose2.ChooseShorterPath((this.ind1, ind2), this.data.points.Count);
             this.DrawMesh(chosenPoints);
 
-            if (this.data.oculusTouch.GetButtonDown(this.data.buttonA) && this.ind1 != ind2)
+            if (this.data.oculusTouch.GetButtonDown(this.data.buttonA))
             {
                 if (this.ind1 != ind2)
                 {
@@ -323,7 +326,7 @@ namespace PullCurve
         }
     }
 
-    public class KnotStateDraw : IKnotState
+    class KnotStateDraw : IKnotState
     {
         private KnotData data;
         private Curve drawnCurve;
