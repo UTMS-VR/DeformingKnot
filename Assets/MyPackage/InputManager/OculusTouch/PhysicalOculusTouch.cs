@@ -55,7 +55,7 @@ namespace InputManager
     class PhysicalOculusTouchPositionDevice : IPhysicalPositionDevice
     {
         private GameObject handAnchor;
-        private bool onHeadset;
+        // private bool onHeadset;
 
         public PhysicalOculusTouchPositionDevice(HandAnchorKey key)
         {
@@ -74,9 +74,9 @@ namespace InputManager
             this.handAnchor = GameObject.Find(handAnchorName);
             // headset上かどうか判定
 #if UNITY_EDITOR
-            this.onHeadset = false;
+            // this.onHeadset = false;
 #else
-            this.onHeadset = true;
+            // this.onHeadset = true;
 #endif
         }
 
@@ -84,12 +84,34 @@ namespace InputManager
 
         public Vector3? GetPosition()
         {
-            return this.handAnchor.GetComponent<Transform>().position;
+            if (this.ControllerIsActive())
+            {
+                return this.handAnchor.GetComponent<Transform>().position;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public Quaternion? GetRotation()
         {
-            return this.handAnchor.GetComponent<Transform>().rotation;
+            if (this.ControllerIsActive())
+            {
+                return this.handAnchor.GetComponent<Transform>().rotation;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private bool ControllerIsActive()
+        {
+            // コンストラクタ内で設定するとうまくいかない。
+            // MonoBehaviour の Start 内で呼び出すと、必ず(？) None になるっぽい。
+            OVRInput.Controller activeController = OVRInput.GetActiveController();
+            return activeController != OVRInput.Controller.None;
         }
     }
 }
