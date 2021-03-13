@@ -7,14 +7,14 @@ using DrawCurve;
 // 暗黙の仮定：隣接する2点の間隔は一定
 public abstract class Flow
 {
-    protected List<Curve> curveList;
+    protected List<HandCurve> curveList;
     protected float lr; // longitude 64, segment 0.03f -> 1e-05f;
     protected abstract void SetGradient();
     protected int[] countList;
     protected List<Vector3[]> gradientList = new List<Vector3[]>();
     protected List<Vector3[]> momentum = new List<Vector3[]>();
 
-    public Flow(ref List<Curve> curveList, float lr= 1e-04f)
+    public Flow(ref List<HandCurve> curveList, float lr= 1e-04f)
     {
         this.curveList = curveList;
         this.lr = lr;

@@ -51,7 +51,7 @@ public class Main : MonoBehaviour
             cacheDirOnHMD: "/mnt/sdcard/CurveData"
         );
 
-        this.state = new BasicDeformation(this.oculusTouch, this.contextMenu, this.dataHandler, new List<Curve>(), comfirm: comfirmBotton);
+        this.state = new BasicDeformation(this.oculusTouch, this.contextMenu, this.dataHandler, new List<HandCurve>(), comfirm: comfirmBotton);
     }
 
     void Update()

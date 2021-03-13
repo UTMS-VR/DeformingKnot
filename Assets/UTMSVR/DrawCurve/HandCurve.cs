@@ -293,16 +293,16 @@ namespace DrawCurve
         {
             List<Vector3> seq = this.points;
             int n = this.Length();
-            float min = -1;
+            float min = float.PositiveInfinity;
             int endi = this.closed ? n - 3 : n - 4;
 
             for (int i = 0; i <= endi; i++)
             {
-                int endj = (i == 0 && !this.closed) ? n - 2 : n - 1;
+                int endj = (i == 0 || !this.closed) ? n - 2 : n - 1;
                 for (int j = i + 2; j <= endj; j++)
                 {
                     float dist = SegmentDist.SSDist(seq[i], seq[i + 1], seq[j], seq[(j + 1) % n]);
-                    if (min < 0 || dist < min) min = dist;
+                    if (dist < min) min = dist;
                 }
             }
 
@@ -311,7 +311,7 @@ namespace DrawCurve
 
         public float CurveDistance(HandCurve curve)
         {
-            float min = -1;
+            float min = float.PositiveInfinity;
             int n1 = this.Length();
             int n2 = curve.Length();
             int end1 = this.closed ? n1 - 1 : n1 - 2;
@@ -322,7 +322,7 @@ namespace DrawCurve
                 for (int j = 0; j <= end2; j++)
                 {
                     float dist = SegmentDist.SSDist(this.points[i], this.points[(i + 1) % n1], curve.points[j], curve.points[(j + 1) % n2]);
-                    if (min < 0 || dist < min) min = dist;
+                    if (dist < min) min = dist;
                 }
             }
 

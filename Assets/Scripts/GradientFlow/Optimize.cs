@@ -8,9 +8,8 @@ using InputManager;
 public class Optimize
 {
     private OculusTouch oculusTouch;
-    private List<Curve> newCurves;
-    private List<Curve> collisionCurves;
-    // private IntersectionManager intersectionManager;
+    private List<HandCurve> deformableCurves;
+    private List<HandCurve> collisionCurves;
     private LogicalButton button1;
     private LogicalButton button2;
     private float epsilon;
@@ -19,36 +18,35 @@ public class Optimize
     private float minSeg = 1e+20f;
 
     public Optimize(OculusTouch oculusTouch,
-                    List<Curve> newCurves,
-                    List<Curve> collisionCurves,
+                    List<HandCurve> deformableCurves,
+                    List<HandCurve> collisionCurves,
                     float epsilon,
                     string flowClass,
                     LogicalButton button1,
                     LogicalButton button2)
     {
-        this.newCurves = newCurves;
+        this.deformableCurves = deformableCurves;
         this.collisionCurves = collisionCurves;
         this.oculusTouch = oculusTouch;
         Debug.Log("Opt");
 
-        for (int i = 0; i < this.newCurves.Count; i++)
+        for (int i = 0; i < this.deformableCurves.Count; i++)
         {
-            this.newCurves[i].points = AdjustParameter.Equalize(this.newCurves[i].points, this.newCurves[i].segment, true);
-            this.newCurves[i].MeshUpdate();
-            this.minSeg = Mathf.Min(this.minSeg,this.newCurves[i].segment);
+            this.deformableCurves[i].points = AdjustParameter.Equalize(this.deformableCurves[i].points, this.deformableCurves[i].segment, true);
+            this.deformableCurves[i].MeshUpdate();
+            this.minSeg = Mathf.Min(this.minSeg,this.deformableCurves[i].segment);
         }
-        // this.intersectionManager = new IntersectionManager(this.newCurves, this.collisionCurves, epsilon);
 
         if (flowClass == "Moebius")
         {
-            curveFlow = new Moebius(ref this.newCurves, 1e-04f);
+            curveFlow = new Moebius(ref this.deformableCurves, 1e-04f);
         }
         else if (flowClass == "MeanCurvature")
         {
-            curveFlow = new MeanCurvature(ref this.newCurves, 0.05f);
+            curveFlow = new MeanCurvature(ref this.deformableCurves, 0.05f);
         }
 
-        elasticity = new Elasticity(ref this.newCurves, 1e-01f);
+        elasticity = new Elasticity(ref this.deformableCurves, 1e-01f);
 
         this.button1 = button1;
         this.button2 = button2;
@@ -59,8 +57,7 @@ public class Optimize
     {
         if (this.oculusTouch.GetButton(this.button1) || this.oculusTouch.GetButton(this.button2))
         {
-            //this.intersectionManager.Update();
-            if (!this.HaveInterSections()) //this.intersectionManager.HaveInterSections())
+            if (!this.HaveInterSections())
             {
                 if (this.oculusTouch.GetButton(this.button1))
                 {
@@ -84,7 +81,7 @@ public class Optimize
             curveFlow.ClearMomentum();
         }
 
-        foreach (Curve curve in this.newCurves)
+        foreach (HandCurve curve in this.deformableCurves)
         {
             curve.MeshUpdate();
             Graphics.DrawMesh(curve.mesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
@@ -93,27 +90,27 @@ public class Optimize
 
     private bool HaveInterSections()
     {
-        int selectedCurvesCount = newCurves.Count;
-        int unselectedCurvesCount = collisionCurves.Count;
+        int deformableCurvesCount = deformableCurves.Count;
+        int collisionCurvesCount = collisionCurves.Count;
 
-        for (int i = 0; i < selectedCurvesCount; i++)
+        for (int i = 0; i < deformableCurvesCount; i++)
         {
-            if (newCurves[i].MinSegmentDist() < this.epsilon) return true;
-            for (int j = i + 1; j < selectedCurvesCount; j++)
+            if (deformableCurves[i].MinSegmentDist() < this.epsilon) return true;
+            for (int j = i + 1; j < deformableCurvesCount; j++)
             {
-                if (newCurves[i].CurveDistance(newCurves[j]) < this.epsilon) return true;
+                if (deformableCurves[i].CurveDistance(deformableCurves[j]) < this.epsilon) return true;
             }
-            for (int k = 0; k < unselectedCurvesCount; k++)
+            for (int k = 0; k < collisionCurvesCount; k++)
             {
-                if (newCurves[i].CurveDistance(collisionCurves[k]) < this.epsilon) return true;
+                if (deformableCurves[i].CurveDistance(collisionCurves[k]) < this.epsilon) return true;
             }
         }
 
         return false;
     }
 
-    public List<Curve> GetCurves()
+    public List<HandCurve> GetCurves()
     {
-        return this.newCurves;
+        return this.deformableCurves;
     }
 }

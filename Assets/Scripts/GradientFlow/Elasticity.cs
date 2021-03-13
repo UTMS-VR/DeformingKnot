@@ -7,7 +7,7 @@ public class Elasticity : Flow
 {
     public float gtol = 0.0f;
 
-    public Elasticity(ref List<Curve> curveList, float lr=1e-04f) : base(ref curveList, lr)
+    public Elasticity(ref List<HandCurve> curveList, float lr=1e-04f) : base(ref curveList, lr)
     {
     }
 

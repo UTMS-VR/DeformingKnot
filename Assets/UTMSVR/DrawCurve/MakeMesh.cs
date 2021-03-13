@@ -12,6 +12,7 @@ namespace DrawCurve
     {
         public static Material CurveMaterial = Resources.Load<Material>("UTMSVR/DrawCurve/Curve");
         public static Material RainbowCurveMaterial = Resources.Load<Material>("UTMSVR/DrawCurve/Rainbow");
+        public static Material RainbowCurveMaterial2 = Resources.Load<Material>("UTMSVR/DrawCurve/Rainbow2");
         public static Material PointMaterial = Resources.Load<Material>("UTMSVR/DrawCurve/Point");
         public static Material SelectedCurveMaterial = Resources.Load<Material>("UTMSVR/DrawCurve/SelectedCurve");
 
