@@ -20,15 +20,27 @@ namespace FileManager
         }
     }
 
-    [Serializable]
     public class CurveCore
+    {
+        public List<Vector3> points;
+        public bool closed;
+
+        public CurveCore(List<Vector3> points, bool closed)
+        {
+            this.points = points;
+            this.closed = closed;
+        }
+    }
+
+    [Serializable]
+    public class SerializedCurveCore
     {
         [SerializeField]
         public List<Vector3> points;
         [SerializeField]
         public bool closed;
 
-        public CurveCore(List<Vector3> points, bool closed)
+        public SerializedCurveCore(List<Vector3> points, bool closed)
         {
             this.points = points;
             this.closed = closed;
@@ -86,32 +98,27 @@ namespace FileManager
             }
         }
 
-        public void SaveCurve(string filename, List<Vector3> curve)
-        {
-            List<Vector3> normalizedCurve = DataHandler.Normalize(curve);
-            string json = JsonUtility.ToJson(new SerializedList<Vector3>(normalizedCurve));
-            this.Save(filename, json);
-        }
-
         public void SaveCurves(string filename, List<(List<Vector3> points, bool closed)> curves)
         {
-            List<CurveCore> serializedCurves = curves.Select(curve => new CurveCore(curve.points, curve.closed)).ToList();
-            string json = JsonUtility.ToJson(new SerializedList<CurveCore>(serializedCurves));
+            List<CurveCore> curveCores = curves.Select(curve => new CurveCore(curve.points, curve.closed)).ToList();
+            List<CurveCore> normalizedCurves = DataHandler.Normalize(curveCores);
+            List<SerializedCurveCore> serializedCurves = normalizedCurves.Select(curve => new SerializedCurveCore(curve.points, curve.closed)).ToList();
+            string json = JsonUtility.ToJson(new SerializedList<SerializedCurveCore>(serializedCurves));
             this.Save(filename, json);
         }
 
-        public List<Vector3> LoadCurve(string filename, float maxLength = 1.0f, Vector3? barycenter = null)
+        public void SaveCurve(string filename, List<Vector3> points, bool closed)
         {
-            string json = this.Load(filename);
-            List<Vector3> curve = JsonUtility.FromJson<SerializedList<Vector3>>(json).ToList();
-            return DataHandler.Normalize(curve, maxLength, barycenter);
+            this.SaveCurves(filename, new List<(List<Vector3>, bool)>{ (points, closed) });
         }
 
-        public List<(List<Vector3> points, bool closed)> LoadCurves(string filename)
+        public List<(List<Vector3> points, bool closed)> LoadCurves(string filename, float maxLength = 1.0f, Vector3? barycenter = null)
         {
             string json = this.Load(filename);
-            List<CurveCore> serializedCurves = JsonUtility.FromJson<SerializedList<CurveCore>>(json).ToList();
-            return serializedCurves.Select(curve => (curve.points, curve.closed)).ToList();
+            List<SerializedCurveCore> serializedCurves = JsonUtility.FromJson<SerializedList<SerializedCurveCore>>(json).ToList();
+            List<CurveCore> curves = serializedCurves.Select(curve => new CurveCore(curve.points, curve.closed)).ToList();
+            List<CurveCore> adjustedCurves = DataHandler.Normalize(curves, maxLength, barycenter);
+            return adjustedCurves.Select(curve => (curve.points, curve.closed)).ToList();
         }
 
         public string LoadStringFromUrl(string url, string filename)
@@ -133,14 +140,16 @@ namespace FileManager
             }
         }
 
-        public List<Vector3> LoadCurveFromGitHub(
+        public List<(List<Vector3> points, bool closed)> LoadCurvesFromGitHub(
             string remoteFilename, string localFilename = null, float maxLength = 1.0f, Vector3? barycenter = null
             )
         {
             string url = $"https://raw.githubusercontent.com/UTMS-VR/CurveData/main/{remoteFilename}";
             string json = this.LoadStringFromUrl(url, localFilename ?? remoteFilename);
-            List<Vector3> curve = JsonUtility.FromJson<SerializedList<Vector3>>(json).ToList();
-            return DataHandler.Normalize(curve, maxLength, barycenter);
+            List<SerializedCurveCore> serializedCurves = JsonUtility.FromJson<SerializedList<SerializedCurveCore>>(json).ToList();
+            List<CurveCore> curves = serializedCurves.Select(curve => new CurveCore(curve.points, curve.closed)).ToList();
+            List<CurveCore> adjustedCurves = DataHandler.Normalize(curves, maxLength, barycenter);
+            return adjustedCurves.Select(curve => (curve.points, curve.closed)).ToList();
         }
 
         private bool onHMD()
@@ -155,32 +164,46 @@ namespace FileManager
 #endif            
         }
 
-        private static List<Vector3> MoveBarycenter(List<Vector3> curve, Vector3? barycenter = null)
+        private static List<Vector3> ConcatAllCurves(List<CurveCore> curves)
         {
-            if (curve.Count == 0)
-            {
-                return curve;
-            }
-            Vector3 barycenterOfCurve = curve.Aggregate((v, w) => v + w) / curve.Count;
-            Vector3 newBarycenter = barycenter ?? Vector3.zero;
-            return curve.Select(v => v - barycenterOfCurve + newBarycenter).ToList();
+            List<List<Vector3>> pointsList = curves.Select(curve => curve.points).ToList();
+            return pointsList.Aggregate((points1, points2) => points1.Concat(points2).ToList()).ToList();   
         }
 
-        static List<Vector3> Normalize(List<Vector3> curve, float maxLength = 1.0f, Vector3? barycenter = null)
+        private static List<CurveCore> MoveBarycenter(List<CurveCore> curves, Vector3? barycenter = null)
         {
-            List<Vector3> movedCurve = DataHandler.MoveBarycenter(curve);
-            float maxLengthInCurve = 0.0f;
-            foreach (Vector3 vector in movedCurve)
+            List<Vector3> allPoints = DataHandler.ConcatAllCurves(curves);
+            if (allPoints.Count == 0)
             {
-                if (vector.magnitude > maxLengthInCurve)
+                return curves;
+            }
+            Vector3 barycenterOfCurves = allPoints.Aggregate((v, w) => v + w) / allPoints.Count;
+            Vector3 newBarycenter = barycenter ?? Vector3.zero;
+            return curves.Select(
+                curve => new CurveCore(curve.points.Select(v => v - barycenterOfCurves + newBarycenter).ToList(), curve.closed)
+            ).ToList();
+        }
+
+        static List<CurveCore> Normalize(List<CurveCore> curves, float maxLength = 1.0f, Vector3? barycenter = null)
+        {
+            List<CurveCore> movedCurves = DataHandler.MoveBarycenter(curves);
+            List<Vector3> allPoints = DataHandler.ConcatAllCurves(movedCurves);
+            float maxLengthInCurves = 0.0f;
+            foreach (Vector3 vector in allPoints)
+            {
+                if (vector.magnitude > maxLengthInCurves)
                 {
-                    maxLengthInCurve = vector.magnitude;
+                    maxLengthInCurves = vector.magnitude;
                 }
             }
-            List<Vector3> normalizedCurve = movedCurve.Select(
-                vector => (vector.magnitude == 0.0f) ? vector : vector * maxLength / maxLengthInCurve
-                ).ToList();
-            return DataHandler.MoveBarycenter(normalizedCurve, barycenter);
+            if (maxLengthInCurves == 0.0f)
+            {
+                return DataHandler.MoveBarycenter(movedCurves, barycenter);
+            }
+            List<CurveCore> normalizedCurves = movedCurves.Select(
+                curve => new CurveCore(curve.points.Select(v => v * maxLength / maxLengthInCurves).ToList(), curve.closed)
+            ).ToList();
+            return DataHandler.MoveBarycenter(normalizedCurves, barycenter);
         }
 
         public List<string> GetFiles()

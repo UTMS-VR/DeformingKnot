@@ -102,9 +102,9 @@ namespace ContextMenu {
     }
 
     private void LoadPrefabs() {
-      this.panelPrefab = Resources.Load<GameObject>("MyPackage/ContextMenu/MenuPanel");
-      this.selectionPrefab = Resources.Load<GameObject>("MyPackage/ContextMenu/SelectionPanel");
-      this.textPrefab = Resources.Load<GameObject>("MyPackage/ContextMenu/MenuText");
+      this.panelPrefab = Resources.Load<GameObject>("UTMSVR/ContextMenu/MenuPanel");
+      this.selectionPrefab = Resources.Load<GameObject>("UTMSVR/ContextMenu/SelectionPanel");
+      this.textPrefab = Resources.Load<GameObject>("UTMSVR/ContextMenu/MenuText");
     }
 
     private void CreatePanel() {

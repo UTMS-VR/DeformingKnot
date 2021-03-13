@@ -8,7 +8,8 @@ namespace PullCurve
 {
     public class Knot
     {
-        public IKnotState state;
+        private IKnotState state;
+
 
         public Knot(
             List<Vector3> points,
@@ -16,7 +17,7 @@ namespace PullCurve
             int meridian = 20,
             float radius = 0.1f,
             float distanceThreshold = -1,
-            List<Curve> collisionCurves = null,
+            List<HandCurve> collisionCurves = null,
             LogicalButton buttonA = null,
             LogicalButton buttonB = null,
             LogicalButton buttonC = null,
@@ -36,7 +37,7 @@ namespace PullCurve
                 buttonA, buttonB, buttonC, buttonD, curveMaterial, pullableCurveMaterial, pointMaterial);
             this.state = new KnotStateBase(data);
 
-            Curve.SetUp(oculusTouch, drawButton: buttonC, moveButton: buttonD);
+            HandCurve.SetUp(oculusTouch, drawButton: buttonC, moveButton: buttonD);
         }
 
         public void Update()
@@ -65,4 +66,5 @@ namespace PullCurve
             return this.state;
         }
     }
+
 }

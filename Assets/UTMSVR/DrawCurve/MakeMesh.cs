@@ -1,18 +1,29 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace DrawCurve
 {
+    using UvTransformer = Func<Vector2, Vector2>;
+
     public static class MakeMesh
     {
-        public static Material CurveMaterial = Resources.Load<Material>("MyPackage/DrawCurve/Curve");
-        public static Material PointMaterial = Resources.Load<Material>("MyPackage/DrawCurve/Point");
-        public static Material SelectedCurveMaterial = Resources.Load<Material>("MyPackage/DrawCurve/SelectedCurve");
+        public static Material CurveMaterial = Resources.Load<Material>("UTMSVR/DrawCurve/Curve");
+        public static Material RainbowCurveMaterial = Resources.Load<Material>("UTMSVR/DrawCurve/Rainbow");
+        public static Material PointMaterial = Resources.Load<Material>("UTMSVR/DrawCurve/Point");
+        public static Material SelectedCurveMaterial = Resources.Load<Material>("UTMSVR/DrawCurve/SelectedCurve");
 
-        public static Mesh GetMesh(List<Vector3> points, int meridian, float radius, bool closed)
+        public static Mesh GetMesh(List<Vector3> points, int meridian, float radius, bool closed,
+            UvTransformer uvTransformer = null)
         {
+            if (uvTransformer == null)
+            {
+                // 変数名を uv にしたら 下で宣言してるやつと重複してると怒られた
+                uvTransformer = _uv => _uv;
+            }
+
             List<Vector3> pointsCopy = new List<Vector3>();
             foreach (Vector3 v in points)
             {
@@ -29,6 +40,7 @@ namespace DrawCurve
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles;
             List<Vector3> normals = new List<Vector3>();
+            List<Vector2> uv = new List<Vector2>();
 
             if (closed)
             {
@@ -37,6 +49,7 @@ namespace DrawCurve
             }
 
             int length = pointsCopy.Count;
+            int numSegments = closed ? points.Count : points.Count - 1;
             List<Vector3> tangents = Tangents(pointsCopy, closed);
             List<Vector3> principalNormals = PrincipalNormals(tangents);
 
@@ -50,6 +63,9 @@ namespace DrawCurve
                     Vector3 direction = Mathf.Cos(theta) * principalNormals[j] + Mathf.Sin(theta) * binormal;
                     vertices.Add(pointsCopy[j] + radius * direction);
                     normals.Add(direction);
+                    float u = ((float)i) / meridian;
+                    float v = ((float)j) / numSegments;
+                    uv.Add(uvTransformer(new Vector2(u, v)));
                 }
             }
 
@@ -58,6 +74,7 @@ namespace DrawCurve
             mesh.vertices = vertices.ToArray();
             mesh.triangles = triangles.ToArray();
             mesh.normals = normals.ToArray();
+            mesh.uv = uv.ToArray();
 
             return mesh;
         }
@@ -170,7 +187,7 @@ namespace DrawCurve
             return tangents;
         }
 
-        private static List<Vector3> PrincipalNormals(List<Vector3> tangents)
+        public static List<Vector3> PrincipalNormals(List<Vector3> tangents)
         {
             int length = tangents.Count;
             List<Vector3> principalNormals = new List<Vector3>();

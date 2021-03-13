@@ -4,16 +4,18 @@ using System.Linq;
 using UnityEngine;
 using InputManager;
 using DrawCurve;
+using System;
 
 namespace PullCurve
 {
+
     public class PullableCurve
     {
         // private List<Vector3> initialPoints;
         private List<Vector3> pullablePoints;
         private List<Vector3> preFixedPoints;
         private List<Vector3> postFixedPoints;
-        private List<(Curve curve, CurveDistanceHandler handler)> collisionCurves;
+        private IEnumerable<(HandCurve curve, CurveDistanceHandler handler)> collisionCurves;
         private SelfDistanceHandler selfDistanceHandler;
         private float distanceThreshold;
         private float epsilon;
@@ -24,7 +26,8 @@ namespace PullCurve
         private int meridian;
         private float radius;
         // private Material material;
-        private bool closed;
+        bool closed;
+        int shift;
 
         public PullableCurve(
             List<Vector3> pullablePoints,
@@ -37,7 +40,8 @@ namespace PullCurve
             float radius = 0.1f,
             bool closed = false,
             float distanceThreshold = -1,
-            List<Curve> collisionCurves = null)
+            List<HandCurve> collisionCurves = null,
+            int shift = 0)
         {
             this.oculusTouch = oculusTouch;
             this.controllerPosition = oculusTouch.GetPositionR();
@@ -53,7 +57,6 @@ namespace PullCurve
                 this.distanceThreshold = distanceThreshold;
             }
             this.epsilon = this.distanceThreshold * 0.2f;
-
             if (weights == null)
             {
                 this.weights = PullableCurve.GetWeights(this.pullablePoints.Count);
@@ -66,37 +69,33 @@ namespace PullCurve
                     throw new System.Exception("PullableCurveのコンストラクタの引数において、weightsとpullablePointsの長さが一致していません");
                 }
                 this.weights = weights;
-            }        
+            }
             // this.material = material;
             this.meridian = meridian;
             this.radius = radius;
             this.closed = closed;
-
-            int count = this.pullablePoints.Count;
-            int preCount = this.preFixedPoints.Count;
-            int postCount = this.postFixedPoints.Count;
-
+            this.shift = shift;
             if (collisionCurves != null)
             {
                 this.collisionCurves = collisionCurves.Select(
                     curve => (
-                        curve,
-                        //new TrivialCurveDistanceHandler(
-                        //    length1: this.pullablePoints.Count, // 注意: pullablePoints に対してだけ衝突判定を考える
-                        //    length2: curve.points.Count,
-                        //    closed1: this.closed,
-                        //    closed2: curve.closed
-                        //    )
-                        (CurveDistanceHandler)new SimpleCurveDistanceHandler(
-                            length1: this.pullablePoints.Count, // 注意: pullablePoints に対してだけ衝突判定を考える
-                            length2: curve.points.Count,
-                            closed1: false,
-                            closed2: curve.closed,
-                            epsilon: this.epsilon,
-                            dist: (i, j) => PullableCurve.CurveSegmentDistance(this.pullablePoints, curve.points, i, j)
+                    curve,
+                    //(CurveDistanceHandler) new TrivialCurveDistanceHandler(
+                    //    length1: this.pullablePoints.Count, // 注意: pullablePoints に対してだけ衝突判定を考える
+                    //    length2: curve.points.Count,
+                    //    closed1: this.closed,
+                    //    closed2: curve.closed
+                    //    )
+                    (CurveDistanceHandler)new SimpleCurveDistanceHandler(
+                        length1: this.pullablePoints.Count, // 注意: pullablePoints に対してだけ衝突判定を考える
+                        length2: curve.points.Count,
+                        closed1: this.closed,
+                        closed2: curve.closed,
+                        epsilon: this.epsilon,
+                        dist: (i, j) => PullableCurve.CurveSegmentDistance(this.pullablePoints, curve.points, i, j)
                         )
                     )
-                ).ToList();
+                    ).ToList(); // ToList しないと、毎回中身が生成される (handler の constructor が毎回呼ばれる)
             }
             List<Vector3> points = this.GetPoints();
             //this.selfDistanceHandler = new TrivialSelfDistanceHandler(
@@ -109,7 +108,7 @@ namespace PullCurve
             epsilon: this.epsilon,
             dist: (i, j) => PullableCurve.CurveSegmentDistance(points, points, i, j));
         }
-
+        
         public static PullableCurve Line(Vector3 start, Vector3 end, int numPoints, OculusTouch oculusTouch)
         {
             var points = new List<Vector3>();
@@ -130,13 +129,18 @@ namespace PullCurve
             return prePoints.Concat(this.postFixedPoints).ToList();
         }
 
-        public (List<Vector3> points, int pullableCount) GetEqualizedPoints()
+        public (List<Vector3> points, int pullableCount, int shift) GetEqualizedPoints()
         {
             List<Vector3> equalizedPullablePoints = AdjustParameter.Equalize(
                 this.pullablePoints, this.distanceThreshold, false);
             int pullableCount = equalizedPullablePoints.Count;
             List<Vector3> equalizedPoints = GetPoints(equalizedPullablePoints);
-            return (equalizedPoints, pullableCount);
+            return (equalizedPoints, pullableCount, this.shift);
+        }
+
+        public int GetCount()
+        {
+            return this.pullablePoints.Count;
         }
 
         private static float BumpFunction(float t)
@@ -153,7 +157,10 @@ namespace PullCurve
 
         public Mesh GetMesh()
         {
-            return MakeMesh.GetMesh(this.GetPoints(), this.meridian, this.radius, this.closed);
+            var points = this.GetPoints();
+            float floatShift = ((float)this.shift) / points.Count;
+            Func<Vector2, Vector2> uvTransformer = (uv) => new Vector2(uv.x, uv.y + floatShift);
+            return MakeMesh.GetMesh(points, this.meridian, this.radius, this.closed, uvTransformer);
         }
 
         public void Update()
@@ -166,7 +173,7 @@ namespace PullCurve
                     handler.Update((i, j) => PullableCurve.CurveSegmentDistance(this.pullablePoints, curve.points, i, j));
                 }
             }
-            List<Vector3> points = GetPoints();
+            List<Vector3> points = this.GetPoints();
             this.selfDistanceHandler.Update((i, j) => PullableCurve.CurveSegmentDistance(points, points, i, j));
         }
 
@@ -189,14 +196,13 @@ namespace PullCurve
             List<Vector3> newPoints = this.GetPoints(newPullablePoints);
             if (this.selfDistanceHandler.Distance((i, j) => PullableCurve.CurveSegmentDistance(
                 newPoints, newPoints, i, j)) <= this.epsilon) return;
-             // if (newPoints.Count >= 4 && PullableCurve.MinSegmentDist(newPoints, true) <= this.epsilon) return;
-            if (collisionCurves != null)
+            if (this.collisionCurves != null)
             {
                 foreach (var (curve, handler) in this.collisionCurves)
                 {
                     float dist = handler.Distance((i, j) => PullableCurve.CurveSegmentDistance(
                         newPullablePoints, curve.points, i, j));
-                    if (dist < this.epsilon) return;
+                    if (dist <= this.epsilon) return;
                 }
             }
             this.pullablePoints = newPullablePoints;
@@ -230,16 +236,16 @@ namespace PullCurve
             return distanceSum / n;
         }
 
-        //private float BumpFunction(float t)
-        //{
-        //    if (t < 0.5f)
+        //    private float BumpFunction(float t)
         //    {
-        //        return 2 * t;
+        //        if (t < 0.5f)
+        //        {
+        //            return 2 * t;
+        //        }
+        //        else
+        //        {
+        //            return 2 - 2 * t;
+        //        }
         //    }
-        //    else
-        //    {
-        //        return 2 - 2 * t;
-        //    }
-        //}
     }
 }
