@@ -1,8 +1,12 @@
 /************************************************************************************
 Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
+Licensed under the Oculus Utilities SDK License Version 1.31 (the "License"); you may not use
+the Utilities SDK except in compliance with the License, which is provided at the time of installation
+or download, or which otherwise accompanies this software in either electronic or hard copy form.
+
+You may obtain a copy of the License at
+https://developer.oculus.com/licenses/utilities-1.31
 
 Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
@@ -51,21 +55,21 @@ public abstract class OVRComposition {
         Debug.Log(cameraRig == null ? "[OVRComposition] CameraRig not found" : "[OVRComposition] CameraRig found");
     }
 
-    public OVRPose ComputeCameraWorldSpacePose(OVRPlugin.CameraExtrinsics extrinsics)
+    public OVRPose ComputeCameraWorldSpacePose(OVRPlugin.CameraExtrinsics extrinsics, OVRPlugin.Posef calibrationRawPose)
 	{
-		OVRPose trackingSpacePose = ComputeCameraTrackingSpacePose(extrinsics);
+		OVRPose trackingSpacePose = ComputeCameraTrackingSpacePose(extrinsics, calibrationRawPose);
 		OVRPose worldSpacePose = OVRExtensions.ToWorldSpacePose(trackingSpacePose);
 		return worldSpacePose;
 	}
 
-	public OVRPose ComputeCameraTrackingSpacePose(OVRPlugin.CameraExtrinsics extrinsics)
+	public OVRPose ComputeCameraTrackingSpacePose(OVRPlugin.CameraExtrinsics extrinsics, OVRPlugin.Posef calibrationRawPose)
 	{
 		OVRPose trackingSpacePose = new OVRPose();
 
 		OVRPose cameraTrackingSpacePose = extrinsics.RelativePose.ToOVRPose();
 #if OVR_ANDROID_MRC
-		OVRPose stageToLocalPose = OVRPlugin.GetTrackingTransformRelativePose(OVRPlugin.TrackingOrigin.Stage).ToOVRPose();
-		cameraTrackingSpacePose = stageToLocalPose * cameraTrackingSpacePose;
+		OVRPose rawPose = OVRPlugin.GetTrackingTransformRawPose().ToOVRPose();
+		cameraTrackingSpacePose = rawPose * (calibrationRawPose.ToOVRPose().Inverse() * cameraTrackingSpacePose);
 #endif
 		trackingSpacePose = cameraTrackingSpacePose;
 

@@ -3,54 +3,103 @@ using System.Collections.Generic;
 using UnityEngine;
 using DrawCurve;
 
-public class Elasticity : Flow
+public class Elasticity
 {
-    public float gtol = 0.0f;
+    private List<Vector3> pos;
+    private List<Vector3> momentum;
+    private int len;
+    private float seg; 
+    private float lr = 1e-01f;
+    private float alpha = 0.95f;
+    private List<Vector3> gradient;
 
-    public Elasticity(ref List<Curve> curveList, float lr=1e-04f):base(ref curveList, lr)
+    public Elasticity(List<Vector3> positions, List<Vector3> momentum, float segment)
     {
+        this.pos = positions;
+        this.len = positions.Count;
+        this.momentum = momentum;
+        this.seg = segment;
+        this.gradient = Gradient();
     }
 
-    protected override void setGradient()
+    public void Flow()
     {
-        for (int i = 0; i < this.curveList.Count; i++)
+        for (int i = 0; i < this.len; i++)
         {
-            for (int j = 0; j < this.countList[i]; j++)
-            {
-                int jn = (j + 1) % this.countList[i];
-                int jp = (j + this.countList[i] - 1) % this.countList[i];
-                Vector3 next = this.curveList[i].points[j] - this.curveList[i].points[jn];
-                Vector3 prev = this.curveList[i].points[j] - this.curveList[i].points[jp];
-                next = (next.magnitude - this.curveList[i].segment) * next.normalized;
-                prev = (prev.magnitude - this.curveList[i].segment) * prev.normalized;
-                gradientList[i][j] = next + prev;
-            }
+            this.pos[i] -= this.gradient[i];
         }
+    }
+
+    // momentum SGD
+    public void MomentumFlow()
+    {
+        for (int i = 0; i < this.len; i++)
+        {
+            this.momentum[i] = this.alpha * this.momentum[i] + this.gradient[i];
+            this.pos[i] -= this.momentum[i];
+        }
+    }
+
+    public List<Vector3> Gradient()
+    {
+        List<Vector3> gradient = new List<Vector3>();
+
+        for (int i = 0; i < this.len; i++)
+        {
+            Vector3 next = this.pos[i] - this.pos[Succ(i)];
+            Vector3 previous = this.pos[i] - this.pos[Pred(i)];
+            gradient.Add(this.lr * (Spring(next) + Spring(previous)));
+        }
+
+        return gradient;
+    }
+
+    public float Energy()
+    {
+        float energy = 0.0f;
+
+        for (int i = 0; i < this.len; i++)
+        {
+            energy += Mathf.Pow(Vector3.Distance(this.pos[i], this.pos[Succ(i)]) - this.seg, 2) / 2;
+        }
+
+        return energy;
     }
 
     public float MaxError()
     {
         float max = 0.0f;
-        for (int i = 0; i < this.curveList.Count; i++)
+
+        for (int i = 0; i < this.len; i++)
         {
-            for (int j = 0; j < this.countList[i]; j++)
+            float error = Mathf.Abs(Vector3.Distance(this.pos[i], this.pos[Succ(i)]) - this.seg);
+
+            if (max < error)
             {
-                int jn = (j + 1) % this.countList[i];
-                max = Mathf.Max(Mathf.Abs(Vector3.Distance(this.curveList[i].points[j], this.curveList[i].points[jn]) - this.curveList[i].segment), max);
+                max = error;
             }
         }
+
         return max;
     }
 
-    // public float Energy()
-    // {
-    //     float energy = 0.0f;
+    private Vector3 Spring(Vector3 v)
+    {
+        return (v.magnitude - this.seg) * v.normalized;
+    }
 
-    //     for (int i = 0; i < this.len; i++)
-    //     {
-    //         energy += Mathf.Pow(Vector3.Distance(this.pos[i], this.pos[Succ(i)]) - this.seg, 2) / 2;
-    //     }
+    private int Succ(int i)
+    {
+        return Sum(i, 1);
+    }
 
-    //     return energy;
-    // }
+    private int Pred(int i)
+    {
+        return Sum(i, this.len - 1);
+    }
+
+    private int Sum(int i, int j)
+    {
+        return (i + j) % this.len;
+    }
 }

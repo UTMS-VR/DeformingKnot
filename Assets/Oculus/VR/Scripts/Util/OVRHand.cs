@@ -1,8 +1,12 @@
 /************************************************************************************
 Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
+Licensed under the Oculus Utilities SDK License Version 1.31 (the "License"); you may not use
+the Utilities SDK except in compliance with the License, which is provided at the time of installation
+or download, or which otherwise accompanies this software in either electronic or hard copy form.
+
+You may obtain a copy of the License at
+https://developer.oculus.com/licenses/utilities-1.31
 
 Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
@@ -59,7 +63,6 @@ public class OVRHand : MonoBehaviour,
 	public Transform PointerPose { get; private set; }
 	public float HandScale { get; private set; }
 	public TrackingConfidence HandConfidence { get; private set; }
-	public bool IsDominantHand { get; private set; }
 
 	private void Awake()
 	{
@@ -80,10 +83,7 @@ public class OVRHand : MonoBehaviour,
 
 	private void FixedUpdate()
 	{
-		if (OVRPlugin.nativeXrApi != OVRPlugin.XrApi.OpenXR)
-		{
-			GetHandState(OVRPlugin.Step.Physics);
-		}
+		GetHandState(OVRPlugin.Step.Physics);
 	}
 
 	private void GetHandState(OVRPlugin.Step step)
@@ -93,7 +93,6 @@ public class OVRHand : MonoBehaviour,
 			IsTracked = (_handState.Status & OVRPlugin.HandStatus.HandTracked) != 0;
 			IsSystemGestureInProgress = (_handState.Status & OVRPlugin.HandStatus.SystemGestureInProgress) != 0;
 			IsPointerPoseValid = (_handState.Status & OVRPlugin.HandStatus.InputStateValid) != 0;
-			IsDominantHand = (_handState.Status & OVRPlugin.HandStatus.DominantHand) != 0;
 			PointerPose.localPosition = _handState.PointerPose.Position.FromFlippedZVector3f();
 			PointerPose.localRotation = _handState.PointerPose.Orientation.FromFlippedZQuatf();
 			HandScale = _handState.HandScale;

@@ -1,8 +1,12 @@
 /************************************************************************************
 Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
+Licensed under the Oculus Utilities SDK License Version 1.31 (the "License"); you may not use
+the Utilities SDK except in compliance with the License, which is provided at the time of installation
+or download, or which otherwise accompanies this software in either electronic or hard copy form.
+
+You may obtain a copy of the License at
+https://developer.oculus.com/licenses/utilities-1.31
 
 Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
@@ -160,7 +164,7 @@ public class OVRSkeletonRenderer : MonoBehaviour
 			SystemGestureMaterial = systemGestureMat;
 
 			BoneCapsule = boneCapsule;
-
+			
 			CapsuleGO = GameObject.CreatePrimitive(PrimitiveType.Capsule);
 			CapsuleCollider collider = CapsuleGO.GetComponent<CapsuleCollider>();
 			Destroy(collider);
@@ -187,7 +191,7 @@ public class OVRSkeletonRenderer : MonoBehaviour
 					CapsuleGO.SetActive(shouldRender);
 				}
 			}
-
+			
 			CapsuleGO.transform.rotation = BoneCapsule.CapsuleCollider.transform.rotation * _capsuleRotationOffset;
 			CapsuleGO.transform.position = BoneCapsule.CapsuleCollider.transform.TransformPoint(BoneCapsule.CapsuleCollider.center);
 			CapsuleGO.transform.localScale = capsuleScale * scale;
@@ -227,20 +231,7 @@ public class OVRSkeletonRenderer : MonoBehaviour
 			return;
 		}
 
-		if (ShouldInitialize())
-		{
-			Initialize();
-		}
-	}
-
-	private bool ShouldInitialize()
-	{
-		if (IsInitialized)
-		{
-			return false;
-		}
-
-		return _ovrSkeleton.IsInitialized;
+		Initialize();
 	}
 
 	private void Initialize()
@@ -270,49 +261,39 @@ public class OVRSkeletonRenderer : MonoBehaviour
 			_systemGestureMaterial = _systemGestureDefaultMaterial;
 		}
 
-		if (_ovrSkeleton.IsInitialized)
+		for (int i = 0; i < _ovrSkeleton.Bones.Count; i++)
 		{
-			for (int i = 0; i < _ovrSkeleton.Bones.Count; i++)
+			var boneVis = new BoneVisualization(
+				_skeletonGO,
+				_skeletonMaterial,
+				_systemGestureMaterial,
+				_scale,
+				_ovrSkeleton.Bones[i].Transform,
+				_ovrSkeleton.Bones[i].Transform.parent);
+
+			_boneVisualizations.Add(boneVis);
+		}
+
+		if (_renderPhysicsCapsules && _ovrSkeleton.Capsules != null)
+		{
+			for (int i = 0; i < _ovrSkeleton.Capsules.Count; i++)
 			{
-				var boneVis = new BoneVisualization(
+				var capsuleVis = new CapsuleVisualization(
 					_skeletonGO,
-					_skeletonMaterial,
+					_capsuleMaterial,
 					_systemGestureMaterial,
 					_scale,
-					_ovrSkeleton.Bones[i].Transform,
-					_ovrSkeleton.Bones[i].Transform.parent);
+					_ovrSkeleton.Capsules[i]);
 
-				_boneVisualizations.Add(boneVis);
+				_capsuleVisualizations.Add(capsuleVis);
 			}
-
-			if (_renderPhysicsCapsules && _ovrSkeleton.Capsules != null)
-			{
-				for (int i = 0; i < _ovrSkeleton.Capsules.Count; i++)
-				{
-					var capsuleVis = new CapsuleVisualization(
-						_skeletonGO,
-						_capsuleMaterial,
-						_systemGestureMaterial,
-						_scale,
-						_ovrSkeleton.Capsules[i]);
-
-					_capsuleVisualizations.Add(capsuleVis);
-				}
-			}
-
-			IsInitialized = true;
 		}
+
+		IsInitialized = true;
 	}
 
 	public void Update()
 	{
-#if UNITY_EDITOR
-		if (ShouldInitialize())
-		{
-			Initialize();
-		}
-#endif
-
 		IsDataValid = false;
 		IsDataHighConfidence = false;
 		ShouldUseSystemGestureMaterial = false;

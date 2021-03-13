@@ -26,28 +26,21 @@ using UnityEditor;
 
 public class OVRDeviceSelector
 {
-	public static bool isTargetDeviceQuestFamily
+	public static bool isTargetDeviceGearVrOrGo
 	{
 		get
 		{
-			return isTargetDeviceQuest || isTargetDeviceQuest2;
+			OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
+			return projectConfig.targetDeviceTypes.Contains(OVRProjectConfig.DeviceType.GearVrOrGo);
 		}
 	}
+
 	public static bool isTargetDeviceQuest
 	{
 		get
 		{
 			OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
 			return projectConfig.targetDeviceTypes.Contains(OVRProjectConfig.DeviceType.Quest);
-		}
-	}
-
-	public static bool isTargetDeviceQuest2
-	{
-		get
-		{
-			OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
-			return projectConfig.targetDeviceTypes.Contains(OVRProjectConfig.DeviceType.Quest2);
 		}
 	}
 }

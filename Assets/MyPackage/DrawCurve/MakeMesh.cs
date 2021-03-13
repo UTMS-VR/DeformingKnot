@@ -170,7 +170,7 @@ namespace DrawCurve
             return tangents;
         }
 
-        public static List<Vector3> PrincipalNormals(List<Vector3> tangents)
+        private static List<Vector3> PrincipalNormals(List<Vector3> tangents)
         {
             int length = tangents.Count;
             List<Vector3> principalNormals = new List<Vector3>();
