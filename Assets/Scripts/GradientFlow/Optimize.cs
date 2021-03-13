@@ -45,7 +45,7 @@ public class Optimize
         }
         else if (flowClass == "MeanCurvature")
         {
-            // curveFlow = new MeanCurvature(ref this.newCurves, 0.05f);
+            curveFlow = new MeanCurvature(ref this.newCurves, 0.05f);
         }
 
         elasticity = new Elasticity(ref this.newCurves, 1e-01f);
