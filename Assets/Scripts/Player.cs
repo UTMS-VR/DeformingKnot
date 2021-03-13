@@ -8,6 +8,7 @@ using InputManager;
 using ContextMenu;
 using FileManager;
 using PullCurve;
+using EnergyOptimizer;
 
 public abstract class State
 {
