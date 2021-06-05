@@ -20,7 +20,7 @@ public static class DockerBuild {
         // AppBundle は使用しない
         EditorUserBuildSettings.buildAppBundle = false;
 
-        BuildPipeline.BuildPlayer(sceneNameArray, "Build.apk", BuildTarget.Android, BuildOptions.Development);
+        BuildPipeline.BuildPlayer(sceneNameArray, "DeformingKnot.apk", BuildTarget.Android, BuildOptions.Development);
     }
 
     #region Util

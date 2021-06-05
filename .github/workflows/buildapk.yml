@@ -1,0 +1,28 @@
+on:
+  push:
+    branches: [ master, docker ]
+    paths: [ 'Assets/**', 'Packages/**', 'ProjectSettings/**', 'UserSettings/**', '.github/workflows/**' ]
+  pull_request:
+    branches: [ master ]
+    paths: [ 'Assets/**', 'Packages/**', 'ProjectSettings/**', 'UserSettings/**', '.github/workflows/**' ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup secret
+        run: 'echo "$Unity_v2020_x_ulf" > Unity_v2020.x.ulf'
+        env:
+          Unity_v2020_x_ulf: ${{secrets.Unity_v2020_x_ulf}}
+      - name: Run docker image
+        run: 'docker run -v $(pwd):/root/MyPackage -dit --name mycontainer unityci/editor:2020.3.3f1-base-0.11.0'
+      - name: Load license file
+        run: docker exec mycontainer /opt/unity/Editor/Unity -quit -batchmode -nographics -manualLicenseFile /root/MyPackage/Unity_v2020.x.ulf || exit 0
+      - name: Build apk
+        run: docker exec mycontainer /opt/unity/Editor/Unity -quit -batchmode -nographics -projectpath /root/DeformingKnot -executeMethod DockerBuild.BuildAndroid
+      - name: Upload *.apk
+        uses: actions/upload-artifact@v2
+        with:
+          name: DeformingKnot
+          path: "*.apk"
