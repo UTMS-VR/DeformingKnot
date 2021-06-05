@@ -16,11 +16,13 @@ jobs:
         env:
           Unity_v2020_x_ulf: ${{secrets.Unity_v2020_x_ulf}}
       - name: Run docker image
-        run: 'docker run -v $(pwd):/root/DeformingKnot -dit --name mycontainer unityci/editor:2020.3.3f1-base-0.11.0'
+        run: 'docker run -v $(pwd):/root/DeformingKnot -dit --name mycontainer unityci/editor:2020.3.3f1-android-0.11.0'
       - name: Load license file
         run: docker exec mycontainer /opt/unity/Editor/Unity -quit -batchmode -nographics -manualLicenseFile /root/DeformingKnot/Unity_v2020.x.ulf || exit 0
       - name: Build apk
         run: docker exec mycontainer /opt/unity/Editor/Unity -quit -batchmode -nographics -projectpath /root/DeformingKnot -executeMethod DockerBuild.BuildAndroid
+      - name: List files
+        run: ls
       - name: Upload *.apk
         uses: actions/upload-artifact@v2
         with:
