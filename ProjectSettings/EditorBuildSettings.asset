@@ -11,4 +11,8 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Oculus/SampleFramework/Usage/AvatarGrab.unity
     guid: 941c413af7c367d40aab0725f5a59530
-  m_configObjects: {}
+  m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 36c6660d71b854b89a050d8d3c2dab86,
+      type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 082d81390c56047a48ca338f79757072,
+      type: 2}
