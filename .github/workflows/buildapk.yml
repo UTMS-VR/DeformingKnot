@@ -21,6 +21,8 @@ jobs:
         run: docker exec mycontainer /opt/unity/Editor/Unity -quit -batchmode -nographics -manualLicenseFile /root/DeformingKnot/Unity_v2020.x.ulf || exit 0
       - name: Build apk
         run: docker exec mycontainer /opt/unity/Editor/Unity -quit -batchmode -nographics -projectpath /root/DeformingKnot -executeMethod DockerBuild.BuildAndroid
+      - name: Build apk again (何故か2回ビルドしないとうまくいかない)
+        run: docker exec mycontainer /opt/unity/Editor/Unity -quit -batchmode -nographics -projectpath /root/DeformingKnot -executeMethod DockerBuild.BuildAndroid
       - name: List files
         run: ls
       - name: Upload *.apk
