@@ -1,0 +1,1166 @@
+[Licensing::Module] Channel doesn't exist: "LicenseClient-masaki"
+Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/Resources/Unity.Licensing.Client
+[Licensing::Module] Successfully launched the LicensingClient (PId: 89717)
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-masaki" (connect: 0.87s, validation: 0.06s, handshake: 0.15s)
+[Licensing::Module] Connected to LicensingClient (PId: 89717, launch time: 0.00, total connection time: 1.08s)
+Entitlement-based licensing initiated
+[LicensingClient] Licenses updated successfully
+
+LICENSE SYSTEM [2021619 16:41:30] Next license update check is after 2021-05-30T05:47:54
+
+
+LICENSE SYSTEM [2021619 16:41:30] Current license is already valid and activated. Skipping license activation process (Provided username/password will be ignored).
+[Licensing::Module] Serial number assigned to: "F4-SW5G-BRX7-8B5D-F93V-XXXX"
+[Package Manager] Server::Start -- Port 61488 was selected
+Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/Server/UnityPackageManager
+
+ COMMAND LINE ARGUMENTS:
+/Users/masaki/unity/2020.3.3f1/Unity.app/Contents/MacOS/Unity
+-quit
+-batchmode
+-nographics
+-logFile
+/Users/masaki/unity/UTMS-VR/DeformingKnot/UnityLog.txt
+-projectpath
+/Users/masaki/unity/UTMS-VR/DeformingKnot
+-executeMethod
+DockerBuild.BuildAndroid
+Successfully changed project path to: /Users/masaki/unity/UTMS-VR/DeformingKnot
+/Users/masaki/unity/UTMS-VR/DeformingKnot
+Using Asset Import Pipeline V2.
+[Package Manager] Restoring resolved packages state from cache
+[Package Manager] Done checking package constraints in 0.00s seconds
+[Package Manager] 
+Registered 46 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.collab-proxy@1.3.9 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.collab-proxy@1.3.9)
+    com.unity.ext.nunit@1.0.6 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.ext.nunit@1.0.6)
+    com.unity.ide.rider@2.0.7 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.ide.rider@2.0.7)
+    com.unity.ide.visualstudio@2.0.7 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.ide.visualstudio@2.0.7)
+    com.unity.ide.vscode@1.2.3 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.ide.vscode@1.2.3)
+    com.unity.test-framework@1.1.24 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.test-framework@1.1.24)
+    com.unity.textmeshpro@3.0.1 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.textmeshpro@3.0.1)
+    com.unity.timeline@1.4.6 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.timeline@1.4.6)
+    com.unity.xr.management@4.0.5 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.xr.management@4.0.5)
+    com.unity.xr.oculus@1.8.1 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.xr.oculus@1.8.1)
+    com.unity.xr.legacyinputhelpers@2.1.7 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.xr.legacyinputhelpers@2.1.7)
+    com.unity.subsystemregistration@1.0.6 (location: /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.subsystemregistration@1.0.6)
+  Built-in packages:
+    com.unity.ugui@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.ugui)
+    com.unity.modules.ai@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.ai)
+    com.unity.modules.androidjni@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.androidjni)
+    com.unity.modules.animation@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.animation)
+    com.unity.modules.assetbundle@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.assetbundle)
+    com.unity.modules.audio@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.audio)
+    com.unity.modules.cloth@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.cloth)
+    com.unity.modules.director@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.director)
+    com.unity.modules.imageconversion@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.imageconversion)
+    com.unity.modules.imgui@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.imgui)
+    com.unity.modules.jsonserialize@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.jsonserialize)
+    com.unity.modules.particlesystem@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.particlesystem)
+    com.unity.modules.physics@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.physics)
+    com.unity.modules.physics2d@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.physics2d)
+    com.unity.modules.screencapture@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.screencapture)
+    com.unity.modules.terrain@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.terrain)
+    com.unity.modules.terrainphysics@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.terrainphysics)
+    com.unity.modules.tilemap@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.tilemap)
+    com.unity.modules.ui@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.ui)
+    com.unity.modules.uielements@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.uielements)
+    com.unity.modules.umbra@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.umbra)
+    com.unity.modules.unityanalytics@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.unityanalytics)
+    com.unity.modules.unitywebrequest@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.unitywebrequest)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.unitywebrequestassetbundle)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.unitywebrequestaudio)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.unitywebrequesttexture)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.unitywebrequestwww)
+    com.unity.modules.vehicles@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.vehicles)
+    com.unity.modules.video@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.video)
+    com.unity.modules.vr@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.vr)
+    com.unity.modules.wind@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.wind)
+    com.unity.modules.xr@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.xr)
+    com.unity.modules.subsystems@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.subsystems)
+    com.unity.modules.uielementsnative@1.0.0 (location: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.modules.uielementsnative)
+
+[Subsystems] Looking for new subsystems at path /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.xr.oculus@1.8.1
+[Subsystems] Novel subsystem found at Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/UnitySubsystemsManifest.json
+[Subsystems] Discovering subsystems at path /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path /Users/masaki/unity/UTMS-VR/DeformingKnot/Assets
+[Subsystems] Discovering subsystems at path /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.xr.oculus@1.8.1
+[Subsystems] No descriptors matched for  examples in Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/UnitySubsystemsManifest.json.
+[Subsystems] 1 'inputs' descriptors matched in Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/UnitySubsystemsManifest.json
+[Subsystems] 1 'displays' descriptors matched in Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/UnitySubsystemsManifest.json
+[Subsystems] No descriptors matched for  meshings in Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/UnitySubsystemsManifest.json.
+Package Manager log level set to [2]
+[Package Manager] Done registering packages in 0.06s seconds
+Refreshing native plugins compatible for Editor in 36.00 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 2020.3.3f1 (76626098c1c4)
+[Subsystems] Discovering subsystems at path /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path /Users/masaki/unity/UTMS-VR/DeformingKnot/Assets
+[Subsystems] Discovering subsystems at path /Users/masaki/unity/UTMS-VR/DeformingKnot/Library/PackageCache/com.unity.xr.oculus@1.8.1
+[Subsystems] No descriptors matched for  examples in Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/UnitySubsystemsManifest.json.
+[Subsystems] 1 'inputs' descriptors matched in Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/UnitySubsystemsManifest.json
+[Subsystems] 1 'displays' descriptors matched in Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/UnitySubsystemsManifest.json
+[Subsystems] No descriptors matched for  meshings in Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/UnitySubsystemsManifest.json.
+Forcing GfxDevice: Null
+GfxDevice: creating device client; threaded=0
+NullGfxDevice:
+    Version:  NULL 1.0 [1.0]
+    Renderer: Null Device
+    Vendor:   Unity Technologies
+Initialize mono
+Mono path[0] = '/Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Managed'
+Mono path[1] = '/Users/masaki/unity/2020.3.3f1/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = '/Users/masaki/unity/2020.3.3f1/Unity.app/Contents/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56716
+AcceleratorClientConnectionCallback - disconnected - :0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll
+Register platform support module: /Users/masaki/unity/2020.3.3f1/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll
+Registered in 0.005532 seconds.
+Native extension for Android target not found
+Native extension for OSXStandalone target not found
+Refreshing native plugins compatible for Editor in 25.72 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  2.544 seconds
+Platform modules already initialized, skipping
+Validating Project structure ... 0.004078 seconds.
+Shader import version has changed; will reimport all shaders...
+Upgrading shader files ...0.014634 seconds.
+Application.AssetDatabase Initial Script Refresh Start
+Registering precompiled user dll's ...
+Registered in 0.002314 seconds.
+AssetDatabase: script compilation time: 0.070157s
+Begin MonoManager ReloadAssembly
+Native extension for Android target not found
+Native extension for OSXStandalone target not found
+Refreshing native plugins compatible for Editor in 0.36 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.050 seconds
+Platform modules already initialized, skipping
+RefreshInfo: InitialScriptRefreshV2(NoUpdateAssetOptions) scanfilter:  ... 1 filters
+RefreshProfiler: Total: 2029.225ms
+	InvokeBeforeRefreshCallbacks: 0.249ms
+	ApplyChangesToAssetFolders: 0.063ms
+	Scan: 48.431ms
+	OnSourceAssetsModified: 0.000ms
+	InitializeImportedAssetsSnapshot: 0.133ms
+	GetAllGuidsForCategorization: 0.147ms
+	CategorizeAssets: 24.246ms
+	ImportAndPostprocessOutOfDateAssets: 1938.570ms (1867.212ms without children)
+		CompileScripts: 70.830ms
+		PostProcessAllAssets: 0.000ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.129ms
+		InitializingProgressBar: 0.002ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.178ms
+		RestoreLoadedAssetsState: 0.218ms
+	ReloadSourceAssets: 0.239ms
+	UnloadImportedAssets: 0.003ms
+	Hotreload: 0.780ms
+	FixTempGuids: 0.003ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.000ms
+	UnloadStreamsBegin: 0.269ms
+	LoadedImportedAssetsSnapshotReleaseGCHandles: 0.004ms
+	GetLoadedSourceAssetsSnapshot: 0.263ms
+	PersistCurrentRevisions: 0.326ms
+	UnloadStreamsEnd: 6.835ms
+	GenerateScriptTypeHashes: 0.137ms
+	Untracked: 8.664ms
+Application.AssetDatabase Initial Script Refresh End
+Application.AssetDatabase.Refresh Start
+Start importing Assets/Oculus/VR/Prefabs/OVRCameraRig.prefab using Guid(126d619cf4daa52469682f85c1378b4a) Importer(-1,00000000000000000000000000000000)  -> (artifact id: '6ef797e4fa74e0c1bef5da5d7573292e') in 0.014973 seconds
+Start importing Assets/Oculus/VR/Prefabs/OVRPlayerController.prefab using Guid(ce816f2e6abb0504092c23ed9b970dfd) Importer(-1,00000000000000000000000000000000)  -> (artifact id: '6832675d9f681ce80f27b2fe9649a187') in 0.006051 seconds
+Refreshing native plugins compatible for Editor in 0.36 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Refresh completed in 0.180658 seconds.
+RefreshInfo: RefreshV2(ForceSynchronousImport) scanfilter: 
+RefreshProfiler: Total: 180.651ms
+Application.AssetDatabase.Refresh End
+Shader 'Oculus/OVRMRCameraFrameLit': fallback shader 'Alpha-Diffuse' not found
+RefreshInfo: StopAssetImportingV2(ForceSynchronousImport) scanfilter: 
+RefreshProfiler: Total: 2.011ms
+Refresh completed in 0.052255 seconds.
+RefreshInfo: RefreshV2(NoUpdateAssetOptions) scanfilter: 
+RefreshProfiler: Total: 52.246ms
+Shader 'Oculus/OVRMRCameraFrameLit': fallback shader 'Alpha-Diffuse' not found
+Initializing Unity extensions:
+Unloading 100 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 131.1 MB.
+System memory in use after: 129.2 MB.
+
+Unloading 142 unused Assets to reduce memory usage. Loaded Objects now: 1822.
+Total: 6.145168 ms (FindLiveObjects: 0.371801 ms CreateObjectMapping: 0.124477 ms MarkObjects: 3.504412 ms  DeleteObjects: 2.142167 ms)
+
+ProgressiveSceneManager::Cancel()
+PlayerSettings.applicationIdentifier only changes the identifier for the currently active platform. Please use SetApplicationIdentifier to set it for any platform
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at /Users/bokken/buildslave/unity/build/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:LogWarning (object)
+UnityEditor.PlayerSettings:set_applicationIdentifier (string) (at /Users/bokken/buildslave/unity/build/Editor/Mono/PlayerSettings.bindings.cs:1171)
+DockerBuild:BuildAndroid () (at Assets/Editor/DockerBuild.cs:16)
+
+(Filename: Assets/Editor/DockerBuild.cs Line: 16)
+
+Start importing ProjectSettings/ProjectSettings.asset using Guid(00000000000000004000000000000000) Importer(-1,00000000000000000000000000000000)  -> (artifact id: '571b51d927ab8854aecc488b2c83781d') in 0.002416 seconds
+Refreshing native plugins compatible for Editor in 0.32 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+RefreshInfo: StopAssetImportingV2(NoUpdateAssetOptions) scanfilter: 
+RefreshProfiler: Total: 15.503ms
+DisplayProgressbar: Checking prerequisites
+Android PostProcess task "Checking prerequisites" took 3.9815 ms
+DisplayProgressbar: Detect Java Development Kit (JDK)
+Android PostProcess task "Detect Java Development Kit (JDK)" took 93.7006 ms
+DisplayProgressbar: Detecting Android SDK
+AndroidSDKTools:
+
+	root          : /Users/masaki/unity/2020.3.3f1/PlaybackEngines/AndroidPlayer/SDK
+	tools         : /Users/masaki/unity/2020.3.3f1/PlaybackEngines/AndroidPlayer/SDK/tools
+	platform-tools: /Users/masaki/unity/2020.3.3f1/PlaybackEngines/AndroidPlayer/SDK/platform-tools
+	build-tools   : /Users/masaki/unity/2020.3.3f1/PlaybackEngines/AndroidPlayer/SDK/build-tools/28.0.3
+
+	adb           : /Users/masaki/unity/2020.3.3f1/PlaybackEngines/AndroidPlayer/SDK/platform-tools/adb
+
+Android PostProcess task "Detecting Android SDK" took 1279.7181 ms
+DisplayProgressbar: Detect Android NDK
+Android PostProcess task "Detect Android NDK" took 24.1487 ms
+Android PostProcess task "Trying to find a suitable Android device" took 0.4274 ms
+BuildPlayerGenerator: Succeeded
+[ScriptCompilation] Recompiling all scripts because: Recompiling scripts for player build.
+BuildPlayer: start building target 13
+- Starting script compilation
+- Starting compile Library/PlayerScriptAssemblies/UnityEngine.TestRunner.dll
+- Starting compile Library/PlayerScriptAssemblies/UnityEngine.UI.dll
+- Finished compile Library/PlayerScriptAssemblies/UnityEngine.TestRunner.dll in 0.37679 seconds
+- Finished compile Library/PlayerScriptAssemblies/UnityEngine.UI.dll in 0.531341 seconds
+- Starting compile Library/PlayerScriptAssemblies/Oculus.VR.dll
+- Starting compile Library/PlayerScriptAssemblies/Unity.Timeline.dll
+- Starting compile Library/PlayerScriptAssemblies/Unity.TextMeshPro.dll
+- Starting compile Library/PlayerScriptAssemblies/Unity.XR.Management.dll
+- Starting compile Library/PlayerScriptAssemblies/Unity.Subsystem.Registration.dll
+- Starting compile Library/PlayerScriptAssemblies/UnityEngine.SpatialTracking.dll
+- Finished compile Library/PlayerScriptAssemblies/Unity.Subsystem.Registration.dll in 0.272522 seconds
+- Finished compile Library/PlayerScriptAssemblies/UnityEngine.SpatialTracking.dll in 0.350957 seconds
+- Starting compile Library/PlayerScriptAssemblies/UnityEngine.XR.LegacyInputHelpers.dll
+- Finished compile Library/PlayerScriptAssemblies/Unity.Timeline.dll in 0.609469 seconds
+- Finished compile Library/PlayerScriptAssemblies/Unity.XR.Management.dll in 0.631067 seconds
+- Starting compile Library/PlayerScriptAssemblies/Unity.XR.Oculus.dll
+- Finished compile Library/PlayerScriptAssemblies/UnityEngine.XR.LegacyInputHelpers.dll in 0.431694 seconds
+- Finished compile Library/PlayerScriptAssemblies/Oculus.VR.dll in 0.893098 seconds
+- Finished compile Library/PlayerScriptAssemblies/Unity.XR.Oculus.dll in 0.270123 seconds
+- Finished compile Library/PlayerScriptAssemblies/Unity.TextMeshPro.dll in 1.003469 seconds
+- Starting compile Library/PlayerScriptAssemblies/Assembly-CSharp.dll
+- Finished compile Library/PlayerScriptAssemblies/Assembly-CSharp.dll in 0.243304 seconds
+- Finished script compilation in 1.838418 seconds
+BuildPlayerGenerator: Succeeded
+Refresh completed in 0.056055 seconds.
+RefreshInfo: RefreshV2() scanfilter: 
+RefreshProfiler: Total: 56.044ms
+Opening scene 'Assets/Scenes/DeformingKnot.unity'
+Unloading 1 Unused Serialized files (Serialized files now loaded: 0)
+Loaded scene 'Assets/Scenes/DeformingKnot.unity'
+	Deserialize:            6.208 ms
+	Integration:            48.591 ms
+	Integration of assets:  0.006 ms
+	Thread Wait Time:       15.542 ms
+	Total Operation Time:   70.347 ms
+System memory in use before: 141.7 MB.
+System memory in use after: 141.0 MB.
+
+Unloading 39 unused Assets to reduce memory usage. Loaded Objects now: 2612.
+Total: 7.155810 ms (FindLiveObjects: 0.358666 ms CreateObjectMapping: 0.111577 ms MarkObjects: 6.098998 ms  DeleteObjects: 0.584784 ms)
+
+Created GICache directory at /Users/masaki/Library/Caches/com.unity3d.UnityEditor/GiCache. Took: 0.007s, timestamps: [11.706 - 11.713]
+gi::BakeBackendSwitch: switching bake backend from 3 to 1.
+[00:00:00] Enlighten: Precompute started.
+[00:00:00] Enlighten: Finished 1 Layout Systems job (0.00s execute, 0.00s integrate, 0.01s wallclock)
+[00:00:00] Enlighten: Finished 1 Tetrahedralize Probes job (0.00s execute, 0.00s integrate, 0.01s wallclock)
+[00:00:00] Enlighten: Precompute took 0.026187 seconds.
+Enlighten scene contents:   0 geometries.   0 instances.   0 systems.   0 probe groups.   0 cube maps. Scene is up-to-date.
+[00:00:00] Enlighten: Bake started.
+Setting up 2 worker threads for Enlighten.
+  Thread -> id: 700004876000 -> priority: 1 
+  Thread -> id: 7000048f9000 -> priority: 1 
+[00:00:00] Enlighten: Finished 1 Create Input Lighting job (0.00s execute, 0.00s integrate, 0.01s wallclock)
+Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Tools/JobProcess
+[00:00:00] Enlighten: Finished 1 Bake Runtime job (0.03s execute, 0.00s integrate, 0.04s wallclock)
+[00:00:00] Enlighten: Bake took 0.051304 seconds.
+[PathTracer] Loaded OpenRL shaders in 0.956 secs -> Timestamps: [11.926 - 12.882].Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Tools/UnityShaderCompiler
+Launched and connected shader compiler UnityShaderCompiler after 0.01 seconds
+[00:00:01] Enlighten: Bake started.
+Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Tools/JobProcess
+[00:00:01] Enlighten: Finished 1 Bake Runtime job (0.01s execute, 0.00s integrate, 0.03s wallclock)
+[00:00:01] Enlighten: Bake took 0.026895 seconds.
+[PathTracer] building lightmap data asset.
+[PathTracer] Total bake time: 0.013381, raw bake time: 0.000000
+[00:00:01] Enlighten: Builtin Sky manager started.
+[00:00:01] Enlighten: Finished 1 Bake Ambient Probe job (0.00s execute, 0.00s integrate, 0.02s wallclock)
+[00:00:01] Enlighten: LightingDataAsset started.
+> Collecting Enlighten data
+Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Tools/UnityShaderCompiler
+Launched and connected shader compiler UnityShaderCompiler after 0.01 seconds
+Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Tools/UnityShaderCompiler
+Launched and connected shader compiler UnityShaderCompiler after 0.01 seconds
+Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Tools/UnityShaderCompiler
+Launched and connected shader compiler UnityShaderCompiler after 0.01 seconds
+Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Tools/UnityShaderCompiler
+Launched and connected shader compiler UnityShaderCompiler after 0.01 seconds
+Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Tools/UnityShaderCompiler
+Launched and connected shader compiler UnityShaderCompiler after 0.01 seconds
+Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Tools/UnityShaderCompiler
+Launched and connected shader compiler UnityShaderCompiler after 0.01 seconds
+Launching external process: /Users/masaki/unity/2020.3.3f1/Unity.app/Contents/Tools/UnityShaderCompiler
+Launched and connected shader compiler UnityShaderCompiler after 0.01 seconds
+Shader 'Oculus/OVRMRCameraFrameLit': fallback shader 'Alpha-Diffuse' not found
+
+
+Mono dependencies included in the build
+Dependency assembly - System.Net.Http.dll
+Dependency assembly - System.Configuration.dll
+Dependency assembly - System.Drawing.dll
+Dependency assembly - System.EnterpriseServices.dll
+Dependency assembly - Unity.XR.Management.dll
+Dependency assembly - System.Runtime.Serialization.Xml.dll
+Dependency assembly - Mono.Security.dll
+Dependency assembly - System.Xml.XPath.XDocument.dll
+Dependency assembly - System.Globalization.Extensions.dll
+Dependency assembly - System.Core.dll
+Dependency assembly - System.Runtime.Serialization.dll
+Dependency assembly - Unity.Timeline.dll
+Dependency assembly - System.dll
+Dependency assembly - System.ComponentModel.Composition.dll
+Dependency assembly - Assembly-CSharp.dll
+Dependency assembly - UnityEngine.UI.dll
+Dependency assembly - mscorlib.dll
+Dependency assembly - Unity.XR.Oculus.dll
+Dependency assembly - System.Transactions.dll
+Dependency assembly - System.Xml.dll
+Dependency assembly - netstandard.dll
+Dependency assembly - System.Diagnostics.StackTrace.dll
+Dependency assembly - System.Data.dll
+Dependency assembly - Oculus.VR.dll
+Dependency assembly - Unity.Subsystem.Registration.dll
+Dependency assembly - UnityEngine.XR.LegacyInputHelpers.dll
+Dependency assembly - System.Numerics.dll
+Dependency assembly - System.Xml.Linq.dll
+Dependency assembly - System.ServiceModel.Internals.dll
+Dependency assembly - System.IO.Compression.FileSystem.dll
+Dependency assembly - System.IO.Compression.dll
+Dependency assembly - Unity.TextMeshPro.dll
+Dependency assembly - UnityEngine.SpatialTracking.dll
+
+DisplayProgressbar: Fetching assembly references
+Unloading 55 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 0.52 GB.
+System memory in use after: 0.52 GB.
+
+Unloading 511 unused Assets to reduce memory usage. Loaded Objects now: 1850.
+Total: 11.630458 ms (FindLiveObjects: 0.440606 ms CreateObjectMapping: 0.161513 ms MarkObjects: 7.152928 ms  DeleteObjects: 3.872571 ms)
+
+ProgressiveSceneManager::Cancel()
+[00:00:00] Enlighten: Builtin Sky manager took 1.958904 seconds. Cancelled, so not done yet.
+[00:00:00] Enlighten: LightingDataAsset took 1.924702 seconds. Cancelled, so not done yet.
+[EnlightenBakeManager] m_Clear = false;
+Unloading 1 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 0.51 GB.
+System memory in use after: 0.51 GB.
+
+Unloading 0 unused Assets to reduce memory usage. Loaded Objects now: 1861.
+Total: 7.309784 ms (FindLiveObjects: 0.429365 ms CreateObjectMapping: 0.137211 ms MarkObjects: 6.727876 ms  DeleteObjects: 0.012937 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 0.65 GB.
+System memory in use after: 0.51 GB.
+
+Unloading 164 unused Assets to reduce memory usage. Loaded Objects now: 1849.
+Total: 33.717932 ms (FindLiveObjects: 0.204625 ms CreateObjectMapping: 0.071310 ms MarkObjects: 4.523365 ms  DeleteObjects: 28.917480 ms)
+
+Shader 'Oculus/OVRMRCameraFrameLit': fallback shader 'Alpha-Diffuse' not found
+Compressed shader 'Standard' on gles3 from 2.19MB to 0.07MB
+Compressed shader 'Autodesk Interactive' on gles3 from 1.09MB to 0.05MB
+DisplayProgressbar: Creating staging area
+Android PostProcess task "Creating staging area" took 1.7097 ms
+DisplayProgressbar: Generating Build Id
+Android PostProcess task "Generating Build Id" took 0.1573 ms
+DisplayProgressbar: Preparing Unity resources
+Android PostProcess task "Preparing Unity resources" took 0.8036 ms
+DisplayProgressbar: Managed Stripping: (Mono)
+Android PostProcess task "Managed Stripping: (Mono)" took 1.051 ms
+DisplayProgressbar: Preparing Managed resources
+DisplayProgressbar: Fetching assembly references
+Android PostProcess task "Preparing Managed resources" took 779.5566 ms
+DisplayProgressbar: Splitting assets
+Android PostProcess task "Splitting assets" took 20.9761 ms
+Android PostProcess task "Processing OBB assets" took 0.0941 ms
+DisplayProgressbar: Preparing Unity libraries
+Android PostProcess task "Preparing Unity libraries" took 86.4645 ms
+DisplayProgressbar: Processing resources
+Android PostProcess task "Processing resources" took 0.3142 ms
+DisplayProgressbar: Preparing APK resources
+Android PostProcess task "Preparing APK resources" took 52.7445 ms
+DisplayProgressbar: Processing plugins
+Android PostProcess task "Processing plugins" took 15.5003 ms
+DisplayProgressbar: Processing Android libraries
+Android PostProcess task "Processing Android libraries" took 2.2456 ms
+DisplayProgressbar: Checking Graphics API compatibility
+Android PostProcess task "Checking Graphics API compatibility" took 1.2933 ms
+DisplayProgressbar: Creating Android manifest
+Android PostProcess task "Creating Android manifest" took 35.9503 ms
+DisplayProgressbar: Compiling resources
+Android PostProcess task "Compiling resources" took 1.3928 ms
+DisplayProgressbar: GenerateIl2cppPlatformProviders
+Android PostProcess task "GenerateIl2cppPlatformProviders" took 0.9369 ms
+Android PostProcess task "IL2CPP" took 0.4503 ms
+Android PostProcess task "Build native Unity binary" took 0.1053 ms
+Android PostProcess task "Zipping symbols" took 0.2413 ms
+Android PostProcess task "Performance Reporting Symbol Upload" took 0.2339 ms
+DisplayProgressbar: Preparing streaming assets
+Android PostProcess task "Preparing streaming assets" took 1.4738 ms
+Android PostProcess task "Creating APK expansion package (OBB)" took 0.0787 ms
+DisplayProgressbar: Exporting project
+OVRGradleGeneration triggered.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at /Users/bokken/buildslave/unity/build/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+OVRGradleGeneration:OnPostGenerateGradleAndroidProject (string) (at Assets/Oculus/VR/Editor/OVRGradleGeneration.cs:161)
+UnityEditor.Android.AndroidBuildPipelineInterfaces:OnGeneratePlatformProjectPostprocess (string,bool) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline/Android/AndroidPostGenerateGradleProject.cs:39)
+UnityEditor.Android.PostProcessor.Tasks.ExportProject:Execute (UnityEditor.Android.PostProcessor.PostProcessorContext)
+UnityEditor.Android.PostProcessor.PostProcessRunner:RunAllTasks (UnityEditor.Android.PostProcessor.PostProcessorContext)
+UnityEditor.Android.PostProcessAndroidPlayer:PostProcess (UnityEditor.BuildTarget,string,string,string,string,string,string,UnityEditor.BuildOptions,UnityEditor.RuntimeClassRegistry,UnityEditor.Build.Reporting.BuildReport)
+UnityEditor.Android.AndroidBuildPostprocessor:PostProcess (UnityEditor.Modules.BuildPostProcessArgs,UnityEditor.BuildProperties&)
+UnityEditor.PostprocessBuildPlayer:Postprocess (UnityEditor.BuildTargetGroup,UnityEditor.BuildTarget,string,string,string,int,int,UnityEditor.BuildOptions,UnityEditor.RuntimeClassRegistry,UnityEditor.Build.Reporting.BuildReport) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline/PostprocessBuildPlayer.cs:337)
+UnityEditor.BuildPipeline:BuildPlayerInternal (string[],string,string,UnityEditor.BuildTargetGroup,UnityEditor.BuildTarget,UnityEditor.BuildOptions,string[]) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline.bindings.cs:422)
+UnityEditor.BuildPipeline:BuildPlayer (string[],string,string,UnityEditor.BuildTargetGroup,UnityEditor.BuildTarget,UnityEditor.BuildOptions,string[]) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline.bindings.cs:321)
+UnityEditor.BuildPipeline:BuildPlayer (UnityEditor.BuildPlayerOptions) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline.bindings.cs:295)
+UnityEditor.BuildPipeline:BuildPlayer (string[],string,UnityEditor.BuildTarget,UnityEditor.BuildOptions) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline.bindings.cs:290)
+DockerBuild:BuildAndroid () (at Assets/Editor/DockerBuild.cs:23)
+
+(Filename: Assets/Oculus/VR/Editor/OVRGradleGeneration.cs Line: 161)
+
+QuestFamily = True: Quest = True, Quest2 = False
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at /Users/bokken/buildslave/unity/build/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:LogFormat (UnityEngine.LogType,string,object[])
+UnityEngine.Debug:LogFormat (string,object[])
+OVRGradleGeneration:OnPostGenerateGradleAndroidProject (string) (at Assets/Oculus/VR/Editor/OVRGradleGeneration.cs:169)
+UnityEditor.Android.AndroidBuildPipelineInterfaces:OnGeneratePlatformProjectPostprocess (string,bool) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline/Android/AndroidPostGenerateGradleProject.cs:39)
+UnityEditor.Android.PostProcessor.Tasks.ExportProject:Execute (UnityEditor.Android.PostProcessor.PostProcessorContext)
+UnityEditor.Android.PostProcessor.PostProcessRunner:RunAllTasks (UnityEditor.Android.PostProcessor.PostProcessorContext)
+UnityEditor.Android.PostProcessAndroidPlayer:PostProcess (UnityEditor.BuildTarget,string,string,string,string,string,string,UnityEditor.BuildOptions,UnityEditor.RuntimeClassRegistry,UnityEditor.Build.Reporting.BuildReport)
+UnityEditor.Android.AndroidBuildPostprocessor:PostProcess (UnityEditor.Modules.BuildPostProcessArgs,UnityEditor.BuildProperties&)
+UnityEditor.PostprocessBuildPlayer:Postprocess (UnityEditor.BuildTargetGroup,UnityEditor.BuildTarget,string,string,string,int,int,UnityEditor.BuildOptions,UnityEditor.RuntimeClassRegistry,UnityEditor.Build.Reporting.BuildReport) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline/PostprocessBuildPlayer.cs:337)
+UnityEditor.BuildPipeline:BuildPlayerInternal (string[],string,string,UnityEditor.BuildTargetGroup,UnityEditor.BuildTarget,UnityEditor.BuildOptions,string[]) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline.bindings.cs:422)
+UnityEditor.BuildPipeline:BuildPlayer (string[],string,string,UnityEditor.BuildTargetGroup,UnityEditor.BuildTarget,UnityEditor.BuildOptions,string[]) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline.bindings.cs:321)
+UnityEditor.BuildPipeline:BuildPlayer (UnityEditor.BuildPlayerOptions) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline.bindings.cs:295)
+UnityEditor.BuildPipeline:BuildPlayer (string[],string,UnityEditor.BuildTarget,UnityEditor.BuildOptions) (at /Users/bokken/buildslave/unity/build/Editor/Mono/BuildPipeline.bindings.cs:290)
+DockerBuild:BuildAndroid () (at Assets/Editor/DockerBuild.cs:23)
+
+(Filename: Assets/Oculus/VR/Editor/OVRGradleGeneration.cs Line: 169)
+
+Android PostProcess task "Exporting project" took 303.4027 ms
+DisplayProgressbar: Building Gradle project
+Android PostProcess task "Building Gradle project" took 11910.9895 ms
+DisplayProgressbar: Processing Mapping File
+Android PostProcess task "Processing Mapping File" took 1.3677 ms
+DisplayProgressbar: Moving output package(s)
+Android PostProcess task "Moving output package(s)" took 3.8691 ms
+RefreshInfo: StopAssetImportingV2(NoUpdateAssetOptions) scanfilter: 
+RefreshProfiler: Total: 16.069ms
+Refreshing native plugins compatible for Editor in 0.36 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+
+-------------------------------------------------------------------------------
+Build Report
+Uncompressed usage by category (Percentages based on user generated assets only):
+Textures               12.2 mb	 41.4% 
+Meshes                 1.3 mb	 4.4% 
+Animations             273.4 kb	 0.9% 
+Sounds                 0.0 kb	 0.0% 
+Shaders                415.2 kb	 1.4% 
+Other Assets           61.7 kb	 0.2% 
+Levels                 163.0 kb	 0.5% 
+Scripts                1.5 mb	 5.1% 
+Included DLLs          13.4 mb	 45.7% 
+File headers           110.8 kb	 0.4% 
+Total User Assets      29.4 mb	 100.0% 
+Complete build size    156.7 mb
+Used Assets and files from the Resources folder, sorted by uncompressed size:
+ 5.3 mb	 3.4% Assets/Oculus/VR/Textures/OculusTouchForQuestAndRiftS/OculusQuestTouchControllerTexture.tga
+ 5.3 mb	 3.4% Assets/Oculus/VR/Textures/OculusTouchForRift/touchController_albedo.png
+ 1.3 mb	 0.9% Assets/Oculus/VR/Textures/OculusTouchForQuest2/OculusTouchForQuest2_AlbedoRoughness.tga
+ 422.6 kb	 0.3% Assets/Oculus/VR/Meshes/OculusTouchForRift/left_touch_controller_model_skel.fbx
+ 421.1 kb	 0.3% Assets/Oculus/VR/Meshes/OculusTouchForRift/right_touch_controller_model_skel.fbx
+ 294.4 kb	 0.2% Resources/unity_builtin_extra
+ 230.1 kb	 0.1% Assets/Oculus/VR/Meshes/OculusTouchForQuest2/OculusTouchForQuest2_Right.fbx
+ 230.1 kb	 0.1% Assets/Oculus/VR/Meshes/OculusTouchForQuest2/OculusTouchForQuest2_Left.fbx
+ 170.8 kb	 0.1% Assets/Resources/UTMSVR/DrawCurve/rainbow.png
+ 155.8 kb	 0.1% Assets/Oculus/VR/Meshes/OculusTouchForQuestAndRiftS/OculusTouchForQuestAndRiftS_Right.fbx
+ 155.7 kb	 0.1% Assets/Oculus/VR/Meshes/OculusTouchForQuestAndRiftS/OculusTouchForQuestAndRiftS_Left.fbx
+ 47.4 kb	 0.0% Assets/Oculus/VR/Resources/Underlay Impostor.shader
+ 32.2 kb	 0.0% Assets/Oculus/VR/Resources/Underlay Transparent Occluder.shader
+ 19.6 kb	 0.0% Assets/Oculus/VR/Resources/OVRMRCameraFrameLit.shader
+ 6.6 kb	 0.0% Assets/Oculus/VR/Meshes/OculusTouchForQuestAndRiftS/Animation/OculusTouchQuestAndRiftSRightAnimation.controller
+ 6.6 kb	 0.0% Assets/Oculus/VR/Meshes/OculusTouchForQuestAndRiftS/Animation/OculusTouchQuestAndRiftSLeftAnimation.controller
+ 6.5 kb	 0.0% Assets/Oculus/VR/Meshes/OculusTouchForRift/Animation/OculusTouchRiftRightAnimation.controller
+ 6.4 kb	 0.0% Assets/Oculus/VR/Meshes/OculusTouchForQuest2/Animation/OculusTouchQuest2RightAnimation.controller
+ 6.4 kb	 0.0% Assets/Oculus/VR/Meshes/OculusTouchForRift/Animation/OculusTouchRiftLeftAnimation.controller
+ 6.4 kb	 0.0% Assets/Oculus/VR/Meshes/OculusTouchForQuest2/Animation/OculusTouchQuest2LeftAnimation.controller
+ 5.9 kb	 0.0% Assets/Oculus/VR/Resources/OVRMRCameraFrame.shader
+ 5.0 kb	 0.0% Assets/Oculus/VR/Resources/Cubemap Blit.shader
+ 4.6 kb	 0.0% Assets/Oculus/VR/Resources/Texture2D Blit.shader
+ 4.2 kb	 0.0% Assets/Oculus/VR/Resources/OVRMRUnlitTransparent.shader
+ 4.2 kb	 0.0% Assets/Oculus/VR/Resources/Unlit Transparent Color.shader
+ 3.9 kb	 0.0% Assets/Oculus/VR/Resources/OVRMRUnlit.shader
+ 0.9 kb	 0.0% Assets/Oculus/VR/Meshes/OculusTouchForQuest2/Materials/OculusTouchForQuest2_MAT.mat
+ 0.9 kb	 0.0% Assets/Oculus/VR/Meshes/OculusTouchForRift/Materials/OculusTouchForRift_Material.mat
+ 0.9 kb	 0.0% Assets/Resources/UTMSVR/DrawCurve/SelectedCurve.mat
+ 0.9 kb	 0.0% Assets/Resources/UTMSVR/DrawCurve/Point.mat
+ 0.9 kb	 0.0% Assets/Resources/UTMSVR/DrawCurve/Curve.mat
+ 0.5 kb	 0.0% Assets/Oculus/VR/Meshes/OculusTouchForQuestAndRiftS/Materials/OculusTouchForQuestAndRiftS_Material.mat
+ 0.5 kb	 0.0% Assets/Resources/UTMSVR/DrawCurve/Rainbow.mat
+ 0.4 kb	 0.0% Assets/Resources/UTMSVR/ContextMenu/ContextMenuCanvas.prefab
+ 0.4 kb	 0.0% Assets/Resources/UTMSVR/ContextMenu/MenuText.prefab
+ 0.4 kb	 0.0% Assets/Resources/UTMSVR/ContextMenu/SelectionPanel.prefab
+ 0.3 kb	 0.0% Assets/Resources/UTMSVR/ContextMenu/MenuPanel.prefab
+ 0.2 kb	 0.0% Packages/com.unity.xr.management/Tests/StandaloneSubsystem/StandaloneSubsystemDescriptor.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/RestoreTestContextAfterDomainReload.cs
+ 0.2 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/RectMask2DWithNestedCanvasCullsUsingCorrectCanvasRect.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityTestExecutionContext.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableApplyChangesToContextCommand.cs
+ 0.2 kb	 0.0% Packages/com.unity.timeline/Runtime/AssetUpgrade/AnimationPlayableAssetUpgrade.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/Vector4ComparerWithEqualsOperator.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/Vector3ComparerWithEqualsOperator.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/Vector2ComparerWithEqualsOperator.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/RemoteHelpers/RemoteTestResultDataWithTestData.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/Callbacks/TestResultRendererCallback.cs
+ 0.2 kb	 0.0% Packages/com.unity.xr.management/Tests/StandaloneSubsystem/StandaloneSubsystem.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/PlaymodeTestsControllerSettings.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityWorkItemDataHolder.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityTestAssemblyRunner.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/PlaymodeWorkItemFactory.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/CoroutineTestWorkItem.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Filters/CategoryFilterExtended.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/UnexpectedLogMessageException.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/RemoteHelpers/RemoteTestResultDataFactory.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/RemoteHelpers/PlayerConnectionMessageIds.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/Callbacks/RemoteTestResultSender.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/Callbacks/PlayModeRunnerCallback.cs
+ 0.2 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/AllocatingGCMemoryConstraint.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Tests/StandaloneSubsystem/StandaloneLoader.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.legacyinputhelpers/Tests/Runtime/TrackedPoseDriver/TrackedPoseDriverTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.legacyinputhelpers/Runtime/ArmModels/TransitionArmModel.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/UnityTestAssemblyBuilder.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/TestCommandBuilder.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/DefaultTestWorkItem.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Filters/AssemblyNameFilter.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableSetUpTearDownCommand.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableRepeatedTestCommand.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestMustExpectAllLogsAttribute.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/UnityTestTimeoutException.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/UnhandledLogMessageException.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/InvalidSignatureException.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/CanvasScalerWithChildTextObjectDoesNotCrash.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/QuaternionEqualityComparer.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/AssemblyProvider/PlayerTestAssemblyProvider.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/RuntimeTestRunnerFilter.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/Callbacks/TestResultRenderer.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/Callbacks/PlayerQuitHandler.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.legacyinputhelpers/Runtime/ArmModels/SwingArmModel.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/PostBuildCleanupAttribute.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/TestEnumeratorWrapper.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/PlaymodeTestsController.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/TestResultExtensions.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/WorkItemFactory.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityWorkItem.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/ConstructDelegator.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/OuterUnityTestActionCommand.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/ImmediateEnumerableCommand.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableRetryTestCommand.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandState.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Attributes/UnityCombinatorialStrategy.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Attributes/ConditionalIgnoreAttribute.cs
+ 0.1 kb	 0.0% Assets/XR/XRGeneralSettings.asset
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Tests/Runtime/RuntimeTestSettings.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Tests/Runtime/RuntimeLoaderTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.legacyinputhelpers/Runtime/TrackedPoseDriver/BasePoseProvider.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/NestedLayout/SceneWithNestedLayoutElementsLoadScript.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/EventSystem/GraphicRaycasterWorldSpaceCanvasTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/NoActiveCameraInSceneDoesNotCrashEditor.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/CanvasSizeCorrectInAwakeAndStartScript.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/AssetUpgrade/AnimationTrackUpgrade.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Animation/AnimationPreviewUpdateCallback.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Animation/AnimationOutputWeightProcessor.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/Vector4EqualityComparer.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/Vector3EqualityComparer.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/Vector2EqualityComparer.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/TestRunCallbackListener.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/FloatEqualityComparer.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/ColorEqualityComparer.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/AssemblyProvider/ScriptingRuntimeProxy.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/SynchronousFilter.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/RemoteHelpers/RemoteTestResultData.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Tests/TestPackage/Runtime/TestLoaderTwo.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Tests/TestPackage/Runtime/TestLoaderThree.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Tests/TestPackage/Runtime/TestLoaderOne.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Tests/TestPackage/Runtime/TestLoaderBase.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Runtime/XRManagementAnalytics.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.legacyinputhelpers/Runtime/TrackedPoseDriver/TrackedPoseDriver.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.legacyinputhelpers/Runtime/CameraOffset.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/HorizontalOrVerticalLayoutGroup.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/TestRunCallbackAttribute.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/TestListenerWrapper.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/TestExtensions.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/FailCommand.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/UnityTestMethodCommand.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/BaseDelegator.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Attributes/UnityTearDownAttribute.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Attributes/UnityPlatformAttribute.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/ActionDelegator.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/NestedLayout/SceneWithNestedLayoutElementsLoads.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/CoroutineWorksIfUIObjectIsAttached.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Utilities/AnimationPreviewUtilities.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Playables/TimeNotificationBehaviour.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Playables/ActivationControlPlayable.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/AssemblyProvider/AssemblyLoadProxy.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/RemoteHelpers/RemoteTestData.cs
+ 0.1 kb	 0.0% Packages/com.unity.subsystemregistration/Tests/Runtime/StandaloneSubsystemTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Tests/TestPackage/Runtime/TestSettings.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Runtime/XRManagerSettings.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Runtime/XRGeneralSettings.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.legacyinputhelpers/Runtime/ArmModels/ArmModel.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Util/UIBehaviourExtensions.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/InputModules/StandaloneInputModule.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/Messages/IEditModeTestYieldInstruction.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/TestCommandPcHelper.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/TestActionCommand.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/SetUpTearDownCommand.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestState.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Attributes/UnityTestAttribute.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Attributes/UnitySetUpAttribute.cs
+ 0.1 kb	 0.0% Packages/com.unity.subsystemregistration/Runtime/SubsystemRegistration.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Editor/OVRPlatformToolSettings.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Tests/Runtime/DummyLoader.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/InputField/GenericInputFieldTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/InputField/DesktopInputFieldTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/RectTransformValidAfterEnable.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/NestedCanvasMaintainsCorrectSize.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/CheckMeshColorsAndColors32Match.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/CanvasSizeCorrectInAwakeAndStart.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/BridgeScriptForRetainingObjects.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Utilities/TimelineCreateUtilities.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Utilities/NotificationUtilities.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Playables/PrefabControlPlayable.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Playables/ParticleControlPlayable.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Playables/DirectorControlPlayable.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Events/Signals/CustomSignalEventDrawer.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Animation/AnimationPlayableAsset.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Activation/ActivationPlayableAsset.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Activation/ActivationMixerPlayable.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_ScrollbarEventHandler.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_PackageResourceImporter.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_EditorResourceManager.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/CoroutineRunner.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/AssemblyProvider/AssemblyWrapper.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/Keyboard/PhysicalKeyPositionDevice.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRMixedRealityCaptureConfiguration.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Runtime/XRLoaderHelper.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Util/GraphicTestHelper.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Util/ExceptionUtils.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/MaskClipping/RectMask2DClipping.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Layout/VerticalLayoutGroupTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Layout/ContentSizeFitterTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Layout/AspectRatioFitterTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Utility/ReflectionMethodsCache.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/MultipleDisplayUtilities.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/HorizontalLayoutGroup.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/GraphicRebuildTracker.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Culling/RectangularVertexClipper.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/Raycasters/Physics2DRaycaster.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/InputModules/PointerInputModule.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/PrebuildSceneSetupAttribute.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/AttributeHelper.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/RemoteHelpers/IRemoteTestResultDataFactory.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Runner/IEnumerableTestMethodCommand.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/IAsyncTestAssemblyBuilder.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/TextEditor/TextEditorBackspaceDelete.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Layout/HorizonalLayoutGroupTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/InputField/TouchInputFieldTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/EventSystem/InputModuleTests/PointerClickCallbackCheck.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/SiblingOrderChangesLayout.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/CanvasGroupInheritedAlpha.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Utilities/AnimatorBindingCache.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Playables/TimeControlPlayable.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Evaluation/ScheduleRuntimeClip.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Evaluation/InfiniteRuntimeClip.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Control/ControlPlayableAsset.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Audio/AudioPlayableAsset.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Audio/AudioMixerProperties.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Audio/AudioClipProperties.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Attributes/TrackColorAttribute.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMPro_ExtensionMethods.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_TextParsingUtilities.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_TextElement_Legacy.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_SpriteAssetImportFormats.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_FontAssetUtilities.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/MaterialReferenceManager.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/PhysicalButtonFromStick.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRPointerEventData.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRPhysicsRaycaster.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRMixedRealityCaptureSettings.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Util/ConcreteGraphic.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Toggle/TestableToggleGroup.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Layout/LayoutGroupScaling.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Graphic/NavigationTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/EventSystem/SelectableTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/SetPropertyUtility.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/VerticalLayoutGroup.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/ContentSizeFitter.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/AspectRatioFitter.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/FontUpdateTracker.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/CanvasUpdateRegistry.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/AnimationTriggers.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/Raycasters/PhysicsRaycaster.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/Raycasters/BaseRaycaster.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/RaycasterManager.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/InputModules/TouchInputModule.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/InputModules/BaseInputModule.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/ExecuteEvents.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/EventData/PointerEventData.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/EventData/BaseEventData.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/EventData/AxisEventData.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/TimelineAsset_CreateRemove.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Events/INotificationOptionProvider.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/IOuterUnityTestAction.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/AssemblyProvider/ITestAssemblyProvider.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/AssemblyProvider/IScriptingRuntimeProxy.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/LogScope/LogScope.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/LogScope/LogMatch.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/LogScope/LogEvent.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/LogAssert.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/ConstraintsExtensions.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/ScrollRect/ScrollRectStableLayout.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/LayoutGroup/LayoutGroupArrangement.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/InputField/FakeInputModule.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Image/ImageFilledGenerateWork.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/EventSystem/PhysicsRaycasterTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/EventSystem/GraphicRaycasterTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Utilities/WeightUtility.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Utilities/Extrapolation.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/TimelinePlayable.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/TimelineAsset.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Scripting/PlayableTrack.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Events/Signals/SignalReceiver.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Events/Signals/SignalEmitter.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Evaluation/RuntimeElement.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Evaluation/RuntimeClipBase.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Animation/AnimationTrack.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Activation/ActivationTrack.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMPro_EventManager.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_UpdateManager.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_TextUtilities.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_TextProcessingStack.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_SpriteCharacter.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_SpriteAnimator.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_SelectionCaret.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_RichTextTagsCommon.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_MaterialManager.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_InputValidator.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_FontFeaturesCommon.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_FontFeatureTable.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_DefaultControls.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_Compatibility.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_ColorGradient.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/Utils.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/Is.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/PullCurve/SelfDistanceHandler.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/PullCurve/CurveDistanceHandler.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/PositionDeviceMap.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRMixedRealityCaptureTest.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRInputModule.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.oculus/Runtime/ShutdownMonitor.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.oculus/Runtime/OculusSettings.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Runtime/XRLoader.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Util/ImageHook.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Toggle/ToggleGroupTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Graphic/ImageTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/VertexModifiers/PositionAsUV1.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/VertexModifiers/BaseMeshEffect.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/StencilMaterial.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/MaskableGraphic.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/MaskUtilities.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/LayoutUtility.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/LayoutRebuilder.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/LayoutElement.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/GridLayoutGroup.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/IGraphicEnabledDisabled.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/GraphicRegistry.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/GraphicRaycaster.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/DefaultControls.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Culling/ClipperRegistry.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/UIBehaviour.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/InputModules/BaseInput.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/EventTrigger.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/EventSystem.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Tests/Runtime/TMP_RuntimeTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/MonoBehaviourTest/MonoBehaviourTest.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/MonoBehaviourTest/IMonoBehaviourTest.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/IPrebuildSceneSetup.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/IPostBuildCleanup.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/AssemblyProvider/IAssemblyLoadProxy.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/ITestRunnerListener.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/FixedInterface/CanvasManager.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/EnergyOptimizer/MeanCurvature.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Runtime/XRConfigurationData.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Util/PrivateFieldSetter.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Layout/GridLayoutGroupTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Graphic/ToggleTestImageHook.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/EventSystem/RaycastSortingTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/EventSystem/InputModuleTests/DragCallbackCheck.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/CreateSceneUtility.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Utilities/TimelineUndo.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Utilities/TimeUtility.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Utilities/HashUtility.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/TrackAsset.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/TimelineClip.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/GroupTrack.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Events/Signals/SignalAsset.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Events/SignalTrack.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Events/MarkerTrack.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Evaluation/RuntimeClip.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Control/ControlTrack.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Audio/AudioTrack.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TextMeshProUGUI.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TextContainer.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMPro_UGUI_Private.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMPro_MeshUtilities.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_UpdateRegistery.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_TextElement.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_SubMeshUI.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_StyleSheet.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_SpriteGlyph.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_SpriteAsset.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_ShaderUtilities.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_ResourcesManager.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_InputField.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_FontAssetCommon.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_FontAsset.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_CoroutineTween.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_CharacterInfo.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_Character.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/ITextPreProcessor.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/PullCurve/PullableCurve.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/PredefinedMaps.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/Keyboard/PhysicalKeyStick.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/DrawCurve/AdjustParameter.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/ContextMenu/SelectionManager.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/ContextMenu/CanvasManager.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRSceneSampleController.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRGearVrControllerTest.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRChromaticAberration.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVROverlayMeshGenerator.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVROnCompleteListener.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRDebugHeadController.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Composition/OVRSandwichComposition.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Composition/OVRExternalComposition.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.oculus/Runtime/OculusUsages.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.oculus/Runtime/OculusPerformance.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.oculus/Runtime/OculusLoader.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.oculus/Runtime/OculusDevelopment.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Tests/TestPackage/Runtime/Constants.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Toggle/ToggleTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Utility/VertexHelper.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/ToggleGroup.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Selectable.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Scrollbar.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/ScrollRect.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/RectMask2D.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/MaterialModifiers/IMaterialModifier.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/LayoutGroup.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/CanvasScaler.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/InputField.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Utilities/IPropertyCollector.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/TimelineAttributes.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Timeline.deprecated.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Playables/NotificationFlags.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Playables/BasicScriptPlayable.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/StacktraceFilter.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/ITestRunCallback.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Utils/AssemblyProvider/IAssemblyWrapper.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/NUnitExtensions/IStateSerializer.cs
+ 0.1 kb	 0.0% Assets/XR/Settings/Oculus Settings.asset
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/OculusTouch/PhysicalOculusTouch.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/OculusTouch/LogicalOculusTouch.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/FixedInterface/TextManager.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/EnergyOptimizer/Elasticity.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Tests/Runtime/RuntimeTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.management/Runtime/IXRLoaderPreInit.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.legacyinputhelpers/Runtime/TrackedPoseDriver/AssemblyInfo.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/TextEditor/TextEditorTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/ScrollRect/ScrollRectTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/ScrollRect/ScrollRectScale.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/ScrollRect/ScrollRectClamp.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/ScrollBar/ScrollBarTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/ScrollBar/ScrollBarClamp.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/InputField/InputFieldTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Image/TestableImage.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Graphic/RawImageTestHook.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Graphic/RawImageTest.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Graphic/MaskTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Graphic/GraphicTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/EventSystem/InputModuleTests/FakeBaseInput.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/EventSystem/InputModuleTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Dropdown/DropdownTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Events/Marker.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TextMeshPro.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMPro_Private.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_TextInfo.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_SubMesh.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_Style.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_Sprite.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_Settings.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_ObjectPool.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_Dropdown.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_Asset.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/FastAction.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/OculusTouch/OculusTouch.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/Keyboard/PhysicalKey.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/Controller.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/ButtonMap.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/FileManager/DataHandler.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/DrawCurve/SegmentDist.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/DrawCurve/HandCurve.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/ContextMenu/ContextMenu.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRSystemPerfMetrics.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRSkeletonRenderer.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRResetOrientation.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRProgressIndicator.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRPlayerController.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRCustomSkeleton.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRCubemapCapture.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRControllerTest.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRControllerHelper.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRAutoDestroyInMRC.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRAudioSourceTest.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRLayerAttribute.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRHeadsetEmulator.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Composition/OVRDirectComposition.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Composition/OVRCompositionUtil.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Composition/OVRCameraComposition.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.oculus/Runtime/OculusBoundary.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.oculus/Runtime/InputSystem/DeviceLayouts.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/VertexModifiers/Shadow.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/VertexModifiers/Outline.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/VertexModifiers/IMeshModifier.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Toggle.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Slider.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/RawImage.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Layout/ILayoutElement.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Image.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Graphic.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/FontData.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Dropdown.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Culling/Clipping.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Button.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Animation/CoroutineTween.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/RaycastResult.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/MoveDirection.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/EventTriggerType.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/EventInterfaces.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Utilities/IPropertyPreview.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Extensions/TrackExtensions.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/AssetUpgrade/TimelineUpgrade.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/TestRunner/TestPlatform.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/Assertions/LogScope/ILogScope.cs
+ 0.1 kb	 0.0% Packages/com.unity.test-framework/UnityEngine.TestRunner/AssemblyInfo.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/PhysicalDevices.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/LogicalDevices.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/FixedInterface/StringProvider.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/EnergyOptimizer/Optimize.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/EnergyOptimizer/Moebius.cs
+ 0.1 kb	 0.0% Assets/Resources/OVRPlatformToolSettings.asset
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Slider/SliderTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Image/ImageTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/EventSystem/InputModuleTests/MouseUpdate.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Canvas/NestedCanvas.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Button/TestButton.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Tests/Runtime/Button/ButtonTests.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_Text.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_MeshInfo.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_ListPool.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/TMP_LineInfo.cs
+ 0.1 kb	 0.0% Packages/com.unity.textmeshpro/Scripts/Runtime/AssemblyInfo.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/InputManager/StickMap.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/DrawCurve/MakeMesh.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/ContextMenu/MenuItem.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/ThirdParty/SimpleJSONUnity.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRWaitCursor.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRScreenFade.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRMonoscopic.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRMeshRenderer.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRGazePointer.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRXRSDKNative.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRSceneLoader.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRPlatformMenu.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRMixedReality.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRHapticsClip.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Composition/OVRComposition.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.oculus/Runtime/OculusPlugin.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.oculus/Runtime/ColorScale.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Utility/ObjectPool.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Text.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/SpriteState.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/SpecializedCollections/IndexedSet.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Navigation.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Misc.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Mask.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/IMaskable.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Culling/IClipRegion.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/ColorBlock.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/Properties/AssemblyInfo.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/EventSystem/EventHandle.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Properties/AssemblyInfo.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Playables/ITimeControl.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/ILayerable.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Events/MarkerList.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Evaluation/IntervalTree.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/DiscreteTime.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/AssetUpgrade/TrackUpgrade.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/AssetUpgrade/ClipUpgrade.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Animation/ICurvesOwner.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/PullCurve/KnotState.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/EnergyOptimizer/Flow.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Editor/OVRConfig.cs
+ 0.1 kb	 0.0% Assets/UTMSVR/PullCurve/Knot.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/ThirdParty/openvr_api.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/ThirdParty/SimpleJSON.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRVignette.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRSkeleton.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRRecord.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRRaycaster.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRProfiler.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRNetwork.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRModeParms.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRHandTest.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRGridCube.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRGrabber.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRGrabbable.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRDebugInfo.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRCursor.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRTracker.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRResources.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRProfile.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRPlugin.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVROverlay.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRManager.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRHaptics.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRDisplay.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRCommon.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRCameraRig.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRBoundary.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/Utility/ListPool.cs
+ 0.1 kb	 0.0% Packages/com.unity.ugui/Runtime/UI/Core/IMask.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/Events/IMarker.cs
+ 0.1 kb	 0.0% Packages/com.unity.timeline/Runtime/ClipCaps.cs
+ 0.1 kb	 0.0% Assets/Scripts/Player.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRMesh.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/Util/OVRHand.cs
+ 0.1 kb	 0.0% Assets/Oculus/VR/Scripts/OVRInput.cs
+ 0.1 kb	 0.0% Packages/com.unity.xr.oculus/Runtime/FFR.cs
+ 0.1 kb	 0.0% Assets/Scripts/Main.cs
+ 0.1 kb	 0.0% Assets/Resources/OVRBuildConfig.asset
+ 0.0 kb	 0.0% Assets/XR/Loaders/Oculus Loader.asset
+-------------------------------------------------------------------------------
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 0.52 GB.
+System memory in use after: 0.52 GB.
+
+Unloading 471 unused Assets to reduce memory usage. Loaded Objects now: 1902.
+Total: 389.619091 ms (FindLiveObjects: 0.478444 ms CreateObjectMapping: 0.121436 ms MarkObjects: 384.842043 ms  DeleteObjects: 4.174013 ms)
+
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0)
+Loaded scene 'Temp/__Backupscenes/0.backup'
+	Deserialize:            1.114 ms
+	Integration:            110.255 ms
+	Integration of assets:  0.005 ms
+	Thread Wait Time:       19.780 ms
+	Total Operation Time:   131.154 ms
+System memory in use before: 0.52 GB.
+System memory in use after: 0.52 GB.
+
+Unloading 0 unused Assets to reduce memory usage. Loaded Objects now: 1894.
+Total: 336.713096 ms (FindLiveObjects: 0.399122 ms CreateObjectMapping: 0.124555 ms MarkObjects: 336.173171 ms  DeleteObjects: 0.012861 ms)
+
+Batchmode quit successfully invoked - shutting down!
+[Performance] Application.InitializeProject                               :        1 samples, Peak.  5.91 s (1.0x), Avg.  5.91 s, Total. 5.912 s (19.1%)
+[Performance] Application.PackageManager.StartServer                      :        1 samples, Peak.  1.88 ms (1.0x), Avg.  1.88 ms, Total. 1.875 ms (0.0%)
+[Performance] Application.AcquireProjectLock                              :        1 samples, Peak.  1.05 ms (1.0x), Avg.  1.05 ms, Total. 1.047 ms (0.0%)
+[Performance] Application.InitializeEngineNoGraphics                      :        1 samples, Peak.  72.7 ms (1.0x), Avg.  72.7 ms, Total. 72.67 ms (0.2%)
+[Performance] Application.PackageManager.Initialize                       :        1 samples, Peak.   490 ms (1.0x), Avg.   490 ms, Total. 490.1 ms (1.6%)
+[Performance] CurlRequestCheck                                            :       10 samples, Peak.  40.0 us (2.2x), Avg.  18.4 us, Total. 184.0 us (0.0%)
+[Performance] VersionControl.Task.Wait                                    :        1 samples, Peak.  13.1 us (1.0x), Avg.  13.1 us, Total. 13.15 us (0.0%)
+[Performance] Application.EngineGraphics.Initialize                       :        1 samples, Peak.  33.2 ms (1.0x), Avg.  33.2 ms, Total. 33.18 ms (0.1%)
+[Performance] Application.GI.Initialize                                   :        1 samples, Peak.   335 us (1.0x), Avg.   335 us, Total. 335.5 us (0.0%)
+[Performance] Application.LoadAllDefaultResourcesFromEditor               :        1 samples, Peak.  2.41 ms (1.0x), Avg.  2.41 ms, Total. 2.410 ms (0.0%)
+[Performance] Application.LoadMonoAssemblies                              :        1 samples, Peak.  2.58 s (1.0x), Avg.  2.58 s, Total. 2.580 s (8.3%)
+[Performance] RestoreManagedReferences                                    :        2 samples, Peak.   108 ms (2.0x), Avg.  54.2 ms, Total. 108.4 ms (0.3%)
+[Performance] ProcessService.EditorAfterLoadAllAssemblies                 :        2 samples, Peak.  38.6 ms (1.1x), Avg.  34.3 ms, Total. 68.52 ms (0.2%)
+[Performance] Application.ReadLicenseInfo                                 :        1 samples, Peak.  24.8 ms (1.0x), Avg.  24.8 ms, Total. 24.83 ms (0.1%)
+[Performance] Application.InitialScriptRefresh                            :        1 samples, Peak.  2.03 s (1.0x), Avg.  2.03 s, Total. 2.031 s (6.5%)
+[Performance] Compiling Scripts                                           :        1 samples, Peak.  70.8 ms (1.0x), Avg.  70.8 ms, Total. 70.79 ms (0.2%)
+[Performance] Application.AssetDatabase.Refresh                           :        1 samples, Peak.   181 ms (1.0x), Avg.   181 ms, Total. 180.7 ms (0.6%)
+[Performance] AssetDatabase.Refresh                                       :        1 samples, Peak.   181 ms (1.0x), Avg.   181 ms, Total. 180.7 ms (0.6%)
+[Performance] PresetManagerPostProcessor.OnPreprocessAsset                :        3 samples, Peak.  1.70 ms (2.7x), Avg.   625 us, Total. 1.875 ms (0.0%)
+[Performance] CancelSplashScreenOnAssetChange.OnPreprocessAsset           :        3 samples, Peak.   162 us (2.9x), Avg.  56.7 us, Total. 170.0 us (0.0%)
+[Performance] AssetDatabase.ImportAssets                                  :        4 samples, Peak.  15.6 ms (4.0x), Avg.  3.89 ms, Total. 15.57 ms (0.1%)
+[Performance] AssetCallbacks.OnPostprocessAllAssets                       :        2 samples, Peak.  50.5 ms (2.0x), Avg.  25.2 ms, Total. 50.49 ms (0.2%)
+[Performance] FontAssetPostProcessor.OnPostprocessAllAssets               :        2 samples, Peak.   395 us (1.9x), Avg.   206 us, Total. 412.6 us (0.0%)
+[Performance] RetainedMode.OnPostprocessAllAssets                         :        2 samples, Peak.   706 us (2.0x), Avg.   361 us, Total. 722.8 us (0.0%)
+[Performance] EditorAtlasMonitorInjector.OnPostprocessAllAssets           :        2 samples, Peak.   179 us (1.9x), Avg.  92.1 us, Total. 184.2 us (0.0%)
+[Performance] AudioMixerPostprocessor.OnPostprocessAllAssets              :        2 samples, Peak.   466 us (2.0x), Avg.   234 us, Total. 468.9 us (0.0%)
+[Performance] AssetEvents.OnPostprocessAllAssets                          :        4 samples, Peak.   263 us (3.0x), Avg.  87.0 us, Total. 348.0 us (0.0%)
+[Performance] ModelImporterPostProcessor.OnPostprocessAllAssets           :        2 samples, Peak.  1.31 ms (1.8x), Avg.   728 us, Total. 1.456 ms (0.0%)
+[Performance] StyleCatalogPostProcessor.OnPostprocessAllAssets            :        2 samples, Peak.  26.5 ms (2.0x), Avg.  13.2 ms, Total. 26.47 ms (0.1%)
+[Performance] BuildCatalog                                                :        1 samples, Peak.  25.2 ms (1.0x), Avg.  25.2 ms, Total. 25.24 ms (0.1%)
+[Performance] Application.ImportAssetsWithMismatchingAssetImporterVersion :        1 samples, Peak.  78.3 ms (1.0x), Avg.  78.3 ms, Total. 78.25 ms (0.3%)
+[Performance] Application.SyncCurrentColorSpace                           :        1 samples, Peak.  7.41 ms (1.0x), Avg.  7.41 ms, Total. 7.410 ms (0.0%)
+[Performance] Application.OnUsbDevicesChanged                             :        1 samples, Peak.   707 us (1.0x), Avg.   707 us, Total. 707.2 us (0.0%)
+[Performance] Application.AssetInstanceCacheUpdate                        :        1 samples, Peak.   300 ns (1.0x), Avg.   300 ns, Total. 300.0 ns (0.0%)
+[Performance] Application.UnityExtensions.Initialize                      :        1 samples, Peak.   711 us (1.0x), Avg.   711 us, Total. 711.1 us (0.0%)
+[Performance] Application.InitializeManagedCompilationPipeline            :        1 samples, Peak.  30.2 ms (1.0x), Avg.  30.2 ms, Total. 30.25 ms (0.1%)
+[Performance] Application.ExecuteStartups                                 :        1 samples, Peak.  59.8 ms (1.0x), Avg.  59.8 ms, Total. 59.81 ms (0.2%)
+[Performance] Gizmo.RebuildRenderers                                      :        2 samples, Peak.  58.7 ms (2.0x), Avg.  29.8 ms, Total. 59.68 ms (0.2%)
+[Performance] Gizmo.AddGizmoRenderers                                     :       78 samples, Peak.  1.60 ms (34.8x), Avg.  46.1 us, Total. 3.593 ms (0.0%)
+[Performance] Application.InitializeMenu                                  :        1 samples, Peak.  41.8 ms (1.0x), Avg.  41.8 ms, Total. 41.78 ms (0.1%)
+[Performance] UpdateAllMenus                                              :        1 samples, Peak.  41.8 ms (1.0x), Avg.  41.8 ms, Total. 41.78 ms (0.1%)
+[Performance] Application.editorInitializingProject                       :        1 samples, Peak.  26.6 us (1.0x), Avg.  26.6 us, Total. 26.58 us (0.0%)
+[Performance] GUIView.RepaintAll.PlayerLoopController                     :        4 samples, Peak.  2.57 us (1.7x), Avg.  1.51 us, Total. 6.034 us (0.0%)
+[Performance] Application.InvokeFinishedLoadingProject                    :        1 samples, Peak.  40.6 ms (1.0x), Avg.  40.6 ms, Total. 40.57 ms (0.1%)
+[Performance] ProcessService.OnProjectLoaded                              :        1 samples, Peak.  37.8 ms (1.0x), Avg.  37.8 ms, Total. 37.83 ms (0.1%)
+[Performance] GenerateAssemblyTypeInfos                                   :        2 samples, Peak.   539 ms (1.2x), Avg.   463 ms, Total. 926.7 ms (3.0%)
+[Performance] Inspector.InitOrRebuild                                     :        2 samples, Peak.  1.98 ms (1.8x), Avg.  1.13 ms, Total. 2.262 ms (0.0%)
+Start importing ProjectSettings/ProjectSettings.asset using Guid(00000000000000004000000000000000) Importer(-1,00000000000000000000000000000000)  -> (artifact id: '1ce9a65a95255ae2c3ee2081ad95e84a') in 0.002705 seconds
+Refreshing native plugins compatible for Editor in 0.40 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+RefreshInfo: StopAssetImportingV2(NoUpdateAssetOptions) scanfilter: 
+RefreshProfiler: Total: 22.869ms
+AcceleratorClientConnectionCallback - disconnected - :0
+Cleanup mono
+Waiting on threads to park on joinable thread list timed out.
+debugger-agent: Unable to listen on 44
+Exiting batchmode successfully now!
+[Package Manager] Server::Kill -- Server was shutdown
