@@ -4,6 +4,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using System.Linq;
+using ContextMenu;
 
 namespace FileManager
 {
@@ -55,8 +56,10 @@ namespace FileManager
         string outputDirOnHMD;
         string cacheDirOnPC;
         string cacheDirOnHMD;
+        ContextMenu.ContextMenu contextMenu;
 
         public DataHandler(
+            ContextMenu.ContextMenu contextMenu,
             string inputDirOnPC = "input", string outputDirOnPC = null,
             string inputDirOnHMD = null, string outputDirOnHMD = "/mnt/sdcard/output",
             string cacheDirOnPC = "cacheFromFileManager", string cacheDirOnHMD = "/mnt/sdcard/cacheFromFileManager"
@@ -68,6 +71,7 @@ namespace FileManager
             this.outputDirOnHMD = outputDirOnHMD;
             this.cacheDirOnPC = cacheDirOnPC;
             this.cacheDirOnHMD = cacheDirOnHMD;
+            this.contextMenu = contextMenu;
         }
 
         public void Save(string filename, string text)
@@ -79,7 +83,7 @@ namespace FileManager
                 return;
             }
             Directory.CreateDirectory(outputDir);
-            using (var writer = new StreamWriter(Path.Combine(outputDir, filename)))
+            using (var writer = new StreamWriter(Path.Combine(outputDir, filename))) // 実行時エラー on HMD
             {
                 writer.Write(text);
             }
@@ -92,7 +96,7 @@ namespace FileManager
             {
                 throw new Exception("Cannot load file since inputDir is null");
             }
-            using (var reader = new StreamReader(Path.Combine(inputDir, filename)))
+            using (var reader = new StreamReader(Path.Combine(inputDir, filename))) // 実行時エラー on HMD
             {
                 return reader.ReadToEnd();
             }
@@ -208,9 +212,15 @@ namespace FileManager
 
         public List<string> GetFiles()
         {
+            this.contextMenu.AddItem(new MenuItem("1", () => {}));
+            this.contextMenu.AddItem(new MenuItem(Directory.GetCurrentDirectory(), () => {}));
+            this.contextMenu.AddItem(new MenuItem("2", () => {}));
             string inputDir = this.onHMD() ? this.inputDirOnHMD : this.inputDirOnPC;
-            Directory.CreateDirectory(inputDir);
-            List<string> filenames = Directory.GetFiles(inputDir, "*.json", SearchOption.TopDirectoryOnly).ToList();
+            this.contextMenu.AddItem(new MenuItem("3", () => {}));
+            Directory.CreateDirectory(inputDir); // 無い時に新しくディレクトリを生成しないバグ on HMD
+            this.contextMenu.AddItem(new MenuItem("4", () => {}));
+            List<string> filenames = Directory.GetFiles(inputDir, "*.jpg", SearchOption.TopDirectoryOnly).ToList(); // 実行時エラー on HMD
+            this.contextMenu.AddItem(new MenuItem("5", () => {}));
             return filenames.Select(name => name.Substring(inputDir.Length + 1)).ToList();
         }
     }

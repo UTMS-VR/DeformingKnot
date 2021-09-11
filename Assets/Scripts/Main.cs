@@ -43,6 +43,7 @@ public class Main : MonoBehaviour
         this.contextMenu.Open();
 
         this.dataHandler = new DataHandler(
+            contextMenu: contextMenu,
             inputDirOnPC: "CurveData",
             outputDirOnPC: "CurveData",
             cacheDirOnPC: "CurveData",
