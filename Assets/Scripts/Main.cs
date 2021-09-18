@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -47,9 +48,9 @@ public class Main : MonoBehaviour
             inputDirOnPC: "CurveData",
             outputDirOnPC: "CurveData",
             cacheDirOnPC: "CurveData",
-            inputDirOnHMD: "/mnt/sdcard/CurveData",
-            outputDirOnHMD: "/mnt/sdcard/CurveData",
-            cacheDirOnHMD: "/mnt/sdcard/CurveData"
+            inputDirOnHMD: Path.Combine(Application.persistentDataPath, "CurveData"),
+            outputDirOnHMD: Path.Combine(Application.persistentDataPath, "CurveData"),
+            cacheDirOnHMD: Path.Combine(Application.persistentDataPath, "CurveData")
         );
 
         this.state = new BasicDeformation(this.oculusTouch, this.contextMenu, this.dataHandler, new List<HandCurve>(), comfirm: comfirmBotton);
