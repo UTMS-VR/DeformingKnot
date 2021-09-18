@@ -270,7 +270,7 @@ public class BasicDeformation : State
 
         if (selection.Count == 1)
         {
-            selection[0].curve.Close();
+            selection[0].curve = selection[0].curve.Close();
         }
         else if (selection.Count == 2 && !selection[0].closed && !selection[1].closed)
         {
