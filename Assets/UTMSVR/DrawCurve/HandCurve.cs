@@ -8,30 +8,28 @@ namespace DrawCurve
 {
     public class HandCurve
     {
-        public List<Vector3> points;
-        public Mesh mesh;
+        // public List<Vector3> points;
+        public Curve curve;
+        public Mesh mesh { get { return this.curve.GetMesh();} }
         public Mesh meshAtPoints;
-        public bool closed;
+        public bool closed { get { return this.curve.closed; } }
         public bool selected;
         public Vector3 position = Vector3.zero;
         public Quaternion rotation = Quaternion.identity;
         public float segment;
-        public int meridian;
-        public float radius;
         public static float collision = 0.05f;
         public static OculusTouch oculusTouch;
         public static LogicalButton drawButton;
         public static LogicalButton moveButton;
 
-        public HandCurve(List<Vector3> points, bool closed, bool selected = false, float segment = 0.03f, int meridian = 10, float radius = 0.005f)
+        public HandCurve(Curve curve, bool selected = false, float? segment = null)
         {
-            this.points = points;
-            this.closed = closed;
+            this.curve = curve;
             this.selected = selected;
-            this.segment = segment;
-            this.meridian = meridian;
-            this.radius = radius;
-            this.mesh = MakeMesh.GetMesh(this.points, this.meridian, this.radius, this.closed);
+            this.segment = segment ?? this.MeanOfSegment();
+            if (this.segment <= 0) {
+                throw new System.Exception("segment must be positive");
+            }
         }
 
         public static void SetUp(OculusTouch oculusTouch, LogicalButton drawButton, LogicalButton moveButton)
@@ -43,51 +41,34 @@ namespace DrawCurve
 
         public void MeshUpdate()
         {
-            this.mesh = MakeMesh.GetMesh(this.points, this.meridian, this.radius, this.closed);
+            this.curve.UpdateMesh();
         }
 
         public void MeshUpdatePos()
         {
-            List<Vector3> pointsCopy = new List<Vector3>(this.points);
-            if (this.closed)
-            {
-                pointsCopy.Add(pointsCopy[0]);
-                pointsCopy.Add(pointsCopy[1]);
-            }
-            List<Vector3> tangents = MakeMesh.Tangents(pointsCopy, this.closed);
-            List<Vector3> principalNormals = MakeMesh.PrincipalNormals(tangents);
-            Vector3[] vertices = this.mesh.vertices;
-            Vector3[] normals = this.mesh.normals;
-            int k=0;
-            for (int j = 0; j < pointsCopy.Count; j++)
-            {
-                Vector3 binormal = Vector3.Cross(tangents[j], principalNormals[j]);
-                for (int i = 0; i <= this.meridian; i++)
-                {
-                    float theta = i * 2 * Mathf.PI / this.meridian;
-                    Vector3 direction = Mathf.Cos(theta) * principalNormals[j] + Mathf.Sin(theta) * binormal;
-                    vertices[k] = pointsCopy[j] + this.radius * direction;
-                    normals[k] = direction;
-                    k++;
-                }
-            }
-            this.mesh.vertices = vertices;
-            this.mesh.normals = normals;
+            this.curve.UpdateMesh();
         }
 
         public void MeshAtPointsUpdate()
         {
-            this.meshAtPoints = MakeMesh.GetMeshAtPoints(this.points, this.radius * 2.0f);
+            this.meshAtPoints = this.curve.GetMeshAtPoints();
         }
 
         public void MeshAtEndPointUpdate()
         {
-            this.meshAtPoints = MakeMesh.GetMeshAtEndPoint(this.points, this.radius * 2.0f);
+            this.meshAtPoints = this.curve.GetMeshAtEndPoint();
         }
 
         private int Length()
         {
-            return this.points.Count;
+            return this.curve.GetPoints().Count;
+        }
+
+        private float MeanOfSegment()
+        {
+            List<Vector3> points = this.curve.GetPoints();
+            int n = this.closed ? points.Count : points.Count - 1;
+            return this.curve.ArcLength() / n;
         }
 
         public void Draw()
@@ -98,11 +79,11 @@ namespace DrawCurve
 
                 if (Length() == 0)
                 {
-                    this.points.Add(nowPosition);
+                    this.curve.Add(nowPosition);
                 }
-                else if (Vector3.Distance(this.points.Last(), nowPosition) >= this.segment)
+                else if (Vector3.Distance(this.curve.GetPoints().Last(), nowPosition) >= this.segment)
                 {
-                    this.points.Add(nowPosition);
+                    this.curve.Add(nowPosition);
                     this.MeshUpdate();
                 }
             }
@@ -131,7 +112,10 @@ namespace DrawCurve
 
         public void MoveSetUp(Vector3 position, Quaternion rotation)
         {
-            this.points = this.points.Select(v => v - position).Select(v => Quaternion.Inverse(rotation) * v).ToList();
+            this.curve.SetPoints(this.curve.GetPoints()
+                .Select(v => v - position)
+                .Select(v => Quaternion.Inverse(rotation) * v)
+                .ToList());
             MeshUpdate();
         }
 
@@ -143,7 +127,10 @@ namespace DrawCurve
 
         public void MoveCleanUp()
         {
-            this.points = this.points.Select(v => this.rotation * v).Select(v => v + this.position).ToList();
+            this.curve.SetPoints(this.curve.GetPoints()
+                .Select(v => this.rotation * v)
+                .Select(v => v + this.position)
+                .ToList());
             MeshUpdate();
             this.position = Vector3.zero;
             this.rotation = Quaternion.identity;
@@ -153,26 +140,27 @@ namespace DrawCurve
         {
             Vector3 nowPosition = oculusTouch.GetPositionR();
 
-            if (Distance(this.points, nowPosition).Item2 < collision)
+            if (Distance(this.curve.GetPoints(), nowPosition).Item2 < collision)
             {
                 this.selected = !this.selected;
             }
         }
 
-        public void Close()
+        public HandCurve ToggleClosed()
         {
-            if (Vector3.Distance(this.points.First(), this.points.Last()) < collision)
+            if (Vector3.Distance(this.curve.GetPoints().First(), this.curve.GetPoints().Last()) >= collision)
             {
-                this.closed = !this.closed;
-                MeshUpdate();
+                return null;
             }
+            Curve newCurve = this.curve.ToggleClosed();
+            return new HandCurve(newCurve, this.selected, this.segment);
         }
 
         public List<HandCurve> Cut()
         {
             List<HandCurve> newCurves = new List<HandCurve>();
             Vector3 nowPosition = oculusTouch.GetPositionR();
-            (int, float) distance = Distance(this.points, nowPosition);
+            (int, float) distance = Distance(this.curve.GetPoints(), nowPosition);
             int num = distance.Item1;
 
             if (distance.Item2 < collision)
@@ -194,79 +182,82 @@ namespace DrawCurve
 
         private HandCurve CutKnot(int num)
         {
+            List<Vector3> points = this.curve.GetPoints();
             List<Vector3> newPoints = new List<Vector3>();
 
             for (int i = num + 1; i < Length(); i++)
             {
-                newPoints.Add(this.points[i]);
+                newPoints.Add(points[i]);
             }
 
             for (int i = 0; i < num; i++)
             {
-                newPoints.Add(this.points[i]);
+                newPoints.Add(points[i]);
             }
 
-            HandCurve cutKnot = new HandCurve(newPoints, false, selected: true);
+            HandCurve cutKnot = new HandCurve(new OpenCurve(newPoints), selected: true);
 
             return cutKnot;
         }
 
         private (HandCurve, HandCurve) CutCurve(int num)
         {
+            List<Vector3> points = this.curve.GetPoints();
             List<Vector3> newPoints1 = new List<Vector3>();
             List<Vector3> newPoints2 = new List<Vector3>();
 
             for (int i = 0; i < num; i++)
             {
-                newPoints1.Add(this.points[i]);
+                newPoints1.Add(points[i]);
             }
 
             for (int i = num + 1; i < Length(); i++)
             {
-                newPoints2.Add(this.points[i]);
+                newPoints2.Add(points[i]);
             }
 
-            HandCurve newCurve1 = new HandCurve(newPoints1, false, selected: true);
-            HandCurve newCurve2 = new HandCurve(newPoints2, false, selected: true);
+            HandCurve newCurve1 = new HandCurve(new OpenCurve(newPoints1), selected: true);
+            HandCurve newCurve2 = new HandCurve(new OpenCurve(newPoints2), selected: true);
 
             return (newCurve1, newCurve2);
         }
 
-        public static List<HandCurve> Combine(HandCurve curve1, HandCurve curve2)
+        public static List<HandCurve> Combine(HandCurve handCurve1, HandCurve handCurve2)
         {
-            List<HandCurve> newCurves = new List<HandCurve>();
-            List<Vector3> points1 = curve1.points;
-            List<Vector3> points2 = curve2.points;
-            AdjustOrientation(ref points1, ref points2);
+            if (!(handCurve1.curve is OpenCurve)) {
+                throw new System.Exception("handCurve1 must be open");
+            }
+            if (!(handCurve2.curve is OpenCurve)) {
+                throw new System.Exception("handCurve2 must be open");
+            }
+
+            (OpenCurve curve1, OpenCurve curve2) = AdjustOrientation(handCurve1.curve as OpenCurve, handCurve2.curve as OpenCurve);
+
+            List<HandCurve> newHandCurves = new List<HandCurve>();
+            List<Vector3> points1 = curve1.GetPoints();
+            List<Vector3> points2 = curve2.GetPoints();
 
             if (Vector3.Distance(points1.Last(), points2.First()) < collision)
             {
-                foreach (Vector3 v in points2)
-                {
-                    points1.Add(v);
-                }
-
-                bool closed = Vector3.Distance(points1.First(), points2.Last()) < collision ? true : false;
-                newCurves.Add(new HandCurve(points1, closed, selected: true));
+                OpenCurve newCurve = curve1.Combine(curve2);
+                bool closed = newCurve.DistanceOfFirstAndLast() < collision;
+                newHandCurves.Add(new HandCurve(newCurve.ChangeClosed(closed), selected: true));
             }
 
-            return newCurves;
+            return newHandCurves;
         }
 
-        private static void AdjustOrientation(ref List<Vector3> points1, ref List<Vector3> points2)
-        {
-            if (Vector3.Distance(points1.Last(), points2.Last()) < collision)
-            {
-                points2.Reverse();
-            }
-            else if (Vector3.Distance(points1.First(), points2.First()) < collision)
-            {
-                points1.Reverse();
-            }
-            else if (Vector3.Distance(points1.First(), points2.Last()) < collision)
-            {
-                points1.Reverse();
-                points2.Reverse();
+        private static (OpenCurve, OpenCurve) AdjustOrientation(OpenCurve curve1, OpenCurve curve2) {
+            var points1 = curve1.GetPoints();
+            var points2 = curve2.GetPoints();
+            if (Vector3.Distance(points1.Last(), points2.Last()) < collision) {
+                    return (curve1, curve2.Reversed());
+            } else if (Vector3.Distance(points1.First(), points2.First()) < collision) {
+                return (curve1.Reversed(), curve2);
+            } else if (Vector3.Distance(points1.First(), points2.Last()) < collision) {
+                return (curve1.Reversed(), curve2.Reversed());
+            } else {
+                return (curve1, curve2);
             }
         }
 
@@ -291,7 +282,7 @@ namespace DrawCurve
 
         public float MinSegmentDist()
         {
-            List<Vector3> seq = this.points;
+            List<Vector3> seq = this.curve.GetPoints();
             int n = this.Length();
             float min = float.PositiveInfinity;
             int endi = this.closed ? n - 3 : n - 4;
@@ -309,19 +300,21 @@ namespace DrawCurve
             return min;
         }
 
-        public float CurveDistance(HandCurve curve)
+        public float CurveDistance(HandCurve other)
         {
+            List<Vector3> thisPoints = this.curve.GetPoints();
+            List<Vector3> otherPoints = other.curve.GetPoints();
             float min = float.PositiveInfinity;
             int n1 = this.Length();
-            int n2 = curve.Length();
+            int n2 = other.Length();
             int end1 = this.closed ? n1 - 1 : n1 - 2;
-            int end2 = curve.closed ? n2 - 1 : n2 - 2;
+            int end2 = other.closed ? n2 - 1 : n2 - 2;
 
             for (int i = 0; i <= end1; i++)
             {
                 for (int j = 0; j <= end2; j++)
                 {
-                    float dist = SegmentDist.SSDist(this.points[i], this.points[(i + 1) % n1], curve.points[j], curve.points[(j + 1) % n2]);
+                    float dist = SegmentDist.SSDist(thisPoints[i], thisPoints[(i + 1) % n1], otherPoints[j], otherPoints[(j + 1) % n2]);
                     if (dist < min) min = dist;
                 }
             }
@@ -331,16 +324,11 @@ namespace DrawCurve
 
         public HandCurve DeepCopy()
         {
-            List<Vector3> points = ListVector3Copy(this.points);
-            HandCurve curve = new HandCurve(points, this.closed, segment: this.segment);
-            curve.mesh = this.mesh;
-            curve.meshAtPoints = this.meshAtPoints;
-            curve.closed = this.closed;
+            List<Vector3> points = ListVector3Copy(this.curve.GetPoints());
+            HandCurve curve = new HandCurve(Curve.create(points, this.closed), segment: this.segment);
             curve.selected = this.selected;
             curve.position = Vector3Copy(this.position);
             curve.rotation = QuaternionCopy(this.rotation);
-            curve.meridian = this.meridian;
-            curve.radius = this.radius;
             return curve;
         }
 
@@ -359,7 +347,7 @@ namespace DrawCurve
         private List<Vector3> ListVector3Copy(List<Vector3> l)
         {
             List<Vector3> m = new List<Vector3>();
-            
+
             foreach (Vector3 v in l)
             {
                 m.Add(Vector3Copy(v));

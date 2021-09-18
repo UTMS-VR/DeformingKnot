@@ -9,22 +9,22 @@ namespace EnergyOptimizer
     {
         public float gtol = 0.0f;
 
-        public Elasticity(ref List<HandCurve> curveList, float lr=1e-04f) : base(ref curveList, lr)
+        public Elasticity(ref List<Vector3[]> pointsList, float segment, float lr = 1e-04f) : base(ref pointsList, segment, lr)
         {
         }
 
         protected override void SetGradient()
         {
-            for (int i = 0; i < this.curveList.Count; i++)
+            for (int i = 0; i < this.pointsList.Count; i++)
             {
                 for (int j = 0; j < this.countList[i]; j++)
                 {
                     int jn = (j + 1) % this.countList[i];
                     int jp = (j + this.countList[i] - 1) % this.countList[i];
-                    Vector3 next = this.curveList[i].points[j] - this.curveList[i].points[jn];
-                    Vector3 prev = this.curveList[i].points[j] - this.curveList[i].points[jp];
-                    next = (next.magnitude - this.curveList[i].segment) * next.normalized;
-                    prev = (prev.magnitude - this.curveList[i].segment) * prev.normalized;
+                    Vector3 next = this.pointsList[i][j] - this.pointsList[i][jn];
+                    Vector3 prev = this.pointsList[i][j] - this.pointsList[i][jp];
+                    next = (next.magnitude - this.segment) * next.normalized;
+                    prev = (prev.magnitude - this.segment) * prev.normalized;
                     gradientList[i][j] = next + prev;
                 }
             }
@@ -33,12 +33,12 @@ namespace EnergyOptimizer
         public float MaxError()
         {
             float max = 0.0f;
-            for (int i = 0; i < this.curveList.Count; i++)
+            for (int i = 0; i < this.pointsList.Count; i++)
             {
                 for (int j = 0; j < this.countList[i]; j++)
                 {
                     int jn = (j + 1) % this.countList[i];
-                    max = Mathf.Max(Mathf.Abs(Vector3.Distance(this.curveList[i].points[j], this.curveList[i].points[jn]) - this.curveList[i].segment), max);
+                    max = Mathf.Max(Mathf.Abs(Vector3.Distance(this.pointsList[i][j], this.pointsList[i][jn]) - this.segment), max);
                 }
             }
             return max;
