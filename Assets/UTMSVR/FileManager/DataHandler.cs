@@ -4,7 +4,6 @@ using UnityEngine;
 using System.IO;
 using System;
 using System.Linq;
-using ContextMenu;
 
 namespace FileManager
 {
@@ -56,22 +55,20 @@ namespace FileManager
         string outputDirOnHMD;
         string cacheDirOnPC;
         string cacheDirOnHMD;
-        ContextMenu.ContextMenu contextMenu;
 
         public DataHandler(
-            ContextMenu.ContextMenu contextMenu,
-            string inputDirOnPC = "input", string outputDirOnPC = null,
-            string inputDirOnHMD = null, string outputDirOnHMD = "/mnt/sdcard/output",
-            string cacheDirOnPC = "cacheFromFileManager", string cacheDirOnHMD = "/mnt/sdcard/cacheFromFileManager"
+            string inputDirOnPC = null, string outputDirOnPC = null,
+            string inputDirOnHMD = null, string outputDirOnHMD = null,
+            string cacheDirOnPC = null, string cacheDirOnHMD = null
             )
         {
-            this.inputDirOnPC = inputDirOnPC;
+            string path = Application.persistentDataPath;
+            this.inputDirOnPC = inputDirOnPC ?? "input";
             this.outputDirOnPC = outputDirOnPC;
-            this.inputDirOnHMD = inputDirOnHMD;
-            this.outputDirOnHMD = outputDirOnHMD;
-            this.cacheDirOnPC = cacheDirOnPC;
-            this.cacheDirOnHMD = cacheDirOnHMD;
-            this.contextMenu = contextMenu;
+            this.inputDirOnHMD = (inputDirOnHMD != null) ? Path.Combine(path, inputDirOnHMD) : null;
+            this.outputDirOnHMD = Path.Combine(path, outputDirOnHMD ?? "output");
+            this.cacheDirOnPC = cacheDirOnPC ?? "cacheFromFileManager";
+            this.cacheDirOnHMD = Path.Combine(path, cacheDirOnHMD ?? "cacheFromFileManager");
         }
 
         public void Save(string filename, string text)
@@ -171,7 +168,7 @@ namespace FileManager
         private static List<Vector3> ConcatAllCurves(List<CurveCore> curves)
         {
             List<List<Vector3>> pointsList = curves.Select(curve => curve.points).ToList();
-            return pointsList.Aggregate((points1, points2) => points1.Concat(points2).ToList()).ToList();   
+            return pointsList.Aggregate(new List<Vector3>(), (points1, points2) => points1.Concat(points2).ToList()).ToList();   
         }
 
         private static List<CurveCore> MoveBarycenter(List<CurveCore> curves, Vector3? barycenter = null)

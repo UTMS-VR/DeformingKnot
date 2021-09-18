@@ -44,13 +44,12 @@ public class Main : MonoBehaviour
         this.contextMenu.Open();
 
         this.dataHandler = new DataHandler(
-            contextMenu: contextMenu,
             inputDirOnPC: "CurveData",
             outputDirOnPC: "CurveData",
             cacheDirOnPC: "CurveData",
-            inputDirOnHMD: Path.Combine(Application.persistentDataPath, "CurveData"),
-            outputDirOnHMD: Path.Combine(Application.persistentDataPath, "CurveData"),
-            cacheDirOnHMD: Path.Combine(Application.persistentDataPath, "CurveData")
+            inputDirOnHMD: "CurveData",
+            outputDirOnHMD: "CurveData",
+            cacheDirOnHMD: "CurveData"
         );
 
         this.state = new BasicDeformation(this.oculusTouch, this.contextMenu, this.dataHandler, new List<HandCurve>(), comfirm: comfirmBotton);
