@@ -27,6 +27,9 @@ namespace DrawCurve
             this.curve = curve;
             this.selected = selected;
             this.segment = segment ?? this.MeanOfSegment();
+            if (this.segment <= 0) {
+                throw new System.Exception("segment must be positive");
+            }
         }
 
         public static void SetUp(OculusTouch oculusTouch, LogicalButton drawButton, LogicalButton moveButton)

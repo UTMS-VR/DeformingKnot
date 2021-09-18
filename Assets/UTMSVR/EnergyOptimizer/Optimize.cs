@@ -33,6 +33,9 @@ namespace EnergyOptimizer
             this.deformableCurves = deformableCurves;
             this.pointsList = new List<Vector3[]>();
             this.collisionCurves = collisionCurves;
+            if (segment <= 0) {
+                throw new System.Exception("segment must be positive");
+            }
             this.segment = segment;
             this.oculusTouch = oculusTouch;
 

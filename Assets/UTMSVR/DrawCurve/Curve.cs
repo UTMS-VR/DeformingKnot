@@ -105,6 +105,10 @@ namespace DrawCurve {
 
         public Curve Equalize(float segment)
         {
+            if (segment <= 0) {
+                throw new System.Exception("segment must be positive");
+            }
+
             int length = this.points.Count;
             List<Vector3> newPoints = new List<Vector3>();
             newPoints.Add(this.points[0]);
