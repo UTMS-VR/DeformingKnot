@@ -62,7 +62,7 @@ public abstract class State
     {
         foreach (HandCurve curve in this.curves)
         {
-            Material material = curve.selected ? MakeMesh.SelectedCurveMaterial : MakeMesh.CurveMaterial;
+            Material material = curve.selected ? Curve.SelectedCurveMaterial : Curve.CurveMaterial;
             Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, material, 0);
         }
     }
@@ -94,7 +94,7 @@ public class BasicDeformation : State
     {
         base.NumberOfUnselectableItems = 9;
         this.preCurves = base.curves;
-        this.drawingCurve = new HandCurve(new List<Vector3>(), false);
+        this.drawingCurve = new HandCurve(new OpenCurve(new List<Vector3>()));
         this.movingCurves = new List<int>();
 
         if (draw != null) this.draw = draw;
@@ -162,7 +162,7 @@ public class BasicDeformation : State
         if (base.oculusTouch.GetButton(this.move) || this.oculusTouch.GetButtonUp(this.move)) valid++;
         if (base.oculusTouch.GetButtonDown(this.select)) valid++;
         if (base.oculusTouch.GetButtonDown(this.cut)) valid++;
-        if (base.oculusTouch.GetButtonDown(this.comfirm)) valid++; 
+        if (base.oculusTouch.GetButtonDown(this.comfirm)) valid++;
 
         return (valid == 1) ? true : false;
     }
@@ -190,17 +190,17 @@ public class BasicDeformation : State
 
         if (base.oculusTouch.GetButtonUp(this.draw))
         {
-            if (this.drawingCurve.points.Count >= 2)
+            if (this.drawingCurve.curve.GetPoints().Count >= 2)
             {
                 base.curves.Add(this.drawingCurve);
             }
 
-            this.drawingCurve = new HandCurve(new List<Vector3>(), false, segment: base.segment);
+            this.drawingCurve = new HandCurve(new OpenCurve(new List<Vector3>()), segment: base.segment);
         }
-        
-        if (this.drawingCurve.points.Count >= 2)
+
+        if (this.drawingCurve.curve.GetPoints().Count >= 2)
         {
-            Graphics.DrawMesh(this.drawingCurve.mesh, this.drawingCurve.position, this.drawingCurve.rotation, MakeMesh.CurveMaterial, 0);
+            Graphics.DrawMesh(this.drawingCurve.mesh, this.drawingCurve.position, this.drawingCurve.rotation, Curve.CurveMaterial, 0);
         }
     }
 
@@ -212,7 +212,7 @@ public class BasicDeformation : State
         {
             for (int i = 0; i < base.curves.Count; i++)
             {
-                if (HandCurve.Distance(base.curves[i].points, nowPosition).Item2 < HandCurve.collision)
+                if (HandCurve.Distance(base.curves[i].curve.GetPoints(), nowPosition).Item2 < HandCurve.collision)
                 {
                     this.movingCurves.Add(i);
                 }
@@ -223,7 +223,7 @@ public class BasicDeformation : State
         {
             base.curves[i].Move();
         }
-        
+
         if (base.oculusTouch.GetButtonUp(this.move))
         {
             this.movingCurves = new List<int>();
@@ -254,7 +254,7 @@ public class BasicDeformation : State
                 if (newCurves.Count != 0)
                 {
                     base.curves.Remove(selection[0]);
-                    
+
                     foreach (HandCurve curve in newCurves)
                     {
                         base.curves.Add(curve);
@@ -270,7 +270,7 @@ public class BasicDeformation : State
 
         if (selection.Count == 1)
         {
-            selection[0].Close();
+            selection[0].curve.Close();
         }
         else if (selection.Count == 2 && !selection[0].closed && !selection[1].closed)
         {
@@ -327,7 +327,7 @@ public class BasicDeformation : State
     {
         string timeString = this.GetCurrentTimeString();
         string filename = $"curve_{timeString}.json";
-        List<(List<Vector3>, bool)> curvesCore = base.curves.Select(curve => (curve.points, curve.closed)).ToList();
+        List<(List<Vector3>, bool)> curvesCore = base.curves.Select(curve => (curve.curve.GetPoints(), curve.closed)).ToList();
         base.dataHandler.SaveCurves(filename, curvesCore);
         base.ResetMenu();
         this.newState = new OpenFile(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
@@ -369,7 +369,7 @@ public class OpenFile : State
         {
             this.contextMenu.AddItem(new MenuItem(file, () => {
                 List<(List<Vector3> points, bool closed)> curvesCore = base.dataHandler.LoadCurves(file, maxLength: 0.2f, barycenter: new Vector3(0, 0, 0.5f));
-                List<HandCurve> loadedCurves = curvesCore.Select(core => new HandCurve(core.points, core.closed, selected: true, segment: base.segment)).ToList();
+                List<HandCurve> loadedCurves = curvesCore.Select(core => new HandCurve(Curve.create(core.points, core.closed), selected: true, segment: base.segment)).ToList();
                 base.ResetMenu();
                 this.newState = new SelectResetOrAdd(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves, loadedCurves);
             }));
@@ -380,7 +380,7 @@ public class OpenFile : State
             this.newState = new BasicDeformation(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
         }));
     }
-    
+
     public override void Update() {}
 }
 
@@ -401,7 +401,7 @@ public class Gallery : State
         {
             List<(List<Vector3> points, bool closed)> curvesCore = this.dataHandler.LoadCurvesFromGitHub("Gallery/" + file, maxLength: 0.2f, barycenter: new Vector3(0, 0, 0.5f));
             this.contextMenu.AddItem(new MenuItem(file, () => {
-                List<HandCurve> curves = curvesCore.Select(core => new HandCurve(core.points, core.closed, selected: true, segment: base.segment)).ToList();
+                List<HandCurve> curves = curvesCore.Select(core => new HandCurve(Curve.create(core.points, core.closed), selected: true, segment: base.segment)).ToList();
                 base.ResetMenu();
                 this.newState = new SelectResetOrAdd(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves, curves);
             }));
@@ -412,7 +412,7 @@ public class Gallery : State
             this.newState = new OpenFile(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
         }));
     }
-    
+
     public override void Update() {}
 
     private List<string> KnotFiles()
@@ -458,7 +458,7 @@ public class SelectResetOrAdd : State
                 base.curves.Concat(this.newCurves).ToList());
         }));
     }
-    
+
     public override void Update() {}
 }
 
@@ -504,7 +504,7 @@ public class SelectAutoOrManual : State
                 List<HandCurve> selection = base.curves.Where(curve => curve.selected).ToList();
                 foreach (HandCurve curve in selection)
                 {
-                    curve.points = this.Smoothing(curve.points);
+                    curve.curve.SetPoints(this.Smoothing(curve.curve.GetPoints()));
                     curve.MeshUpdate();
                 }
             }
@@ -584,7 +584,7 @@ public class AutomaticDeformation : State
     private Optimize optimizer;
     private LogicalButton button1;
     private LogicalButton button2;
-    
+
     public AutomaticDeformation(OculusTouch oculusTouch,
                                 ContextMenu.ContextMenu contextMenu,
                                 DataHandler dataHandler,
@@ -602,7 +602,7 @@ public class AutomaticDeformation : State
         else this.button2 = LogicalOVRInput.RawButton.B;
 
         List<HandCurve> selectedCurves = curves.Where(curve => curve.selected).ToList();
-        this.optimizer = new Optimize(oculusTouch, selectedCurves, base.curves, base.epsilon, "Moebius", this.button1, this.button2);
+        this.optimizer = new Optimize(oculusTouch, selectedCurves, base.curves, base.segment, base.epsilon, "Moebius", this.button1, this.button2);
     }
 
     protected override void SetupMenu()
@@ -626,24 +626,26 @@ public class AutomaticDeformation : State
 public class ManualDeformation : State
 {
     private Knot deformingCurve;
-    
+
     public ManualDeformation(OculusTouch oculusTouch,
                              ContextMenu.ContextMenu contextMenu,
                              DataHandler dataHandler,
                              List<HandCurve> curves,
-                             HandCurve curve)
+                             HandCurve handCurve)
         : base(oculusTouch, contextMenu, dataHandler, curves)
     {
         base.NumberOfUnselectableItems = 8;
-        this.deformingCurve = new Knot(curve.points,
+        if (handCurve.curve !is ClosedCurve) {
+            throw new Exception("curve must be closed for ManualDeformation");
+        }
+        ClosedCurve curve = handCurve.curve as ClosedCurve;
+        this.deformingCurve = new Knot(curve,
                                        oculusTouch,
-                                       meridian: curve.meridian,
-                                       radius: curve.radius,
-                                       distanceThreshold: curve.segment,
+                                       distanceThreshold: handCurve.segment,
                                        collisionCurves: curves,
                                        buttonC: LogicalOVRInput.RawButton.DisabledButton,
                                        buttonD: LogicalOVRInput.RawButton.DisabledButton,
-                                       curveMaterial: MakeMesh.SelectedCurveMaterial);
+                                       curveMaterial: Curve.SelectedCurveMaterial);
     }
 
     protected override void SetupMenu()
@@ -653,7 +655,7 @@ public class ManualDeformation : State
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("", () => {}));
         this.contextMenu.AddItem(new MenuItem("戻る", () => {
-            base.curves.Add(new HandCurve(this.deformingCurve.GetPoints(), true, selected: true, segment: base.segment));
+            base.curves.Add(new HandCurve(this.deformingCurve.GetCurve().Close(), selected: true, segment: base.segment));
             base.ResetMenu();
             this.newState = new SelectAutoOrManual(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
         }));
