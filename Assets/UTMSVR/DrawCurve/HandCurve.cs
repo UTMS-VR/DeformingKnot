@@ -192,7 +192,7 @@ namespace DrawCurve
                 newPoints.Add(points[i]);
             }
 
-            HandCurve cutKnot = new HandCurve(new ClosedCurve(newPoints), selected: true);
+            HandCurve cutKnot = new HandCurve(new OpenCurve(newPoints), selected: true);
 
             return cutKnot;
         }
@@ -213,8 +213,8 @@ namespace DrawCurve
                 newPoints2.Add(points[i]);
             }
 
-            HandCurve newCurve1 = new HandCurve(new ClosedCurve(newPoints1), selected: true);
-            HandCurve newCurve2 = new HandCurve(new ClosedCurve(newPoints2), selected: true);
+            HandCurve newCurve1 = new HandCurve(new OpenCurve(newPoints1), selected: true);
+            HandCurve newCurve2 = new HandCurve(new OpenCurve(newPoints2), selected: true);
 
             return (newCurve1, newCurve2);
         }
