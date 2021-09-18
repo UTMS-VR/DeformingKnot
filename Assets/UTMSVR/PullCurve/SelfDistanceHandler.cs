@@ -102,7 +102,7 @@ namespace PullCurve
                 for (int j = i + 2; j <= endj; j++)
                 {
                     float d = dist(i, j);
-                    if (d < this.epsilon * (this.updateFrame + 1))
+                    if (d < this.epsilon * this.updateFrame)
                     {
                         collidablePairs.Add((i, j));
                     }

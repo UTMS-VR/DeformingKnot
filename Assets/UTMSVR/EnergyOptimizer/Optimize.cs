@@ -11,7 +11,9 @@ namespace EnergyOptimizer
     {
         private OculusTouch oculusTouch;
         private List<HandCurve> deformableCurves;
+        private List<Vector3[]> pointsList;
         private List<HandCurve> collisionCurves;
+        private float segment;
         private LogicalButton button1;
         private LogicalButton button2;
         private float epsilon;
@@ -22,32 +24,39 @@ namespace EnergyOptimizer
         public Optimize(OculusTouch oculusTouch,
                         List<HandCurve> deformableCurves,
                         List<HandCurve> collisionCurves,
+                        float segment,
                         float epsilon,
                         string flowClass,
                         LogicalButton button1,
                         LogicalButton button2)
         {
             this.deformableCurves = deformableCurves;
+            this.pointsList = new List<Vector3[]>();
             this.collisionCurves = collisionCurves;
+            this.segment = segment;
             this.oculusTouch = oculusTouch;
 
             for (int i = 0; i < this.deformableCurves.Count; i++)
             {
-                this.deformableCurves[i].points = AdjustParameter.Equalize(this.deformableCurves[i].points, this.deformableCurves[i].segment, true);
+                if (this.deformableCurves[i].curve !is ClosedCurve) {
+                    throw new System.Exception("curves must be closed");
+                }
+                this.deformableCurves[i].curve = this.deformableCurves[i].curve.Equalize(this.deformableCurves[i].segment);
                 this.deformableCurves[i].MeshUpdate();
+                this.pointsList.Add(this.deformableCurves[i].curve.GetPoints().ToArray());
                 this.minSeg = Mathf.Min(this.minSeg,this.deformableCurves[i].segment);
             }
 
             if (flowClass == "Moebius")
             {
-                curveFlow = new Moebius(ref this.deformableCurves, 1e-04f);
+                curveFlow = new Moebius(ref pointsList, this.segment, 1e-04f);
             }
             else if (flowClass == "MeanCurvature")
             {
-                curveFlow = new MeanCurvature(ref this.deformableCurves, 0.05f);
+                curveFlow = new MeanCurvature(ref pointsList, this.segment, 0.05f);
             }
 
-            elasticity = new Elasticity(ref this.deformableCurves, 1e-01f);
+            elasticity = new Elasticity(ref pointsList, this.segment, 1e-01f);
 
             this.button1 = button1;
             this.button2 = button2;
@@ -74,6 +83,8 @@ namespace EnergyOptimizer
                         elasticity.Update(0.0f);
                     }
                     elasticity.ClearMomentum();
+
+                    this.UpdatePoints();
                 }
             }
 
@@ -85,7 +96,15 @@ namespace EnergyOptimizer
             foreach (HandCurve curve in this.deformableCurves)
             {
                 curve.MeshUpdatePos();
-                Graphics.DrawMesh(curve.mesh, Vector3.zero, Quaternion.identity, MakeMesh.SelectedCurveMaterial, 0);
+                Graphics.DrawMesh(curve.mesh, Vector3.zero, Quaternion.identity, Curve.SelectedCurveMaterial, 0);
+            }
+        }
+
+        private void UpdatePoints()
+        {
+            for (int i = 0; i < this.deformableCurves.Count; i++)
+            {
+                this.deformableCurves[i].curve.SetPoints(this.pointsList[i].ToList());
             }
         }
 

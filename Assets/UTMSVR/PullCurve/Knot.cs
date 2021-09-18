@@ -12,10 +12,8 @@ namespace PullCurve
 
 
         public Knot(
-            List<Vector3> points,
+            ClosedCurve curve,
             OculusTouch oculusTouch,
-            int meridian = 20,
-            float radius = 0.1f,
             float distanceThreshold = -1,
             List<HandCurve> collisionCurves = null,
             LogicalButton buttonA = null,
@@ -31,9 +29,9 @@ namespace PullCurve
             buttonB = buttonB ?? LogicalOVRInput.RawButton.B;
             buttonC = buttonC ?? LogicalOVRInput.RawButton.RIndexTrigger;
             buttonD = buttonD ?? LogicalOVRInput.RawButton.RHandTrigger;
-            int count = points.Count;
+            int count = curve.GetPoints().Count;
             (int first, int second) chosenPoints = (count / 3, 2 * count / 3);
-            KnotData data = new KnotData(points, chosenPoints, oculusTouch, radius, meridian, distanceThreshold, collisionCurves,
+            KnotData data = new KnotData(curve, chosenPoints, oculusTouch, distanceThreshold, collisionCurves,
                 buttonA, buttonB, buttonC, buttonD, curveMaterial, pullableCurveMaterial, pointMaterial);
             this.state = new KnotStateBase(data);
 
@@ -50,9 +48,9 @@ namespace PullCurve
             }
         }
 
-        public List<Vector3> GetPoints()
+        public Curve GetCurve()
         {
-            return this.state.GetPoints();
+            return this.state.GetCurve();
         }
 
 

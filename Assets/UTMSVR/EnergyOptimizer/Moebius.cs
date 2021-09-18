@@ -9,13 +9,13 @@ namespace EnergyOptimizer
     // 暗黙の仮定：隣接する2点の間隔は一定
     public class Moebius : Flow
     {
-        public Moebius(ref List<HandCurve> curveList, float lr=1e-04f):base(ref curveList, lr)
+        public Moebius(ref List<Vector3[]> pointsList, float segment, float lr = 1e-04f) : base(ref pointsList, segment, lr)
         {
         }
 
         protected override void SetGradient()
         {
-            for (int i1 = 0; i1 < this.curveList.Count; i1++)
+            for (int i1 = 0; i1 < this.pointsList.Count; i1++)
             {
                 for (int j1 = 0; j1 < this.countList[i1]; j1++)
                 {
@@ -23,21 +23,21 @@ namespace EnergyOptimizer
                     for (int j2 = 1; j2 < this.countList[i1]; j2++)
                     {
                         int j3 = (j1 + j2) % this.countList[i1];
-                        Vector3 first = this.CoulombDiff(this.curveList[i1].points[j1], this.curveList[i1].points[j3])
-                                        * Mathf.Pow(this.curveList[i1].segment, 2);
-                        Vector3 second = this.Coulomb(this.curveList[i1].points[j1], this.curveList[i1].points[j3])
-                                        * 2 * this.curveList[i1].segment * this.SegmentDiff(i1, j1);
+                        Vector3 first = this.CoulombDiff(this.pointsList[i1][j1], this.pointsList[i1][j3])
+                                        * Mathf.Pow(this.segment, 2);
+                        Vector3 second = this.Coulomb(this.pointsList[i1][j1], this.pointsList[i1][j3])
+                                        * 2 * this.segment * this.SegmentDiff(i1, j1);
                         gradient += 2 * (first + second);
                     }
-                    for (int i2 = 1; i2 < this.curveList.Count; i2++)
+                    for (int i2 = 1; i2 < this.pointsList.Count; i2++)
                     {
-                        int i3 = (i1 + i2) % this.curveList.Count;
+                        int i3 = (i1 + i2) % this.pointsList.Count;
                         for (int j2 = 0; j2 < this.countList[i3]; j2++)
                         {
-                            Vector3 first = this.CoulombDiff(this.curveList[i1].points[j1], this.curveList[i3].points[j2])
-                                            * this.curveList[i1].segment * this.curveList[i3].segment;
-                            Vector3 second = this.Coulomb(this.curveList[i1].points[j1], this.curveList[i3].points[j2])
-                                            * this.SegmentDiff(i1, j1) * this.curveList[i3].segment;
+                            Vector3 first = this.CoulombDiff(this.pointsList[i1][j1], this.pointsList[i3][j2])
+                                            * this.segment * this.segment;
+                            Vector3 second = this.Coulomb(this.pointsList[i1][j1], this.pointsList[i3][j2])
+                                            * this.SegmentDiff(i1, j1) * this.segment;
                             gradient += 2 * (first + second);
                         }
                     }
@@ -57,7 +57,7 @@ namespace EnergyOptimizer
         //             for (int j2 = 1; j2 < this.countList[i1]; j2++)
         //             {
         //                 int j3 = (j1 + j2) % this.countList[i1];
-        //                 energy += this.Coulomb(this.curveList[i1].points[i1][j1], this.curveList[i1].points[i1][j3])
+        //                 energy += this.Coulomb(this.pointsList[i1][i1][j1], this.pointsList[i1][i1][j3])
         //                           * Mathf.Pow(this.segmentList[i1], 2);
         //             }
         //
@@ -66,7 +66,7 @@ namespace EnergyOptimizer
         //                 int i3 = (i1 + i2) % this.count;
         //                 for (int j2 = 0; j2 < this.countList[i3]; j2++)
         //                 {
-        //                     energy += this.Coulomb(this.curveList[i1].points[i1][j1], this.curveList[i1].points[i3][j2])
+        //                     energy += this.Coulomb(this.pointsList[i1][i1][j1], this.pointsList[i1][i3][j2])
         //                               * this.segmentList[i1] * this.segmentList[i3];
         //                 }
         //             }
@@ -103,8 +103,8 @@ namespace EnergyOptimizer
         {
             int jp = (j + 1) % this.countList[i];
             int jn = (j + this.countList[i] - 1) % this.countList[i];
-            Vector3 tangentp = (this.curveList[i].points[j] - this.curveList[i].points[jp]).normalized;
-            Vector3 tangentn = (this.curveList[i].points[j] - this.curveList[i].points[jn]).normalized;
+            Vector3 tangentp = (this.pointsList[i][j] - this.pointsList[i][jp]).normalized;
+            Vector3 tangentn = (this.pointsList[i][j] - this.pointsList[i][jn]).normalized;
             return (tangentp + tangentn) / this.countList[i];
         }
     }
