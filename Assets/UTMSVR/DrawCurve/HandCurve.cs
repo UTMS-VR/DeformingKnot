@@ -221,10 +221,10 @@ namespace DrawCurve
 
         public static List<HandCurve> Combine(HandCurve handCurve1, HandCurve handCurve2)
         {
-            if (handCurve1.curve !is OpenCurve) {
+            if (!(handCurve1.curve is OpenCurve)) {
                 throw new System.Exception("handCurve1 must be open");
             }
-            if (handCurve2.curve !is OpenCurve) {
+            if (!(handCurve2.curve is OpenCurve)) {
                 throw new System.Exception("handCurve2 must be open");
             }
             OpenCurve curve1 = handCurve1.curve as OpenCurve;

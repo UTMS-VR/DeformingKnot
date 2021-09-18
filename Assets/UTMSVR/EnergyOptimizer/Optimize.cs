@@ -38,7 +38,7 @@ namespace EnergyOptimizer
 
             for (int i = 0; i < this.deformableCurves.Count; i++)
             {
-                if (this.deformableCurves[i].curve !is ClosedCurve) {
+                if (!(this.deformableCurves[i].curve is ClosedCurve)) {
                     throw new System.Exception("curves must be closed");
                 }
                 this.deformableCurves[i].curve = this.deformableCurves[i].curve.Equalize(this.deformableCurves[i].segment);

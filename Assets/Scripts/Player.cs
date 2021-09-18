@@ -635,7 +635,7 @@ public class ManualDeformation : State
         : base(oculusTouch, contextMenu, dataHandler, curves)
     {
         base.NumberOfUnselectableItems = 8;
-        if (handCurve.curve !is ClosedCurve) {
+        if (!(handCurve.curve is ClosedCurve)) {
             throw new Exception("curve must be closed for ManualDeformation");
         }
         ClosedCurve curve = handCurve.curve as ClosedCurve;
