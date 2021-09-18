@@ -94,7 +94,7 @@ public class BasicDeformation : State
     {
         base.NumberOfUnselectableItems = 9;
         this.preCurves = base.curves;
-        this.drawingCurve = new HandCurve(new OpenCurve(new List<Vector3>()));
+        this.drawingCurve = new HandCurve(new OpenCurve(new List<Vector3>()), segment: this.segment);
         this.movingCurves = new List<int>();
 
         if (draw != null) this.draw = draw;
