@@ -227,13 +227,12 @@ namespace DrawCurve
             if (!(handCurve2.curve is OpenCurve)) {
                 throw new System.Exception("handCurve2 must be open");
             }
-            OpenCurve curve1 = handCurve1.curve as OpenCurve;
-            OpenCurve curve2 = handCurve2.curve as OpenCurve;
-            (curve1, curve2) = AdjustOrientation(curve1, curve2);
+
+            (OpenCurve curve1, OpenCurve curve2) = AdjustOrientation(handCurve1.curve as OpenCurve, handCurve2.curve as OpenCurve);
 
             List<HandCurve> newHandCurves = new List<HandCurve>();
-            List<Vector3> points1 = handCurve1.curve.GetPoints();
-            List<Vector3> points2 = handCurve2.curve.GetPoints();
+            List<Vector3> points1 = curve1.GetPoints();
+            List<Vector3> points2 = curve2.GetPoints();
 
             if (Vector3.Distance(points1.Last(), points2.First()) < collision)
             {
