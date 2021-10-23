@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using InputManager;
 
+#nullable enable
+
 namespace DrawCurve
 {
     public class HandCurve
@@ -11,16 +13,16 @@ namespace DrawCurve
         // public List<Vector3> points;
         public Curve curve;
         public Mesh mesh { get { return this.curve.GetMesh();} }
-        public Mesh meshAtPoints;
+        public Mesh? meshAtPoints;
         public bool closed { get { return this.curve.closed; } }
         public bool selected;
         public Vector3 position = Vector3.zero;
         public Quaternion rotation = Quaternion.identity;
         public float segment;
         public static float collision = 0.05f;
-        public static OculusTouch oculusTouch;
-        public static LogicalButton drawButton;
-        public static LogicalButton moveButton;
+        public static OculusTouch? oculusTouch;
+        public static LogicalButton? drawButton;
+        public static LogicalButton? moveButton;
 
         public HandCurve(Curve curve, bool selected = false, float? segment = null)
         {
@@ -54,11 +56,6 @@ namespace DrawCurve
             this.meshAtPoints = this.curve.GetMeshAtPoints();
         }
 
-        public void MeshAtEndPointUpdate()
-        {
-            this.meshAtPoints = this.curve.GetMeshAtEndPoint();
-        }
-
         private int Length()
         {
             return this.curve.GetPoints().Count;
@@ -73,6 +70,9 @@ namespace DrawCurve
 
         public void Draw()
         {
+            if (oculusTouch == null) {
+                throw new System.Exception("Call HandCurve.SetUp()");
+            }
             if (oculusTouch.GetButton(drawButton))
             {
                 Vector3 nowPosition = oculusTouch.GetPositionR();
@@ -91,6 +91,9 @@ namespace DrawCurve
 
         public void Move()
         {
+            if (oculusTouch == null) {
+                throw new System.Exception("Call HandCurve.SetUp()");
+            }
             Vector3 nowPosition = oculusTouch.GetPositionR();
             Quaternion nowRotation = oculusTouch.GetRotationR();
 
@@ -138,6 +141,10 @@ namespace DrawCurve
 
         public void Select()
         {
+            if (oculusTouch == null) {
+                throw new System.Exception("Call HandCurve.SetUp()");
+            }
+
             Vector3 nowPosition = oculusTouch.GetPositionR();
 
             if (Distance(this.curve.GetPoints(), nowPosition).Item2 < collision)
@@ -146,7 +153,7 @@ namespace DrawCurve
             }
         }
 
-        public HandCurve ToggleClosed()
+        public HandCurve? ToggleClosed()
         {
             if (Vector3.Distance(this.curve.GetPoints().First(), this.curve.GetPoints().Last()) >= collision)
             {
@@ -158,6 +165,10 @@ namespace DrawCurve
 
         public List<HandCurve> Cut()
         {
+            if (oculusTouch == null) {
+                throw new System.Exception("Call HandCurve.SetUp()");
+            }
+
             List<HandCurve> newCurves = new List<HandCurve>();
             Vector3 nowPosition = oculusTouch.GetPositionR();
             (int, float) distance = Distance(this.curve.GetPoints(), nowPosition);
@@ -231,7 +242,7 @@ namespace DrawCurve
                 throw new System.Exception("handCurve2 must be open");
             }
 
-            (OpenCurve curve1, OpenCurve curve2) = AdjustOrientation(handCurve1.curve as OpenCurve, handCurve2.curve as OpenCurve);
+            (OpenCurve curve1, OpenCurve curve2) = AdjustOrientation((OpenCurve)handCurve1.curve, (OpenCurve)handCurve2.curve);
 
             List<HandCurve> newHandCurves = new List<HandCurve>();
             List<Vector3> points1 = curve1.GetPoints();
@@ -239,7 +250,7 @@ namespace DrawCurve
 
             if (Vector3.Distance(points1.Last(), points2.First()) < collision)
             {
-                OpenCurve newCurve = curve1.Combine(curve2);
+                OpenCurve newCurve = curve1.Concat(curve2);
                 bool closed = newCurve.DistanceOfFirstAndLast() < collision;
                 newHandCurves.Add(new HandCurve(newCurve.ChangeClosed(closed), selected: true));
             }
@@ -325,7 +336,7 @@ namespace DrawCurve
         public HandCurve DeepCopy()
         {
             List<Vector3> points = ListVector3Copy(this.curve.GetPoints());
-            HandCurve curve = new HandCurve(Curve.create(points, this.closed), segment: this.segment);
+            HandCurve curve = new HandCurve(Curve.Create(this.closed, points), segment: this.segment);
             curve.selected = this.selected;
             curve.position = Vector3Copy(this.position);
             curve.rotation = QuaternionCopy(this.rotation);
