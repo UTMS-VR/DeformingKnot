@@ -62,7 +62,7 @@ public abstract class State
     {
         foreach (HandCurve curve in this.curves)
         {
-            Material material = curve.selected ? Curve.SelectedCurveMaterial : Curve.CurveMaterial;
+            Material material = curve.selected ? Curve.RainbowCurveMaterial : Curve.RainbowCurveMaterial2;
             Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, material, 0);
         }
     }
@@ -200,7 +200,7 @@ public class BasicDeformation : State
 
         if (this.drawingCurve.curve.GetPoints().Count >= 2)
         {
-            Graphics.DrawMesh(this.drawingCurve.mesh, this.drawingCurve.position, this.drawingCurve.rotation, Curve.CurveMaterial, 0);
+            Graphics.DrawMesh(this.drawingCurve.mesh, this.drawingCurve.position, this.drawingCurve.rotation, Curve.RainbowCurveMaterial2, 0);
         }
     }
 
@@ -369,7 +369,7 @@ public class OpenFile : State
         {
             this.contextMenu.AddItem(new MenuItem(file, () => {
                 List<(List<Vector3> points, bool closed)> curvesCore = base.dataHandler.LoadCurves(file, maxLength: 0.2f, barycenter: new Vector3(0, 0, 0.5f));
-                List<HandCurve> loadedCurves = curvesCore.Select(core => new HandCurve(Curve.create(core.points, core.closed), selected: true, segment: base.segment)).ToList();
+                List<HandCurve> loadedCurves = curvesCore.Select(core => new HandCurve(Curve.Create(core.closed, core.points), selected: true, segment: base.segment)).ToList();
                 base.ResetMenu();
                 this.newState = new SelectResetOrAdd(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves, loadedCurves);
             }));
@@ -401,7 +401,7 @@ public class Gallery : State
         {
             List<(List<Vector3> points, bool closed)> curvesCore = this.dataHandler.LoadCurvesFromGitHub("Gallery/" + file, maxLength: 0.2f, barycenter: new Vector3(0, 0, 0.5f));
             this.contextMenu.AddItem(new MenuItem(file, () => {
-                List<HandCurve> curves = curvesCore.Select(core => new HandCurve(Curve.create(core.points, core.closed), selected: true, segment: base.segment)).ToList();
+                List<HandCurve> curves = curvesCore.Select(core => new HandCurve(Curve.Create(core.closed, core.points), selected: true, segment: base.segment)).ToList();
                 base.ResetMenu();
                 this.newState = new SelectResetOrAdd(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves, curves);
             }));
@@ -642,10 +642,10 @@ public class ManualDeformation : State
         this.deformingCurve = new Knot(curve,
                                        oculusTouch,
                                        distanceThreshold: handCurve.segment,
-                                       collisionCurves: curves,
+                                       collisionCurves: curves.Select(handcurve => handCurve.curve).ToList(),
                                        buttonC: LogicalOVRInput.RawButton.DisabledButton,
                                        buttonD: LogicalOVRInput.RawButton.DisabledButton,
-                                       curveMaterial: Curve.SelectedCurveMaterial);
+                                       curveMaterial: Curve.RainbowCurveMaterial);
     }
 
     protected override void SetupMenu()

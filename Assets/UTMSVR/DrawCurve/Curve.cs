@@ -7,27 +7,72 @@ using UnityEngine;
 #nullable enable
 
 namespace DrawCurve {
-    using UvTransformer = Func<Vector2, Vector2>;
-
     public abstract partial class Curve
     {
         public const int defaultMeridianCount = 10;
         public const float defaultRadius = 0.005f;
 
         protected List<Vector3> points;
+        protected List<float> vCoordinates;
         private Mesh mesh = new Mesh();
         public readonly int meridianCount;
         public readonly float radius;
         public abstract bool closed { get; }
+        public abstract Vector3 this[int i] { get; }
+        private VisiblePoints? visiblePoints = null;
 
-        public Curve(List<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
+        public Curve(List<Vector3> points, List<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
         {
             this.points = points;
             this.meridianCount = meridianCount;
             this.radius = radius;
+            if (vCoordinates != null) {
+                if (vCoordinates.Count != this.points.Count) {
+                    throw new Exception("Length must be the same: points and vCoordinates");
+                }
+                this.vCoordinates = vCoordinates;
+            } else {
+                this.vCoordinates = Curve.GenerateVCoordinates(this.points.Count, 0.0f, 1.0f);
+            }
         }
 
-        public static Curve create(List<Vector3> points, bool closed, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
+        public Curve(List<Vector3> points,
+                     (float start, float end) vRange,
+                     int meridianCount = Curve.defaultMeridianCount,
+                     float radius = Curve.defaultRadius) :
+        this(points,
+             Curve.GenerateVCoordinates(points.Count, vRange.start, vRange.end),
+             meridianCount, radius) {}
+
+        public Curve(List<Vector3> points,
+                     int meridianCount = Curve.defaultMeridianCount,
+                     float radius = Curve.defaultRadius) :
+        this(points, (0.0f, 1.0f), meridianCount, radius) {}
+
+        private static List<float> GenerateVCoordinates(int count, float vStart, float vEnd) {
+            // 返り値のリストの最後の値は必ず vEnd よりも少し小さい値になる
+            return Enumerable.Range(0, count)
+                .Select(i => vStart + (vEnd - vStart) * ((float)i) / count)
+                .ToList();
+        }
+
+        public static Curve Create(bool closed, List<Vector3> points, List<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
+        {
+            if (closed) {
+                return new ClosedCurve(points, vCoordinates, meridianCount, radius);
+            } else {
+                return new OpenCurve(points, vCoordinates, meridianCount, radius);
+            }
+        }
+        public static Curve Create(bool closed, List<Vector3> points, (float start, float end) vRange, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
+        {
+            if (closed) {
+                return new ClosedCurve(points, vRange, meridianCount, radius);
+            } else {
+                return new OpenCurve(points, vRange, meridianCount, radius);
+            }
+        }
+        public static Curve Create(bool closed, List<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
         {
             if (closed) {
                 return new ClosedCurve(points, meridianCount, radius);
@@ -41,27 +86,47 @@ namespace DrawCurve {
             return this.points;
         }
 
+        public List<float> GetVCoordinates(){
+            return this.vCoordinates;
+        }
+
+        protected int GetVLength() {
+            if (this.vCoordinates.Count == 0) {
+                return 0;
+                // throw new Exception("Cannot compute vLength because the list vCoordinates is empty");
+            }
+            return (int)Math.Round(this.vCoordinates.Last() - this.vCoordinates.First());
+        }
+
         public void Add(Vector3 vector)
         {
             this.points.Add(vector);
+            float vSegment = 0.05f;
+            if (this.vCoordinates.Count == 0) {
+                this.vCoordinates.Add(0f);
+            } else {
+                float previousV = this.vCoordinates.Last();
+                this.vCoordinates.Add(previousV + vSegment);
+            }
         }
 
         public void SetPoints(List<Vector3> points)
         {
+            // TODO: change vCoordinates
             this.points = points;
         }
 
-        public Mesh GetMesh(UvTransformer? uvTransformer = null)
+        public Mesh GetMesh()
         {
             if (this.mesh.vertices.Length == 0) {
-                this.UpdateMesh(uvTransformer);
+                this.UpdateMesh();
             }
             return this.mesh;
         }
 
-        public void UpdateMesh(UvTransformer? uvTransformer = null)
+        public void UpdateMesh()
         {
-            var (vertices, normals, uv, triangles) = MakeMesh.GetMeshInfo(this, this.meridianCount, this.radius, this.closed, uvTransformer);
+            var (vertices, normals, uv, triangles) = MakeMesh.GetMeshInfo(this, this.meridianCount, this.radius, this.closed);
             this.mesh.vertices = vertices.ToArray();
             this.mesh.normals = normals.ToArray();
             this.mesh.uv = uv.ToArray();
@@ -70,12 +135,11 @@ namespace DrawCurve {
 
         public Mesh GetMeshAtPoints()
         {
-            return MakeMesh.GetMeshAtPoints(this, this.radius * 2.0f);
-        }
-
-        public Mesh GetMeshAtEndPoint()
-        {
-            return MakeMesh.GetMeshAtEndPoint(this, radius * 2.0f);
+            if (this.visiblePoints == null) {
+                this.visiblePoints = new VisiblePoints(this.points, this.radius * 2.0f);
+            }
+            this.visiblePoints.UpdateMesh();
+            return this.visiblePoints.GetMesh();
         }
 
         public Curve ToggleClosed() {
@@ -103,7 +167,23 @@ namespace DrawCurve {
         }
         protected abstract Curve ReversedInternal();
 
-        public Curve Equalize(float segment)
+        public OpenCurve Take(int count) {
+            List<Vector3> points = this.points.Take(count).ToList();
+            List<float> vCoordinates = this.vCoordinates.Take(count).ToList();
+            return new OpenCurve(points, vCoordinates, this.meridianCount, this.radius);
+        }
+
+        public OpenCurve Skip(int count) {
+            List<Vector3> points = this.points.Skip(count).ToList();
+            List<float> vCoordinates = this.vCoordinates.Skip(count).ToList();
+            return new OpenCurve(points, vCoordinates, this.meridianCount, this.radius);
+        }
+
+        public Curve Equalize(float segment) {
+            return this.EqualizeInternal(segment);
+        }
+        protected abstract Curve EqualizeInternal(float segment);
+        protected (List<Vector3>, List<float>) GetEqualizedPoints(float segment)
         {
             if (segment <= 0) {
                 throw new System.Exception("segment must be positive");
@@ -112,22 +192,30 @@ namespace DrawCurve {
             int length = this.points.Count;
             List<Vector3> newPoints = new List<Vector3>();
             newPoints.Add(this.points[0]);
+            List<float> newVCoordinates = new List<float>();
+            newVCoordinates.Add(this.vCoordinates[0]);
             float remainder = 0.0f;
             float temporarySegment = this.TemporarySegment(segment);
 
             for (int i = 1; i < length; i++)
             {
-                Completion(ref newPoints, this.points[i - 1], this.points[i], ref remainder, temporarySegment);
+                Completion(ref newPoints, this.points[i - 1], this.points[i],
+                           ref newVCoordinates, this.vCoordinates[i - 1], this.vCoordinates[i],
+                           ref remainder, temporarySegment);
             }
 
             if (this.closed)
             {
-                Completion(ref newPoints, this.points[length - 1], this.points[0], ref remainder, temporarySegment);
+                int vLength = this.GetVLength();
+                Completion(ref newPoints, this.points[length - 1], this.points[0],
+                           ref newVCoordinates, this.vCoordinates[length - 1], this.vCoordinates[0] + vLength,
+                           ref remainder, temporarySegment);
 
                 // 始点と終点が重複して追加されるのを回避する
                 if (newPoints.Count > this.DivisionNumber(segment))
                 {
-                    newPoints.Remove(newPoints[newPoints.Count - 1]);
+                    newPoints.RemoveAt(newPoints.Count - 1);
+                    newVCoordinates.RemoveAt(vCoordinates.Count - 1);
                 }
             }
             else
@@ -136,10 +224,11 @@ namespace DrawCurve {
                 if (newPoints.Count < this.DivisionNumber(segment) + 1)
                 {
                     newPoints.Add(this.points[length - 1]);
+                    newVCoordinates.Add(this.vCoordinates[length - 1]);
                 }
             }
 
-            return Curve.create(newPoints, this.closed, this.meridianCount, this.radius);
+            return (newPoints, newVCoordinates);
         }
 
         public float ArcLength()
@@ -170,7 +259,9 @@ namespace DrawCurve {
             return Mathf.FloorToInt(this.ArcLength() / segment + 0.5f);
         }
 
-        private static void Completion(ref List<Vector3> newPoints, Vector3 start, Vector3 end, ref float remainder, float segment)
+        private static void Completion(ref List<Vector3> newPoints, Vector3 start, Vector3 end,
+                                       ref List<float> newVCoordinates, float vStart, float vEnd,
+                                       ref float remainder, float segment)
         {
             // start から (弧長で測って) remainder だけ前の点を始点にして，
             // そこから segment ごとに newPoints に点を追加していく
@@ -183,92 +274,10 @@ namespace DrawCurve {
             while (segment < remainder)
                 {
                     remainder -= segment;
-                    newPoints.Add(start + (end - start) * (distance - remainder) / distance);
+                    float rate = (distance - remainder) / distance;
+                    newPoints.Add(start + (end - start) * rate);
+                    newVCoordinates.Add(vStart + (vEnd - vStart) * rate);
                 }
-        }
-    }
-
-    public class OpenCurve : Curve {
-        public OpenCurve(List<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, meridianCount, radius) {}
-
-        public override bool closed {
-            get {
-                return false;
-            }
-        }
-
-        override public ClosedCurve Close() {
-            return new ClosedCurve(this.points, this.meridianCount, this.radius);
-        }
-
-        override public OpenCurve Open() {
-            return this;
-        }
-
-        public OpenCurve Combine(OpenCurve other) {
-            List<Vector3> newPoints = this.points.Concat(other.points).ToList();
-            return new OpenCurve(newPoints, this.meridianCount, this.radius);
-        }
-
-        public float DistanceOfFirstAndLast() {
-            return Vector3.Distance(this.points.First(), this.points.Last());
-        }
-
-        public new OpenCurve Reversed()
-        {
-            // this.points.Reverse() だと in-place に反転される
-            List<Vector3> newPoints = this.points.AsEnumerable().Reverse().ToList();
-            return new OpenCurve(newPoints, this.meridianCount, this.radius);
-        }
-
-        protected override Curve ReversedInternal() {
-            return this.Reversed();
-        }
-    }
-
-    public class ClosedCurve : Curve {
-        public ClosedCurve(List<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, meridianCount, radius) {}
-
-        public override bool closed {
-            get {
-                return true;
-            }
-        }
-
-        override public OpenCurve Open() {
-            return new OpenCurve(this.points, this.meridianCount, this.radius);
-        }
-
-        override public ClosedCurve Close() {
-            return this;
-        }
-
-        public Curve Shift(int n) // 0 <= n < this.points.Count
-        {
-            List<Vector3> newPoints = new List<Vector3>();
-
-            for (int i = n; i < this.points.Count; i++)
-                {
-                    newPoints.Add(this.points[i]);
-                }
-
-            for (int i = 0; i < n; i++)
-                {
-                    newPoints.Add(this.points[i]);
-                }
-
-            return Curve.create(newPoints, this.closed, this.meridianCount, this.radius);
-        }
-
-        public new ClosedCurve Reversed()
-        {
-            // this.points.Reverse() だと in-place に反転される
-            List<Vector3> newPoints = this.points.AsEnumerable().Reverse().ToList();
-            return new ClosedCurve(newPoints, this.meridianCount, this.radius);
-        }
-
-        protected override Curve ReversedInternal() {
-            return this.Reversed();
         }
     }
 }

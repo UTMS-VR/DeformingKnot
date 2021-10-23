@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#nullable enable
+
 namespace PullCurve
 {
     using DistFunc = Func<int, int, float>;

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DrawCurve;
 
 namespace EnergyOptimizer
 {
@@ -9,7 +8,7 @@ namespace EnergyOptimizer
     {
         public float gtol = 0.0f;
 
-        public Elasticity(ref List<Vector3[]> pointsList, float segment, float lr = 1e-04f) : base(ref pointsList, segment, lr)
+        public Elasticity(List<Vector3[]> pointsList, float segment, float lr = 1e-04f) : base(pointsList, segment, lr)
         {
         }
 

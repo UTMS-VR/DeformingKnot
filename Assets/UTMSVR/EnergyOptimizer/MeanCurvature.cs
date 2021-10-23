@@ -2,14 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DrawCurve;
 
 namespace EnergyOptimizer
 {
     // 暗黙の仮定：隣接する2点の間隔は一定
     public class MeanCurvature : Flow
     {
-        public MeanCurvature(ref List<Vector3[]> pointsList, float segment, float lr = 0.01f) : base(ref pointsList, segment, lr)
+        public MeanCurvature(List<Vector3[]> pointsList, float segment, float lr = 0.01f) : base(pointsList, segment, lr)
         {
         }
 
