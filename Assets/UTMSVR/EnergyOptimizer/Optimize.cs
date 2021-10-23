@@ -99,7 +99,7 @@ namespace EnergyOptimizer
             foreach (HandCurve curve in this.deformableCurves)
             {
                 curve.MeshUpdatePos();
-                Graphics.DrawMesh(curve.mesh, Vector3.zero, Quaternion.identity, Curve.SelectedCurveMaterial, 0);
+                Graphics.DrawMesh(curve.mesh, Vector3.zero, Quaternion.identity, Curve.RainbowCurveMaterial, 0);
             }
         }
 

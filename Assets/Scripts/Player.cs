@@ -62,7 +62,7 @@ public abstract class State
     {
         foreach (HandCurve curve in this.curves)
         {
-            Material material = curve.selected ? Curve.SelectedCurveMaterial : Curve.CurveMaterial;
+            Material material = curve.selected ? Curve.RainbowCurveMaterial : Curve.RainbowCurveMaterial2;
             Graphics.DrawMesh(curve.mesh, curve.position, curve.rotation, material, 0);
         }
     }
@@ -200,7 +200,7 @@ public class BasicDeformation : State
 
         if (this.drawingCurve.curve.GetPoints().Count >= 2)
         {
-            Graphics.DrawMesh(this.drawingCurve.mesh, this.drawingCurve.position, this.drawingCurve.rotation, Curve.CurveMaterial, 0);
+            Graphics.DrawMesh(this.drawingCurve.mesh, this.drawingCurve.position, this.drawingCurve.rotation, Curve.RainbowCurveMaterial2, 0);
         }
     }
 
@@ -645,7 +645,7 @@ public class ManualDeformation : State
                                        collisionCurves: curves.Select(handcurve => handCurve.curve).ToList(),
                                        buttonC: LogicalOVRInput.RawButton.DisabledButton,
                                        buttonD: LogicalOVRInput.RawButton.DisabledButton,
-                                       curveMaterial: Curve.SelectedCurveMaterial);
+                                       curveMaterial: Curve.RainbowCurveMaterial);
     }
 
     protected override void SetupMenu()
