@@ -11,7 +11,6 @@ namespace EnergyOptimizer
     {
         private OculusTouch oculusTouch;
         private List<HandCurve> deformableCurves;
-        private List<Vector3[]> pointsList;
         private List<HandCurve> collisionCurves;
         private float segment;
         private LogicalButton button1;
@@ -31,7 +30,7 @@ namespace EnergyOptimizer
                         LogicalButton button2)
         {
             this.deformableCurves = deformableCurves;
-            this.pointsList = new List<Vector3[]>();
+            List<Vector3[]> pointsList = new List<Vector3[]>();
             this.collisionCurves = collisionCurves;
             if (segment <= 0) {
                 throw new System.Exception("segment must be positive");
@@ -46,20 +45,20 @@ namespace EnergyOptimizer
                 }
                 this.deformableCurves[i].curve = this.deformableCurves[i].curve.Equalize(this.deformableCurves[i].segment);
                 this.deformableCurves[i].MeshUpdate();
-                this.pointsList.Add(this.deformableCurves[i].curve.GetPoints().ToArray());
+                pointsList.Add(this.deformableCurves[i].curve.GetPoints().ToArray());
                 this.minSeg = Mathf.Min(this.minSeg,this.deformableCurves[i].segment);
             }
 
             if (flowClass == "Moebius")
             {
-                curveFlow = new Moebius(ref pointsList, this.segment, 1e-04f);
+                curveFlow = new Moebius(pointsList, this.segment, 1e-04f);
             }
             else if (flowClass == "MeanCurvature")
             {
-                curveFlow = new MeanCurvature(ref pointsList, this.segment, 0.05f);
+                curveFlow = new MeanCurvature(pointsList, this.segment, 0.05f);
             }
 
-            elasticity = new Elasticity(ref pointsList, this.segment, 1e-01f);
+            elasticity = new Elasticity(pointsList, this.segment, 1e-01f);
 
             this.button1 = button1;
             this.button2 = button2;
@@ -74,20 +73,18 @@ namespace EnergyOptimizer
                 {
                     if (this.oculusTouch.GetButton(this.button1))
                     {
-                        curveFlow.Update(0.0f);
+                        curveFlow.SetPoints(this.UpdatePoints, 0.0f);
                     }
                     else if (this.oculusTouch.GetButton(this.button2))
                     {
-                        curveFlow.Update(0.95f);
+                        curveFlow.SetPoints(this.UpdatePoints, 0.95f);
                     }
 
                     while (elasticity.MaxError() > this.minSeg * 0.2f)
                     {
-                        elasticity.Update(0.0f);
+                        elasticity.SetPoints(this.UpdatePoints, 0.0f);
                     }
                     elasticity.ClearMomentum();
-
-                    this.UpdatePoints();
                 }
             }
 
@@ -103,11 +100,11 @@ namespace EnergyOptimizer
             }
         }
 
-        private void UpdatePoints()
+        private void UpdatePoints(List<Vector3[]> pointsList)
         {
             for (int i = 0; i < this.deformableCurves.Count; i++)
             {
-                this.deformableCurves[i].curve.SetPoints(this.pointsList[i].ToList());
+                this.deformableCurves[i].curve.SetPoints(pointsList[i].ToList());
             }
         }
 

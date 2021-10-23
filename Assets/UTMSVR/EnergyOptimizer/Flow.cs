@@ -1,8 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DrawCurve;
 
 namespace EnergyOptimizer
 {
@@ -17,7 +17,7 @@ namespace EnergyOptimizer
         protected List<Vector3[]> gradientList = new List<Vector3[]>();
         protected List<Vector3[]> momentum = new List<Vector3[]>();
 
-        public Flow(ref List<Vector3[]> pointsList, float segment, float lr = 1e-04f)
+        public Flow(List<Vector3[]> pointsList, float segment, float lr = 1e-04f)
         {
             this.pointsList = pointsList;
             this.segment = segment;
@@ -30,6 +30,12 @@ namespace EnergyOptimizer
             }
             this.ClearGradient();
             this.ClearMomentum();
+        }
+
+        public void SetPoints(Action<List<Vector3[]>> setter, float alpha)
+        {
+            this.Update(alpha);
+            setter(this.pointsList);
         }
 
         public void Update(float alpha)
