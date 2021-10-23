@@ -4,6 +4,8 @@ using UnityEngine;
 using InputManager;
 using DrawCurve;
 
+#nullable enable
+
 namespace PullCurve
 {
     public class Knot
@@ -15,14 +17,14 @@ namespace PullCurve
             ClosedCurve curve,
             OculusTouch oculusTouch,
             float distanceThreshold = -1,
-            List<HandCurve> collisionCurves = null,
-            LogicalButton buttonA = null,
-            LogicalButton buttonB = null,
-            LogicalButton buttonC = null,
-            LogicalButton buttonD = null,
-            Material curveMaterial = null,
-            Material pullableCurveMaterial = null,
-            Material pointMaterial = null
+            List<Curve>? collisionCurves = null,
+            LogicalButton? buttonA = null,
+            LogicalButton? buttonB = null,
+            LogicalButton? buttonC = null,
+            LogicalButton? buttonD = null,
+            Material? curveMaterial = null,
+            Material? pullableCurveMaterial = null,
+            Material? pointMaterial = null
         )
         {
             buttonA = buttonA ?? LogicalOVRInput.RawButton.A;
@@ -40,7 +42,7 @@ namespace PullCurve
 
         public void Update()
         {
-            IKnotState newState = this.state.Update();
+            IKnotState? newState = this.state.Update();
             if (newState != null)
             {
                 Debug.Log($"Changed to {newState}");
