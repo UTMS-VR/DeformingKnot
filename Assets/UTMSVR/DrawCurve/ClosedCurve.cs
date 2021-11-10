@@ -39,7 +39,7 @@ namespace DrawCurve {
         public ClosedCurve Shift(int n) // 0 <= n < this.points.Count
         {
             if (!(0 <= n && n < this.points.Count)) {
-                throw new Exception("Required: 0 <= n < this.points.Count");
+                throw new Exception($"Required 0 <= n < this.points.Count, but n={n} was given");
             }
 
             List<Vector3> newPoints = new List<Vector3>();
