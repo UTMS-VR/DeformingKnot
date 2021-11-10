@@ -20,6 +20,7 @@ namespace DrawCurve {
         public abstract bool closed { get; }
         public abstract Vector3 this[int i] { get; }
         private VisiblePoints? visiblePoints = null;
+        public int Count { get { return this.points.Count; } }
 
         public Curve(List<Vector3> points, List<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
         {

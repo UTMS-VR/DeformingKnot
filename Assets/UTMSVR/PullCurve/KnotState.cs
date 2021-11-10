@@ -64,7 +64,7 @@ namespace PullCurve
             (int first, int second)? chosenPoints = null)
         {
             (int first, int second) chosenPointsNonNull = chosenPoints ?? this.chosenPoints;
-            int count = this.curve.GetPoints().Count;
+            int count = this.curve.Count;
             Curve shiftedCurve = this.curve.Shift(chosenPointsNonNull.first);
             int pullableRangeCount = (chosenPointsNonNull.second - chosenPointsNonNull.first + 1 + count) % count;
 
@@ -109,6 +109,12 @@ namespace PullCurve
             var boundaryPoints = new List<Vector3>() { pullableRange.GetPoints().Last(), pullableRange.GetPoints().First() };
             VisiblePoints boundaryVisiblePoints = new VisiblePoints(boundaryPoints, this.curve.radius * 2.0f);
             return boundaryVisiblePoints.GetMesh();
+        }
+
+        public void ChooseDefaultPoints() {
+            int first = 0;
+            int second = this.curve.GetPoints().Count / 3;
+            this.chosenPoints = (first, second);
         }
     }
 
@@ -244,6 +250,7 @@ namespace PullCurve
             int ind1 = KnotStateChoose1.FindClosestPoint(this.data.oculusTouch, this.data.curve);
             var chosenPoints = new List<Vector3>() { this.data.curve.GetPoints()[ind1] };
             this.visiblePoints.SetPoints(chosenPoints);
+            this.visiblePoints.UpdateMesh();
             Mesh pointMesh = this.visiblePoints.GetMesh();
 
             Graphics.DrawMesh(this.knotMesh, Vector3.zero, Quaternion.identity, this.data.curveMaterial, 0);
@@ -386,7 +393,12 @@ namespace PullCurve
 
             if (this.data.oculusTouch.GetButtonDown(this.data.buttonA))
             {
+                if (this.drawnCurve.curve.Count <= 5) {
+                    Debug.Log("Written curve is too short. Restored the previous curve.");
+                    return new KnotStateBase(this.data);
+                }
                 this.data.curve = this.drawnCurve.curve.Close();
+                this.data.ChooseDefaultPoints();
                 return new KnotStateBase(this.data);
             }
             else if (this.data.oculusTouch.GetButtonDown(this.data.buttonB))
