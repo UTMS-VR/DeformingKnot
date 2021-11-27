@@ -27,22 +27,22 @@ namespace DrawCurve {
         private VisiblePoints? visiblePoints = null;
         public int Count { get { return this.points.Count; } }
 
-        public Curve(List<Vector3> points, List<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
+        public Curve(IReadOnlyList<Vector3> points, IReadOnlyList<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
         {
-            this.points = points;
+            this.points = points.ToList();
             this.meridianCount = meridianCount;
             this.radius = radius;
             if (vCoordinates != null) {
                 if (vCoordinates.Count != this.points.Count) {
                     throw new Exception("Length must be the same: points and vCoordinates");
                 }
-                this.vCoordinates = vCoordinates;
+                this.vCoordinates = vCoordinates.ToList();
             } else {
                 this.vCoordinates = Curve.GenerateVCoordinates(this.points.Count, 0.0f, 1.0f);
             }
         }
 
-        public Curve(List<Vector3> points,
+        public Curve(IReadOnlyList<Vector3> points,
                      (float start, float end) vRange,
                      int meridianCount = Curve.defaultMeridianCount,
                      float radius = Curve.defaultRadius) :
@@ -50,7 +50,7 @@ namespace DrawCurve {
              Curve.GenerateVCoordinates(points.Count, vRange.start, vRange.end),
              meridianCount, radius) {}
 
-        public Curve(List<Vector3> points,
+        public Curve(IReadOnlyList<Vector3> points,
                      int meridianCount = Curve.defaultMeridianCount,
                      float radius = Curve.defaultRadius) :
         this(points, (0.0f, 1.0f), meridianCount, radius) {}
@@ -62,7 +62,7 @@ namespace DrawCurve {
                 .ToList();
         }
 
-        public static Curve Create(bool closed, List<Vector3> points, List<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
+        public static Curve Create(bool closed, IReadOnlyList<Vector3> points, List<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
         {
             if (closed) {
                 return new ClosedCurve(points, vCoordinates, meridianCount, radius);
@@ -70,7 +70,7 @@ namespace DrawCurve {
                 return new OpenCurve(points, vCoordinates, meridianCount, radius);
             }
         }
-        public static Curve Create(bool closed, List<Vector3> points, (float start, float end) vRange, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
+        public static Curve Create(bool closed, IReadOnlyList<Vector3> points, (float start, float end) vRange, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
         {
             if (closed) {
                 return new ClosedCurve(points, vRange, meridianCount, radius);
@@ -78,7 +78,7 @@ namespace DrawCurve {
                 return new OpenCurve(points, vRange, meridianCount, radius);
             }
         }
-        public static Curve Create(bool closed, List<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
+        public static Curve Create(bool closed, IReadOnlyList<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius)
         {
             if (closed) {
                 return new ClosedCurve(points, meridianCount, radius);
@@ -87,27 +87,27 @@ namespace DrawCurve {
             }
         }
 
-        public List<Vector3> GetPoints() {
+        public IReadOnlyList<Vector3> GetPoints() {
             return this.points;
         }
 
-        public List<float> GetVCoordinates() {
+        public IReadOnlyList<float> GetVCoordinates() {
             return this.vCoordinates;
         }
 
-        public List<Vector3> GetPreVirtualPoints() {
+        public IReadOnlyList<Vector3> GetPreVirtualPoints() {
             return this.preVirtualPoints;
         }
 
-        public List<float> GetPreVirtualVCoordinates() {
+        public IReadOnlyList<float> GetPreVirtualVCoordinates() {
             return this.preVirtualVCoordinates;
         }
 
-        public List<Vector3> GetPostVirtualPoints() {
+        public IReadOnlyList<Vector3> GetPostVirtualPoints() {
             return this.postVirtualPoints;
         }
 
-        public List<float> GetPostVirtualVCoordinates() {
+        public IReadOnlyList<float> GetPostVirtualVCoordinates() {
             return this.postVirtualVCoordinates;
         }
 
@@ -136,10 +136,10 @@ namespace DrawCurve {
             this.vCoordinates = Curve.GenerateVCoordinates(this.points.Count, vRangeNotNull.start, vRangeNotNull.end);
         }
 
-        public virtual void SetPoints(List<Vector3> points)
+        public virtual void SetPoints(IReadOnlyList<Vector3> points)
         {
             bool pointsCountChanged = (this.points.Count != points.Count);
-            this.points = points;
+            this.points = points.ToList();
             if (pointsCountChanged) {
                 this.UpdateVCoordinates(); // 内部で this.points にアクセスするので，先に this.points を更新しておく必要がある．
             }

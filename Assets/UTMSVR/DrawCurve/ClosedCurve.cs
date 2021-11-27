@@ -8,13 +8,13 @@ using UnityEngine;
 
 namespace DrawCurve {
     public class ClosedCurve : Curve {
-        public ClosedCurve(List<Vector3> points, List<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, vCoordinates, meridianCount, radius) {
+        public ClosedCurve(IReadOnlyList<Vector3> points, IReadOnlyList<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, vCoordinates, meridianCount, radius) {
             this.UpdatePostVirtual();
         }
-        public ClosedCurve(List<Vector3> points, (float start, float end) vRange, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, vRange, meridianCount, radius) {
+        public ClosedCurve(IReadOnlyList<Vector3> points, (float start, float end) vRange, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, vRange, meridianCount, radius) {
             this.UpdatePostVirtual();
         }
-        public ClosedCurve(List<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, meridianCount, radius) {
+        public ClosedCurve(IReadOnlyList<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, meridianCount, radius) {
             this.UpdatePostVirtual();
         }
 
@@ -49,7 +49,7 @@ namespace DrawCurve {
             }
         }
 
-        public override void SetPoints(List<Vector3> points) {
+        public override void SetPoints(IReadOnlyList<Vector3> points) {
             base.SetPoints(points);
             this.UpdatePostVirtual();
         }

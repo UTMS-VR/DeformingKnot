@@ -25,9 +25,9 @@ namespace FileManager
         public List<Vector3> points;
         public bool closed;
 
-        public CurveCore(List<Vector3> points, bool closed)
+        public CurveCore(IReadOnlyList<Vector3> points, bool closed)
         {
-            this.points = points;
+            this.points = points.ToList();
             this.closed = closed;
         }
     }
@@ -99,7 +99,7 @@ namespace FileManager
             }
         }
 
-        public void SaveCurves(string filename, List<(List<Vector3> points, bool closed)> curves)
+        public void SaveCurves(string filename, List<(IReadOnlyList<Vector3> points, bool closed)> curves)
         {
             List<CurveCore> curveCores = curves.Select(curve => new CurveCore(curve.points, curve.closed)).ToList();
             List<CurveCore> normalizedCurves = DataHandler.Normalize(curveCores);
@@ -108,9 +108,9 @@ namespace FileManager
             this.Save(filename, json);
         }
 
-        public void SaveCurve(string filename, List<Vector3> points, bool closed)
+        public void SaveCurve(string filename, IReadOnlyList<Vector3> points, bool closed)
         {
-            this.SaveCurves(filename, new List<(List<Vector3>, bool)>{ (points, closed) });
+            this.SaveCurves(filename, new List<(IReadOnlyList<Vector3>, bool)>{ (points, closed) });
         }
 
         public List<(List<Vector3> points, bool closed)> LoadCurves(string filename, float maxLength = 1.0f, Vector3? barycenter = null)
@@ -162,13 +162,13 @@ namespace FileManager
             return false;
 #else
             return true;
-#endif            
+#endif
         }
 
         private static List<Vector3> ConcatAllCurves(List<CurveCore> curves)
         {
             List<List<Vector3>> pointsList = curves.Select(curve => curve.points).ToList();
-            return pointsList.Aggregate(new List<Vector3>(), (points1, points2) => points1.Concat(points2).ToList()).ToList();   
+            return pointsList.Aggregate(new List<Vector3>(), (points1, points2) => points1.Concat(points2).ToList()).ToList();
         }
 
         private static List<CurveCore> MoveBarycenter(List<CurveCore> curves, Vector3? barycenter = null)
@@ -216,4 +216,3 @@ namespace FileManager
         }
     }
 }
-

@@ -8,13 +8,13 @@ using UnityEngine;
 
 namespace DrawCurve {
     public class OpenCurve : Curve {
-        public OpenCurve(List<Vector3> points, List<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius, List<Vector3>? preVirtualPoints = null, List<Vector3>? postVirtualPoints = null) : base(points, vCoordinates, meridianCount, radius) {
+        public OpenCurve(IReadOnlyList<Vector3> points, IReadOnlyList<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius, List<Vector3>? preVirtualPoints = null, List<Vector3>? postVirtualPoints = null) : base(points, vCoordinates, meridianCount, radius) {
             this.InitializeVirtual(preVirtualPoints, postVirtualPoints);
         }
-        public OpenCurve(List<Vector3> points, (float start, float end) vRange, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius, List<Vector3>? preVirtualPoints = null, List<Vector3>? postVirtualPoints = null) : base(points, vRange, meridianCount, radius) {
+        public OpenCurve(IReadOnlyList<Vector3> points, (float start, float end) vRange, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius, List<Vector3>? preVirtualPoints = null, List<Vector3>? postVirtualPoints = null) : base(points, vRange, meridianCount, radius) {
             this.InitializeVirtual(preVirtualPoints, postVirtualPoints);
         }
-        public OpenCurve(List<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius, List<Vector3>? preVirtualPoints = null, List<Vector3>? postVirtualPoints = null) : base(points, meridianCount, radius) {
+        public OpenCurve(IReadOnlyList<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius, List<Vector3>? preVirtualPoints = null, List<Vector3>? postVirtualPoints = null) : base(points, meridianCount, radius) {
             this.InitializeVirtual(preVirtualPoints, postVirtualPoints);
         }
 

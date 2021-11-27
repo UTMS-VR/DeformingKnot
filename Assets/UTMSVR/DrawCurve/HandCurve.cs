@@ -63,7 +63,7 @@ namespace DrawCurve
 
         private float MeanOfSegment()
         {
-            List<Vector3> points = this.curve.GetPoints();
+            IReadOnlyList<Vector3> points = this.curve.GetPoints();
             int n = this.closed ? points.Count : points.Count - 1;
             return this.curve.ArcLength() / n;
         }
@@ -193,7 +193,7 @@ namespace DrawCurve
 
         private HandCurve CutKnot(int num)
         {
-            List<Vector3> points = this.curve.GetPoints();
+            IReadOnlyList<Vector3> points = this.curve.GetPoints();
             List<Vector3> newPoints = new List<Vector3>();
 
             for (int i = num + 1; i < Length(); i++)
@@ -213,7 +213,7 @@ namespace DrawCurve
 
         private (HandCurve, HandCurve) CutCurve(int num)
         {
-            List<Vector3> points = this.curve.GetPoints();
+            IReadOnlyList<Vector3> points = this.curve.GetPoints();
             List<Vector3> newPoints1 = new List<Vector3>();
             List<Vector3> newPoints2 = new List<Vector3>();
 
@@ -245,8 +245,8 @@ namespace DrawCurve
             (OpenCurve curve1, OpenCurve curve2) = AdjustOrientation((OpenCurve)handCurve1.curve, (OpenCurve)handCurve2.curve);
 
             List<HandCurve> newHandCurves = new List<HandCurve>();
-            List<Vector3> points1 = curve1.GetPoints();
-            List<Vector3> points2 = curve2.GetPoints();
+            IReadOnlyList<Vector3> points1 = curve1.GetPoints();
+            IReadOnlyList<Vector3> points2 = curve2.GetPoints();
 
             if (Vector3.Distance(points1.Last(), points2.First()) < collision)
             {
@@ -272,7 +272,7 @@ namespace DrawCurve
             }
         }
 
-        public static (int, float) Distance(List<Vector3> points, Vector3 position)
+        public static (int, float) Distance(IReadOnlyList<Vector3> points, Vector3 position)
         {
             List<Vector3> relPoints = points.Select(v => v - position).ToList();
 
@@ -293,7 +293,7 @@ namespace DrawCurve
 
         public float MinSegmentDist()
         {
-            List<Vector3> seq = this.curve.GetPoints();
+            IReadOnlyList<Vector3> seq = this.curve.GetPoints();
             int n = this.Length();
             float min = float.PositiveInfinity;
             int endi = this.closed ? n - 3 : n - 4;
@@ -313,8 +313,8 @@ namespace DrawCurve
 
         public float CurveDistance(HandCurve other)
         {
-            List<Vector3> thisPoints = this.curve.GetPoints();
-            List<Vector3> otherPoints = other.curve.GetPoints();
+            IReadOnlyList<Vector3> thisPoints = this.curve.GetPoints();
+            IReadOnlyList<Vector3> otherPoints = other.curve.GetPoints();
             float min = float.PositiveInfinity;
             int n1 = this.Length();
             int n2 = other.Length();
@@ -335,7 +335,7 @@ namespace DrawCurve
 
         public HandCurve DeepCopy()
         {
-            List<Vector3> points = ListVector3Copy(this.curve.GetPoints());
+            IReadOnlyList<Vector3> points = ListVector3Copy(this.curve.GetPoints());
             HandCurve curve = new HandCurve(Curve.Create(this.closed, points), segment: this.segment);
             curve.selected = this.selected;
             curve.position = Vector3Copy(this.position);
@@ -355,7 +355,7 @@ namespace DrawCurve
             return w;
         }
 
-        private List<Vector3> ListVector3Copy(List<Vector3> l)
+        private List<Vector3> ListVector3Copy(IReadOnlyList<Vector3> l)
         {
             List<Vector3> m = new List<Vector3>();
 
