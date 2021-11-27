@@ -327,7 +327,7 @@ public class BasicDeformation : State
     {
         string timeString = this.GetCurrentTimeString();
         string filename = $"curve_{timeString}.json";
-        List<(List<Vector3>, bool)> curvesCore = base.curves.Select(curve => (curve.curve.GetPoints(), curve.closed)).ToList();
+        List<(IReadOnlyList<Vector3>, bool)> curvesCore = base.curves.Select(curve => (curve.curve.GetPoints(), curve.closed)).ToList();
         base.dataHandler.SaveCurves(filename, curvesCore);
         base.ResetMenu();
         this.newState = new OpenFile(base.oculusTouch, base.contextMenu, base.dataHandler, base.curves);
@@ -532,7 +532,7 @@ public class SelectAutoOrManual : State
         }
     }
 
-    private List<Vector3> Smoothing(List<Vector3> points)
+    private List<Vector3> Smoothing(IReadOnlyList<Vector3> points)
     {
         int count = points.Count;
         List<Vector3> newPoints = new List<Vector3>();
