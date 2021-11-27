@@ -65,11 +65,12 @@ namespace PullCurve
         {
             (int first, int second) chosenPointsNonNull = chosenPoints ?? this.chosenPoints;
             int count = this.curve.Count;
-            Curve shiftedCurve = this.curve.Shift(chosenPointsNonNull.first);
+            ClosedCurve shiftedCurve = this.curve.Shift(chosenPointsNonNull.first);
             int pullableRangeCount = (chosenPointsNonNull.second - chosenPointsNonNull.first + 1 + count) % count;
 
             OpenCurve pullableRange = shiftedCurve.Take(pullableRangeCount);
-            OpenCurve fixedRange = shiftedCurve.Skip(pullableRangeCount);
+            int virtualCount = 1;
+            OpenCurve fixedRange = shiftedCurve.Skip(pullableRangeCount, virtualCount, virtualCount);
             return (pullableRange, fixedRange);
         }
 

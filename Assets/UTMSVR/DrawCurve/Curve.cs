@@ -13,7 +13,12 @@ namespace DrawCurve {
         public const float defaultRadius = 0.005f;
 
         protected List<Vector3> points;
+        protected List<Vector3> preVirtualPoints = new List<Vector3>();
+        protected List<Vector3> postVirtualPoints = new List<Vector3>();
         protected List<float> vCoordinates;
+        protected List<float> preVirtualVCoordinates = new List<float>();
+        protected List<float> postVirtualVCoordinates = new List<float>();
+
         private Mesh mesh = new Mesh();
         public readonly int meridianCount;
         public readonly float radius;
@@ -82,13 +87,28 @@ namespace DrawCurve {
             }
         }
 
-        public List<Vector3> GetPoints()
-        {
+        public List<Vector3> GetPoints() {
             return this.points;
         }
 
-        public List<float> GetVCoordinates(){
+        public List<float> GetVCoordinates() {
             return this.vCoordinates;
+        }
+
+        public List<Vector3> GetPreVirtualPoints() {
+            return this.preVirtualPoints;
+        }
+
+        public List<float> GetPreVirtualVCoordinates() {
+            return this.preVirtualVCoordinates;
+        }
+
+        public List<Vector3> GetPostVirtualPoints() {
+            return this.postVirtualPoints;
+        }
+
+        public List<float> GetPostVirtualVCoordinates() {
+            return this.postVirtualVCoordinates;
         }
 
         protected int GetVLength() {
@@ -111,10 +131,18 @@ namespace DrawCurve {
             }
         }
 
-        public void SetPoints(List<Vector3> points)
+        public void UpdateVCoordinates((float start, float end)? vRange = null) {
+            (float start, float end) vRangeNotNull = vRange ?? (0.0f, 1.0f);
+            this.vCoordinates = Curve.GenerateVCoordinates(this.points.Count, vRangeNotNull.start, vRangeNotNull.end);
+        }
+
+        public virtual void SetPoints(List<Vector3> points)
         {
-            // TODO: change vCoordinates
+            bool pointsCountChanged = (this.points.Count != points.Count);
             this.points = points;
+            if (pointsCountChanged) {
+                this.UpdateVCoordinates(); // 内部で this.points にアクセスするので，先に this.points を更新しておく必要がある．
+            }
         }
 
         public Mesh GetMesh()
@@ -169,12 +197,14 @@ namespace DrawCurve {
         protected abstract Curve ReversedInternal();
 
         public OpenCurve Take(int count) {
+            // virtual points を取りたい場合は OpenCurve, ClosedCurve のメソッドを用いる
             List<Vector3> points = this.points.Take(count).ToList();
             List<float> vCoordinates = this.vCoordinates.Take(count).ToList();
             return new OpenCurve(points, vCoordinates, this.meridianCount, this.radius);
         }
 
         public OpenCurve Skip(int count) {
+            // virtual points を取りたい場合は OpenCurve, ClosedCurve のメソッドを用いる
             List<Vector3> points = this.points.Skip(count).ToList();
             List<float> vCoordinates = this.vCoordinates.Skip(count).ToList();
             return new OpenCurve(points, vCoordinates, this.meridianCount, this.radius);
@@ -216,7 +246,7 @@ namespace DrawCurve {
                 if (newPoints.Count > this.DivisionNumber(segment))
                 {
                     newPoints.RemoveAt(newPoints.Count - 1);
-                    newVCoordinates.RemoveAt(vCoordinates.Count - 1);
+                    newVCoordinates.RemoveAt(newVCoordinates.Count - 1);
                 }
             }
             else

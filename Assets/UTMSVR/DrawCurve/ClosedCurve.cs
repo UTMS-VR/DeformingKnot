@@ -8,9 +8,30 @@ using UnityEngine;
 
 namespace DrawCurve {
     public class ClosedCurve : Curve {
-        public ClosedCurve(List<Vector3> points, List<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, vCoordinates, meridianCount, radius) {}
-        public ClosedCurve(List<Vector3> points, (float start, float end) vRange, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, vRange, meridianCount, radius) {}
-        public ClosedCurve(List<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, meridianCount, radius) {}
+        public ClosedCurve(List<Vector3> points, List<float> vCoordinates, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, vCoordinates, meridianCount, radius) {
+            this.UpdatePostVirtual();
+        }
+        public ClosedCurve(List<Vector3> points, (float start, float end) vRange, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, vRange, meridianCount, radius) {
+            this.UpdatePostVirtual();
+        }
+        public ClosedCurve(List<Vector3> points, int meridianCount = Curve.defaultMeridianCount, float radius = Curve.defaultRadius) : base(points, meridianCount, radius) {
+            this.UpdatePostVirtual();
+        }
+
+        private void UpdatePostVirtual() {
+            if (this.points.Count > 1) {
+                this.postVirtualPoints = new List<Vector3>() {
+                    this.points[0], this.points[1]
+                };
+
+                float vLast = vCoordinates.Last();
+                float vBeforeLast = vCoordinates[vCoordinates.Count - 2];
+                float vDiff = vLast - vBeforeLast;
+                this.postVirtualVCoordinates = new List<float>() {
+                    vLast + vDiff, vLast + 2 * vDiff
+                };
+            }
+        }
 
         public override bool closed {
             get {
@@ -26,6 +47,11 @@ namespace DrawCurve {
                 }
                 return this.points[iModCount];
             }
+        }
+
+        public override void SetPoints(List<Vector3> points) {
+            base.SetPoints(points);
+            this.UpdatePostVirtual();
         }
 
         override public OpenCurve Open() {
@@ -61,6 +87,25 @@ namespace DrawCurve {
 
             return new ClosedCurve(newPoints, newVCoordinates, this.meridianCount, this.radius);
         }
+
+        public OpenCurve Take(int count, int preVirtualCount, int postVirtualCount) {
+            // virtual points が不要な場合は Curve のメソッドを用いる
+            List<Vector3> points = this.points.Take(count).ToList();
+            List<Vector3> preVirtualPoints = this.points.Skip(this.points.Count - preVirtualCount).ToList();
+            List<Vector3> postVirtualPoints = this.points.Take(count + postVirtualCount).Skip(count).ToList();
+            List<float> vCoordinates = this.vCoordinates.Take(count).ToList();
+            return new OpenCurve(points, vCoordinates, this.meridianCount, this.radius, preVirtualPoints: preVirtualPoints, postVirtualPoints: postVirtualPoints);
+        }
+
+        public OpenCurve Skip(int count, int preVirtualCount, int postVirtualCount) {
+            // virtual points が不要な場合は Curve のメソッドを用いる
+            List<Vector3> points = this.points.Skip(count).ToList();
+            List<Vector3> preVirtualPoints = this.points.Skip(count - preVirtualCount).Take(preVirtualCount).ToList();
+            List<Vector3> postVirtualPoints = this.points.Take(postVirtualCount).ToList();
+            List<float> vCoordinates = this.vCoordinates.Skip(count).ToList();
+            return new OpenCurve(points, vCoordinates, this.meridianCount, this.radius, preVirtualPoints: preVirtualPoints, postVirtualPoints: postVirtualPoints);
+        }
+
 
         public new ClosedCurve Reversed()
         {
