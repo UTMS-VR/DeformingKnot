@@ -10,7 +10,6 @@ using System;
 
 namespace PullCurve
 {
-
     public interface IKnotState
     {
         IKnotState? Update();
@@ -65,11 +64,12 @@ namespace PullCurve
         {
             (int first, int second) chosenPointsNonNull = chosenPoints ?? this.chosenPoints;
             int count = this.curve.Count;
-            Curve shiftedCurve = this.curve.Shift(chosenPointsNonNull.first);
+            ClosedCurve shiftedCurve = this.curve.Shift(chosenPointsNonNull.first);
             int pullableRangeCount = (chosenPointsNonNull.second - chosenPointsNonNull.first + 1 + count) % count;
 
             OpenCurve pullableRange = shiftedCurve.Take(pullableRangeCount);
-            OpenCurve fixedRange = shiftedCurve.Skip(pullableRangeCount);
+            int virtualCount = 1;
+            OpenCurve fixedRange = shiftedCurve.Skip(pullableRangeCount, virtualCount, virtualCount);
             return (pullableRange, fixedRange);
         }
 
@@ -212,14 +212,14 @@ namespace PullCurve
             return this.data.curve;
         }
 
-        private List<Vector3> GetCompliment(int start, int end)
+        private IReadOnlyList<Vector3> GetCompliment(int start, int end)
         {
             int numPoints = this.data.curve.GetPoints().Count;
             int margin = 2;
             if (start <= end)
             {
-                List<Vector3> range1 = this.data.curve.GetPoints().GetRange(end + margin, numPoints - end - margin);
-                List<Vector3> range2 = this.data.curve.GetPoints().GetRange(0, start - margin);
+                IReadOnlyList<Vector3> range1 = this.data.curve.GetPoints().GetRange(end + margin, numPoints - end - margin);
+                IReadOnlyList<Vector3> range2 = this.data.curve.GetPoints().GetRange(0, start - margin);
                 return range1.Concat(range2).ToList();
             }
             else

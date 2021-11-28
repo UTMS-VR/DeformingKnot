@@ -228,8 +228,8 @@ namespace PullCurve
 
         private static float CurveSegmentDistance(Curve curve1, Curve curve2, int index1, int index2)
         {
-            List<Vector3> points1 = curve1.GetPoints();
-            List<Vector3> points2 = curve2.GetPoints();
+            IReadOnlyList<Vector3> points1 = curve1.GetPoints();
+            IReadOnlyList<Vector3> points2 = curve2.GetPoints();
             int count1 = curve1.GetPoints().Count;
             int count2 = curve2.GetPoints().Count;
             return SegmentDist.SSDist(
@@ -241,7 +241,7 @@ namespace PullCurve
         private static float DistanceAverage(Curve curve)
         {
             float distanceSum = 0;
-            List<Vector3> points = curve.GetPoints();
+            IReadOnlyList<Vector3> points = curve.GetPoints();
             int n = points.Count;
             for (int i = 0; i < n; i++)
             {

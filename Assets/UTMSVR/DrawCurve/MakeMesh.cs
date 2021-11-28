@@ -21,24 +21,10 @@ namespace DrawCurve
             public static (List<Vector3> vertices, List<Vector3> normals, List<Vector2> uv, List<int> triangles)
             GetMeshInfo(Curve curve, int meridianCount, float radius, bool closed)
             {
-                List<Vector3> points = curve.GetPoints();
-                List<float> vCoordinates = curve.GetVCoordinates();
+                List<Vector3> points = curve.GetPreVirtualPoints().Concat(curve.GetPoints()).Concat(curve.GetPostVirtualPoints()).ToList();
+                List<float> vCoordinates = curve.GetPreVirtualVCoordinates().Concat(curve.GetVCoordinates()).Concat(curve.GetPostVirtualVCoordinates()).ToList();
 
-                List<Vector3> pointsCopy = new List<Vector3>();
-                List<float> vCoordinatesCopy = new List<float>();
-
-                foreach (Vector3 point in points)
-                    {
-                        pointsCopy.Add(point);
-                    }
-                foreach (float v in vCoordinates)
-                    {
-                        vCoordinatesCopy.Add(v);
-                    }
-
-                // Mesh mesh = new Mesh();
-
-                if (pointsCopy.Count < 2)
+                if (points.Count < 2)
                     {
                         return (new List<Vector3>(), new List<Vector3>(), new List<Vector2>(), new List<int>());
                     }
@@ -48,20 +34,8 @@ namespace DrawCurve
                 List<Vector3> normals = new List<Vector3>();
                 List<Vector2> uv = new List<Vector2>();
 
-                if (closed)
-                    {
-                        pointsCopy.Add(pointsCopy[0]);
-                        pointsCopy.Add(pointsCopy[1]);
-
-                        float vLast = vCoordinates.Last();
-                        float vBeforeLast = vCoordinates[vCoordinates.Count - 2];
-                        float vDiff = vLast - vBeforeLast;
-                        vCoordinatesCopy.Add(vLast + vDiff);
-                        vCoordinatesCopy.Add(vLast + 2 * vDiff);
-                    }
-
-                int length = pointsCopy.Count;
-                List<Vector3> tangents = Tangents(pointsCopy, closed);
+                int length = points.Count;
+                List<Vector3> tangents = Tangents(points, closed);
                 List<Vector3> principalNormals = PrincipalNormals(tangents);
 
                 for (int j = 0; j < length; j++)
@@ -72,20 +46,15 @@ namespace DrawCurve
                             {
                                 float theta = i * 2 * Mathf.PI / meridianCount;
                                 Vector3 direction = Mathf.Cos(theta) * principalNormals[j] + Mathf.Sin(theta) * binormal;
-                                vertices.Add(pointsCopy[j] + radius * direction);
+                                vertices.Add(points[j] + radius * direction);
                                 normals.Add(direction);
                                 float u = ((float)i) / meridianCount;
-                                float v = vCoordinatesCopy[j];
+                                float v = vCoordinates[j];
                                 uv.Add(new Vector2(u, v));
                             }
                     }
 
                 triangles = Triangles(length, meridianCount);
-
-                // mesh.vertices = vertices.ToArray();
-                // mesh.triangles = triangles.ToArray();
-                // mesh.normals = normals.ToArray();
-                // mesh.uv = uv.ToArray();
 
                 return (vertices, normals, uv, triangles);
             }
