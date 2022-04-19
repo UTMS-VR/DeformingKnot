@@ -4,7 +4,7 @@
 
 ## インストール
 - このリポジトリをcloneする. 
-- Unity 2019.2.21f1で開く. (2021年春にUnity 2020.4 LTSに変更する予定)
+- Unity 2020.3.3f1で開く. 
 - `File`から`Build Settings`を開く. 
 - プラットフォームをAndroidに変更する. 
 - `Scene`が1つも追加されていない場合は`Scenes/SampleScene`を追加する. 
