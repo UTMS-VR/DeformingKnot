@@ -73,7 +73,7 @@ namespace InputManager
             }
             this.handAnchor = GameObject.Find(handAnchorName);
             // headset上かどうか判定
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_WEBGL
             // this.onHeadset = false;
 #else
             // this.onHeadset = true;
