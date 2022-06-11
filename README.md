@@ -86,3 +86,7 @@ z軸正方向にいくらか動かすと視界に入るようになる。
 | l | y軸負方向 |
 | i | z軸正方向 |
 | , | z軸負方向 |
+
+## 日本語フォントのライセンス
+
+日本語フォントは[`SIL OPEN FONT LICENSE`](Assets/Resources/UTMSVR/ContextMenu/OFL.txt)のNoto Sans Japaneseを用いています. 

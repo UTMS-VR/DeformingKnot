@@ -24,7 +24,7 @@ namespace InputManager
             (LogicalOVRInput.RawButton.LIndexTrigger, new PhysicalOculusTouchButton(OVRInput.RawButton.LIndexTrigger))
         });
 
-        private static StickMap defaultStickMap = new StickMap(new StickMapData 
+        private static StickMap defaultStickMap = new StickMap(new StickMapData
         {
             //(LogicalOVRInput.RawAxis2D.RStick, new PhysicalOculusTouchStick(OVRInput.RawAxis2D.RThumbstick)),
             //(LogicalOVRInput.RawAxis2D.LStick, new PhysicalOculusTouchStick(OVRInput.RawAxis2D.LThumbstick))
@@ -44,7 +44,7 @@ namespace InputManager
             float handSpeed = 0.3f,
             uint? repeatDelay = null,
             uint? repeatInterval = null
-            ) : base(OculusTouch.defaultButtonMap, OculusTouch.defaultStickMap, OculusTouch.defaultPositionDeviceMap, 
+            ) : base(OculusTouch.defaultButtonMap, OculusTouch.defaultStickMap, OculusTouch.defaultPositionDeviceMap,
                 repeatDelay: repeatDelay, repeatInterval: repeatInterval)
         {
             var buttonMapData = new ButtonMapData { };
@@ -76,7 +76,7 @@ namespace InputManager
                 new PhysicalButtonFromStick(lStick, PhysicalButtonFromStick.Direction.Right)));
             buttonMapData.Add((LogicalOVRInput.RawButton.LStickLeft,
                 new PhysicalButtonFromStick(lStick, PhysicalButtonFromStick.Direction.Left)));
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_WEBGL
             // setup sticks
             if (rightStickKey != null)
             {
