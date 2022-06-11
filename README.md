@@ -89,8 +89,4 @@ z軸正方向にいくらか動かすと視界に入るようになる。
 
 ## 日本語フォントのライセンス
 
-日本語フォントはNoto Sans Japaneseを用いています. 
-
-Copyright 2012 Google Inc. All Rights Reserved.
-
-[`SIL OPEN FONT LICENSE`](Assets/Resources/UTMSVR/ContextMenu/OFL.txt)
+日本語フォントは[`SIL OPEN FONT LICENSE`](Assets/Resources/UTMSVR/ContextMenu/OFL.txt)のNoto Sans Japaneseを用いています. 
